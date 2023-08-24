@@ -1,3 +1,6 @@
+-- los comentarios 'table' permiten a db.crear_schemas separar cada CREATE statement
+-- para manejar individualmente cada creacion y sus posibles errores
+-- table
 CREATE TABLE IF NOT EXISTS proyecto(
     ID_proyecto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
@@ -8,7 +11,7 @@ CREATE TABLE IF NOT EXISTS proyecto(
     fecha_inicio DATE NOT NULL DEFAULT (CURRENT_DATE()),
     fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01'
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS usuario(
     ID_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL DEFAULT 'no_name',
@@ -16,13 +19,13 @@ CREATE TABLE IF NOT EXISTS usuario(
     mail VARCHAR(320) UNIQUE NOT NULL,
     contraseña VARCHAR(60) NOT NULL
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS prefijo_telefono (
     ID_prefijo INT AUTO_INCREMENT PRIMARY KEY,
     prefijo VARCHAR(8) UNIQUE NOT NULL,
     pais VARCHAR(60) NOT NULL
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS numero_telefono (
     ID_telefono INT AUTO_INCREMENT PRIMARY KEY,
     ID_usuario INT NOT NULL,
@@ -31,12 +34,12 @@ CREATE TABLE IF NOT EXISTS numero_telefono (
     FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario),
     FOREIGN KEY (ID_prefijo) REFERENCES prefijo_telefono(ID_prefijo)
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS roles_proyecto (
     ID_rol_proyecto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(60) UNIQUE NOT NULL
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS detalle_proyecto(
     ID_detalle_proyecto INT AUTO_INCREMENT PRIMARY KEY,
     ID_proyecto INT NOT NULL,    /*FORANEA*/
@@ -50,7 +53,7 @@ CREATE TABLE IF NOT EXISTS detalle_proyecto(
     FOREIGN KEY (rol) REFERENCES roles_proyecto(ID_rol_proyecto),
     CONSTRAINT integrante_proyecto UNIQUE (ID_proyecto, ID_usuario)
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS equipo(
     ID_equipo INT AUTO_INCREMENT PRIMARY KEY,
     ID_proyecto INT NOT NULL,    /*FORANEA*/
@@ -58,12 +61,12 @@ CREATE TABLE IF NOT EXISTS equipo(
     fecha_creacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
     FOREIGN KEY (ID_proyecto) REFERENCES proyecto(ID_proyecto)
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS roles_equipo (
     ID_rol_equipo INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(60) UNIQUE NOT NULL
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS detalle_equipo(
     ID_detalle_equipo INT AUTO_INCREMENT PRIMARY KEY,
     ID_equipo INT NOT NULL,  /*FORANEA*/
@@ -77,12 +80,12 @@ CREATE TABLE IF NOT EXISTS detalle_equipo(
     FOREIGN KEY (rol) REFERENCES roles_equipo(ID_rol_equipo),
     CONSTRAINT integrante_equipo UNIQUE (ID_equipo, ID_usuario)
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS estado(
     ID_estado INT AUTO_INCREMENT PRIMARY KEY,
     nombre_estado VARCHAR(25) UNIQUE NOT NULL
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS hito(
     ID_hito INT AUTO_INCREMENT PRIMARY KEY,
     ID_proyecto INT NOT NULL,    /*FORANEA*/
@@ -96,7 +99,7 @@ CREATE TABLE IF NOT EXISTS hito(
     FOREIGN KEY (ID_proyecto) REFERENCES proyecto(ID_proyecto),
     FOREIGN KEY (estado) REFERENCES estado(ID_estado)
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS ticket(
     ID_ticket INT AUTO_INCREMENT PRIMARY KEY,
     ID_hito INT NOT NULL,    /*FORANEA*/
@@ -112,7 +115,7 @@ CREATE TABLE IF NOT EXISTS ticket(
     FOREIGN KEY (ID_hito) REFERENCES hito(ID_hito),
     FOREIGN KEY (estado) REFERENCES estado(ID_estado)
 );
-
+-- table
 CREATE TABLE IF NOT EXISTS unidad_trabajo(
     ID_unidad_trabajo INT AUTO_INCREMENT PRIMARY KEY,
     ID_proyecto INT NOT NULL, /*FORANEA*/
