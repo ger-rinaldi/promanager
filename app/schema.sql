@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS promanager;
-USE promanager;
-
 CREATE TABLE IF NOT EXISTS proyecto(
     ID_proyecto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
