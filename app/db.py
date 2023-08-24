@@ -79,3 +79,24 @@ def crear_schemas(test: bool):
     cursor.close()
     cnx.close()
 
+
+def get_connection(test: bool):
+    """Obtain a mysql-connector connection object
+
+    return: mysql.connector.connect(config)
+    """
+
+    if test:
+        DB_CONFIG["database"] = TEST_DB
+    else:
+        DB_CONFIG["database"] = DB_NAME
+
+    connection = mysql.connector.connect(**DB_CONFIG)
+
+    return connection
+
+
+def close_cursors(*cursors: object | list):
+    """Close one or many mysql-connector cursors"""
+    for cursor in cursors:
+        cursor.close()
