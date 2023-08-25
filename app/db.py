@@ -5,9 +5,8 @@
 import os
 
 import mysql.connector
+from config import DB_CONFIG, DB_NAME, TEST_DB
 from mysql.connector import Error as dbError
-
-from config import DB_CONFIG, DB_NAME, TEST_DB  # pylint: disable=no-name-in-module
 
 
 def crear_base_de_datos(test: bool):
@@ -50,12 +49,22 @@ def crear_schemas(test: bool):
     cnx = get_connection(test)
     cursor = cnx.cursor()
 
-    schema_file = os.path.abspath(os.path.join(__file__, os.pardir)) + "/schema.sql"
+    schema_file = (
+        os.path.abspath(
+            os.path.join(
+                __file__,
+                os.pardir,
+            )
+        )
+        + "/schema.sql"
+    )
 
     with open(schema_file, encoding="utf8") as schema:
         # separa cada CREATE statement en su propio string
-        # crea una lista de strings, donde cada string es un CREATE TABLE IF EXISTS
-        # dividir el archivo schema.sql de esta manera, permite controlar individualmente
+        # crea una lista de strings,
+        # donde cada string es un CREATE TABLE IF EXISTS
+        # dividir el archivo schema.sql de esta manera,
+        # permite controlar individualmente
         # cada CREATE
 
         # Unir todas las listas retornadas por .readlines()
@@ -72,7 +81,8 @@ def crear_schemas(test: bool):
         except dbError as exception:
             # TODO: Loggear este output a algun lugar que no sea stdout
             print(
-                f"Hubo un problema al crear las tablas de {DB_CONFIG['database']}:\n{exception}"
+                f"Hubo un problema al crear las tablas de\
+                    {DB_CONFIG['database']}:\\n{exception}"
             )
 
     cnx.commit()
