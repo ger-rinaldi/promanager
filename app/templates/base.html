@@ -13,11 +13,11 @@
 
     <title>{% block title %}{% endblock %}</title>
   </head>
-  <body>
-
-    <nav class="navbar navbar-expand-lg bg-dark navbar-dark px-3">
-      <div class="container-fluid">
-        <a href="#" class="navbar-brand">PROmanager</a>
+  <body class="d-flex flex-column min-vh-100">
+    <header>
+      <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top px-3">
+        <div class="container-fluid">
+          <a href="#" class="navbar-brand">PROmanager</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -36,12 +36,20 @@
         </div>
       </div>
     </nav>
+    </header>
 
+<main class="flex-shrink-0 pt-3">
+  <div class="container">
+    {% block content %}
+    {% endblock %} 
+  </div>
+</main>
 
-
-  {% block content %}
-  {% endblock %} 
-
+<footer class="footer mt-auto py-3 bg-light">
+  <div class="container">
+    <span class="text-muted">Placeholder footer text.</span>
+  </div>
+</footer>
 </body>
 <!-- Latest compiled and minified CSS -->
 </html>
