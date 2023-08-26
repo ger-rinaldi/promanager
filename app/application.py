@@ -35,5 +35,10 @@ class Promanager:
         template = self.jinja_env.get_template(template_name)
         return Response(template.render(context), mimetype="text/html")
 
+    def run(self, **app_config):
+        from werkzeug.serving import run_simple
+
+        run_simple(application=self, **app_config)
+
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)
