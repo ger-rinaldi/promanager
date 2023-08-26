@@ -30,3 +30,10 @@ class Promanager:
         request = Request(environ)
         response = self.dispatch_request(request)
         return response(environ, start_response)
+
+    def render_template(self, template_name, **context):
+        template = self.jinja_env.get_template(template_name)
+        return Response(template.render(context), mimetype="text/html")
+
+    def __call__(self, environ, start_response):
+        return self.wsgi_app(environ, start_response)
