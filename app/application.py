@@ -17,3 +17,16 @@ class Promanager:
             loader=FileSystemLoader(template_path), autoescape=True
         )
         self.url_map = Map([])
+
+    def dispatch_request(self, request):
+        adapter = self.url_map.bind_to_environ(request.environ)
+        try:
+            endpoint, values = adapter.match()
+            return getattr(self, f"{endpoint}")(request, **values)
+        except HTTPException as thisExept:
+            return thisExept
+
+    def wsgi_app(self, environ, start_response):
+        request = Request(environ)
+        response = self.dispatch_request(request)
+        return response(environ, start_response)
