@@ -10,6 +10,16 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 
 
+def create_app(with_static=True):
+    new_app = Promanager()
+    if with_static:
+        new_app.wsgi_app = SharedDataMiddleware(
+            new_app.wsgi_app,
+            {"/static": os.path.join(os.path.dirname(__file__), "static")},
+        )
+    return new_app
+
+
 class Promanager:
     def __init__(self) -> None:
         template_path = os.path.join(os.path.dirname(__file__), "templates")
