@@ -9,7 +9,7 @@ from config import DB_CONFIG, DB_NAME, TEST_DB
 from mysql.connector import Error as dbError
 
 
-def crear_base_de_datos(test: bool):
+def crear_base_de_datos(test_db: bool = False, dry_run: bool = True):
     """Crear la base de datos al:
         - inicializar la aplicación
         - en caso de que la base de datos no exista previamente
@@ -23,7 +23,7 @@ def crear_base_de_datos(test: bool):
     cursor = cnx.cursor()
 
     try:
-        if test:
+        if test_db:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {TEST_DB}")
         else:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
@@ -31,11 +31,16 @@ def crear_base_de_datos(test: bool):
         # TODO: Loggear este output a algun lugar
         print(f"There was an error while creating the database:\n {exception}")
     finally:
+        if dry_run:
+            cnx.rollback()
+        else:
+            cnx.commit()
+
         cursor.close()
         cnx.close()
 
 
-def crear_schemas(test: bool):
+def crear_schemas(test_db: bool = False, dry_run: bool = True):
     """Crear las tablas de la base de datos al:
         - inicializar la aplicación
         - en caso de que la base de datos no exista previamente
@@ -46,7 +51,7 @@ def crear_schemas(test: bool):
         de testing, en tal caso crea las tablas en esta.
     """
 
-    cnx = get_connection(test)
+    cnx = get_connection(connect_test_db=test_db)
     cursor = cnx.cursor()
 
     schema_file = (
@@ -82,21 +87,25 @@ def crear_schemas(test: bool):
             # TODO: Loggear este output a algun lugar que no sea stdout
             print(
                 f"Hubo un problema al crear las tablas de\
-                    {DB_CONFIG['database']}:\\n{exception}"
+                    {DB_CONFIG['database']}:\n{exception}"
             )
 
-    cnx.commit()
+    if dry_run:
+        cnx.rollback()
+    else:
+        cnx.commit()
+
     cursor.close()
     cnx.close()
 
 
-def get_connection(test: bool):
+def get_connection(connect_test_db: bool = False):
     """Obtain a mysql-connector connection object
 
     return: mysql.connector.connect(config)
     """
 
-    if test:
+    if connect_test_db:
         DB_CONFIG["database"] = TEST_DB
     else:
         DB_CONFIG["database"] = DB_NAME
