@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS usuario(
 -- table
 CREATE TABLE IF NOT EXISTS prefijo_telefono (
     ID_prefijo INT AUTO_INCREMENT PRIMARY KEY,
-    prefijo VARCHAR(8) UNIQUE NOT NULL,
+    prefijo VARCHAR(8) NOT NULL,
     pais VARCHAR(60) NOT NULL
 );
 -- table
