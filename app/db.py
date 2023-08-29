@@ -92,6 +92,80 @@ def crear_schemas(test_db: bool = False):
     cnx.close()
 
 
+def tirar_base_de_datos(test_db: bool = False):
+    cnx = mysql.connector.connect(**DB_CONFIG)
+    cursor = cnx.cursor()
+
+    try:
+        if test_db:
+            cursor.execute(f"DROP DATABASE IF EXISTS {TEST_DB}")
+        else:
+            cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
+            return 0
+    except dbError as exception:
+        # TODO: Loggear este output a algun lugar
+        print(f"There was an error while dropping the database:\n {exception}")
+    finally:
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+
+def tirar_tablas_raiz(test_db: bool = False):
+    cnx = get_connection(connect_test_db=test_db)
+    cursor = cnx.cursor()
+
+    try:
+        cursor.execute("DROP TABLE IF EXISTS proyecto")
+        cursor.execute("DROP TABLE IF EXISTS usuario")
+        cursor.execute("DROP TABLE IF EXISTS prefijo_telefono")
+        cursor.execute("DROP TABLE IF EXISTS roles_equipo")
+        cursor.execute("DROP TABLE IF EXISTS roles_proyecto")
+        cursor.execute("DROP TABLE IF EXISTS estado")
+    except dbError as exception:
+        # TODO: Loggear este output a algun lugar
+        print(f"There was an error while dropping the root tables:\n {exception}")
+    finally:
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+
+def tirar_tablas_rama(test_db: bool = False):
+    cnx = get_connection(connect_test_db=test_db)
+    cursor = cnx.cursor()
+
+    try:
+        cursor.execute("DROP TABLE IF EXISTS equipo")
+        cursor.execute("DROP TABLE IF EXISTS hito")
+    except dbError as exception:
+        # TODO: Loggear este output a algun lugar
+        print(f"There was an error while dropping the branch tables:\n {exception}")
+    finally:
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+
+def tirar_tablas_hoja(test_db: bool = False):
+    cnx = get_connection(connect_test_db=test_db)
+    cursor = cnx.cursor()
+
+    try:
+        cursor.execute("DROP TABLE IF EXISTS detalle_proyecto")
+        cursor.execute("DROP TABLE IF EXISTS detalle_equipo")
+        cursor.execute("DROP TABLE IF EXISTS numero_telefono")
+        cursor.execute("DROP TABLE IF EXISTS ticket")
+        cursor.execute("DROP TABLE IF EXISTS unidad_trabajo")
+    except dbError as exception:
+        # TODO: Loggear este output a algun lugar
+        print(f"There was an error while dropping the leaf tables:\n {exception}")
+    finally:
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+
 def get_connection(connect_test_db: bool = False):
     """Obtain a mysql-connector connection object
 
