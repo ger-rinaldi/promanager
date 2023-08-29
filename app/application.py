@@ -29,6 +29,7 @@ class Promanager:
         self.url_map = Map(
             [
                 Rule("/", endpoint="home_page"),
+                Rule("/register", endpoint="register"),
             ]
         )
 
@@ -60,3 +61,19 @@ class Promanager:
     def home_page(self, request):
         return self.render_template("home.html")
 
+    def register(self, request):
+        from auth import password_complexity_validator
+
+        register_template = "auth/register.html"
+        error = None
+
+        if request.method == "POST":
+            form = request.form
+            email = form["email"]
+            password = form["password"]
+
+            if password_complexity_validator(password):
+                return redirect("/")
+            else:
+                error = "La contraseña no alcanza los requisitos de complejidad."
+        return self.render_template(register_template, error=error)
