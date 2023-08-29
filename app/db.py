@@ -9,7 +9,7 @@ from config import DB_CONFIG, DB_NAME, TEST_DB
 from mysql.connector import Error as dbError
 
 
-def crear_base_de_datos(test_db: bool = False, dry_run: bool = True):
+def crear_base_de_datos(test_db: bool = False):
     """Crear la base de datos al:
         - inicializar la aplicación
         - en caso de que la base de datos no exista previamente
@@ -27,20 +27,17 @@ def crear_base_de_datos(test_db: bool = False, dry_run: bool = True):
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {TEST_DB}")
         else:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+            return 0
     except dbError as exception:
         # TODO: Loggear este output a algun lugar
         print(f"There was an error while creating the database:\n {exception}")
     finally:
-        if dry_run:
-            cnx.rollback()
-        else:
-            cnx.commit()
-
+        cnx.commit()
         cursor.close()
         cnx.close()
 
 
-def crear_schemas(test_db: bool = False, dry_run: bool = True):
+def crear_schemas(test_db: bool = False):
     """Crear las tablas de la base de datos al:
         - inicializar la aplicación
         - en caso de que la base de datos no exista previamente
@@ -90,11 +87,7 @@ def crear_schemas(test_db: bool = False, dry_run: bool = True):
                     {DB_CONFIG['database']}:\n{exception}"
             )
 
-    if dry_run:
-        cnx.rollback()
-    else:
-        cnx.commit()
-
+    cnx.commit()
     cursor.close()
     cnx.close()
 
