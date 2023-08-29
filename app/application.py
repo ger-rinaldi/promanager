@@ -26,7 +26,11 @@ class Promanager:
         self.jinja_env = Environment(
             loader=FileSystemLoader(template_path), autoescape=True
         )
-        self.url_map = Map([])
+        self.url_map = Map(
+            [
+                Rule("/", endpoint="home_page"),
+            ]
+        )
 
     def dispatch_request(self, request):
         adapter = self.url_map.bind_to_environ(request.environ)
@@ -52,3 +56,7 @@ class Promanager:
 
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)
+
+    def home_page(self, request):
+        return self.render_template("home.html")
+
