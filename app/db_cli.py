@@ -95,5 +95,17 @@ def drop_leafs(test_db: bool = False):
     tirar_tablas_hoja(test_db=test_db)
 
 
+@db_setup.command()
+@click.option(
+    "--test-db",
+    is_flag=True,
+    help="usar db de pruebas",
+)
+def drop_tables(test_db: bool = False):
+    tirar_tablas_hoja(test_db=test_db)
+    tirar_tablas_rama(test_db=test_db)
+    tirar_tablas_raiz(test_db=test_db)
+
+
 if __name__ == "__main__":
     db_setup()
