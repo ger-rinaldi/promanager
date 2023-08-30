@@ -3,6 +3,18 @@ import re
 password_required_length = 12
 
 
+class Errors:
+    pass_too_short = f"La contraseña debe tener un mínimo de\
+                    {password_required_length} caractéres"
+
+    pass_too_simple = "La contraseña debe tener al menos 3 letras minúscula,\
+                    3 mayúscula, 3 números y 3 caracteres especiales."
+
+    invalid_email = "La dirección de email ingresada no es válida"
+
+    email_alreay_registered = "La dirección de email ingresada ya está sido registrada."
+
+
 def password_complexity_validator(password: str = None) -> bool:
     if password is None:
         return
