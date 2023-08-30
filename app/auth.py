@@ -27,6 +27,19 @@ def password_complexity_validator(password: str = None) -> bool:
         password, minuscula, mayuscula, numeros, especiales
     )
 
-    match_result.append(len(password) > 10)
+    return all(match_result)
+
+
+def password_length_validator(password: str = None) -> bool:
+    if password is None:
+        return
+
+    required_length: int = 12
+
+    if len(password) < required_length:
+        return False
+    else:
+        return True
+
 
     return all(match_result)
