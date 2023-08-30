@@ -62,18 +62,29 @@ class Promanager:
         return self.render_template("home.html")
 
     def register(self, request):
-        from auth import password_complexity_validator
+        import auth
 
         register_template = "auth/register.html"
-        error = None
+        errors = []
 
         if request.method == "POST":
             form = request.form
             email = form["email"]
             password = form["password"]
 
-            if password_complexity_validator(password):
+            if not auth.email_address_validator(email):
+                errors.append(auth.Errors.invalid_email)
+
+            if not auth.check_email_not_registered(email):
+                errors.append(auth.Errors.email_alreay_registered)
+
+            if not auth.password_length_validator(password):
+                errors.append(auth.Errors.pass_too_short)
+
+            if not auth.password_complexity_validator(password):
+                errors.append(auth.Errors.pass_too_simple)
+
+            if not errors:
                 return redirect("/")
-            else:
-                error = "La contraseña no alcanza los requisitos de complejidad."
-        return self.render_template(register_template, error=error)
+
+        return self.render_template(register_template, errors=errors)
