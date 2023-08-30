@@ -1,5 +1,7 @@
 import re
 
+password_required_length = 12
+
 
 def password_complexity_validator(password: str = None) -> bool:
     if password is None:
@@ -37,7 +39,7 @@ def password_length_validator(password: str = None) -> bool:
     if password is None:
         return
 
-    required_length: int = 12
+    required_length: int = password_required_length
 
     if len(password) < required_length:
         return False
