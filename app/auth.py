@@ -42,4 +42,32 @@ def password_length_validator(password: str = None) -> bool:
         return True
 
 
-    return all(match_result)
+def email_address_validator(mail_address: str = None) -> bool:
+    if mail_address is None:
+        return
+
+    regex = re.compile(
+        r"""
+        ^                       # el string debe comenzar con
+        [a-zA-Z_0-9\\"“”]+      # 1:N caracteres que se hallen dentro de este rango
+        (                       # luego de eso, el mail PUEDE contener el siguiente grupo:
+            (\.|-|\+)               # un simbolo de 'punto', 'guion' o 'más'  previo a
+            [a-zA-Z_0-9\\"“”\s]+    # 1:N caracteres de esta lista
+        )*                      # el grupo previamente descripto puede estar entre 0 y N veces
+        @                       # el mail debe contener una arroba
+        (                       # el mail DEBE contener el siguiente grupo:
+            \w+                 # 1:N caracteres palabra, seguidos de
+            ((\.|\-)\w+)+       # 1:N grupos que empiecen por '.' o '-' terminen con 1:N caracteres
+            |                                # O
+            (\[(\d{3}\.){3}\d{1,3}\]){1}     # una IP como [123.123.123.123]
+        )                       # el grupo despues de la arroba es obligatorio
+        $                       # y debe encontrarse al final del string
+        """,
+        re.VERBOSE,
+    )
+    is_valid_mail = regex.fullmatch(mail_address)
+
+    if is_valid_mail is None:
+        return False
+    else:
+        return True
