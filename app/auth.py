@@ -2,6 +2,9 @@ import re
 
 
 def password_complexity_validator(password: str = None) -> bool:
+    if password is None:
+        return
+
     def _correct_match_times(
         password: str, *patterns: re, times: int = 3
     ) -> list[bool]:
