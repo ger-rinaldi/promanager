@@ -88,3 +88,24 @@ def email_address_validator(mail_address: str = None) -> bool:
         return False
     else:
         return True
+
+
+def check_email_not_registered(email: str = None) -> bool:
+    if email is None:
+        return
+
+    from db import get_connection
+
+    cnx = get_connection()
+    cursor = cnx.cursor()
+
+    sql = "SELECT 1 FROM usuario WHERE mail = %s;"
+
+    cursor.execute(sql, (email,))
+
+    email_exists = cursor.fetchone()
+
+    if not email_exists:
+        return True
+    else:
+        return False
