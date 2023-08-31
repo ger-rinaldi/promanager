@@ -63,7 +63,7 @@ class Promanager:
 
     def register(self, request):
         import auth
-        from models import prefijos_telefonicos
+        from models import prefijos_telefonicos, usuario
 
         register_template = "auth/register.html"
         errors = []
@@ -86,6 +86,12 @@ class Promanager:
                 errors.append(auth.Errors.pass_too_simple)
 
             if not errors:
+                nombre = form["username"]
+                apellido = form["surname"]
+
+                usuario.create(
+                    nombre=nombre, apellido=apellido, mail=email, contraseña=password
+                )
                 return redirect("/")
 
         country_codes = prefijos_telefonicos.read_all()

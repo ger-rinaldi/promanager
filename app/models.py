@@ -1,3 +1,4 @@
+from bcrypt import gensalt, hashpw
 from db import get_connection
 
 
@@ -6,6 +7,35 @@ class usuario:
     fields = ("ID_usuario", "nombre", "apellido", "mail", "contraseña")
     all_fields: str = ", ".join(fields)
     no_id_fields: str = ", ".join(fields[1:])
+
+    @classmethod
+    def create(
+        cls,
+        nombre: str = None,
+        apellido: str = None,
+        mail: str = None,
+        contraseña: str = None,
+    ):
+        "Crear nuevo registro de usuario en la base de datos"
+
+        cnx = get_connection()
+        cursor_create = cnx.cursor()
+
+        sql = f"INSERT INTO {usuario.tablename}({usuario.no_id_fields})\
+                VALUES  (%s, %s, %s, %s)"
+
+        values = (
+            nombre,
+            apellido,
+            mail,
+            hashpw(password=contraseña.encode("utf8"), salt=gensalt()),
+        )
+
+        cursor_create.execute(sql, values)
+
+        cnx.commit()
+        cursor_create.close()
+        cnx.close()
 
     def __init__(
         self,
