@@ -20,13 +20,53 @@
     <!-- Form de registro de usuario -->
     <div class="container mt-3">
       <form action="" method="POST">
-        <div class="mb-3 mt-3">
+        <div class="row my-2" id="email">
+          <div class="col">
           <label for="email" class="form-label">Email:</label>
-          <input type="email" class="form-control" id="email" placeholder="promanager@example.com" name="email">
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="promanager@example.com"
+              name="email"
+            />
+          </div>
         </div>
-        <div class="mb-3 mt-3">
+
+        <div class="row my-2" id="password">
+          <div class="col">
           <label for="pwd" class="form-label">Contraseña:</label>
-          <input type="password" class="form-control" id="pwd" placeholder="Ingresar contraseña" name="password">
+            <input
+              type="password"
+              class="form-control"
+              id="pwd"
+              placeholder="Ingresar contraseña"
+              name="password"
+            />
+          </div>
+        </div>
+
+        <div class="row my-2" id="names">
+          <div class="col my-2">
+            <label for="username" class="form-label">Nombre:</label>
+
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nombre"
+              name="username"
+            />
+          </div>
+          <div class="col my-2">
+            <label for="surname" class="form-label">Apellido:</label>
+
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Apellido"
+              name="surname"
+            />
+          </div>
         </div>
 
         <div class="row my-2" id="phonenumber">
