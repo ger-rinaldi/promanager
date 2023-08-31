@@ -7,20 +7,20 @@
 <main class="form-signing my-5 mx-5 pt-3">
   <div class="container">
     <!-- Mostrar errores de autenticación -->
-      {% if errors %}
+    {% if errors %}
     <!-- prettier-ignore  -->
-        {% for e in errors %}
-        <div class="alert alert-danger">{{ e }}</div>
-        {% endfor %}
+    {% for e in errors %}
+    <div class="alert alert-danger">{{ e }}</div>
+    {% endfor %}
     <!-- prettier-ignore  -->
-      {% endif %}
-    
+    {% endif %}
+
     <!-- Form de registro de usuario -->
     <div class="container mt-3">
       <form action="" method="POST">
         <div class="row my-2" id="email">
           <div class="col">
-          <label for="email" class="form-label">Email:</label>
+            <label for="email" class="form-label">Email:</label>
             <input
               type="email"
               class="form-control"
@@ -33,7 +33,7 @@
 
         <div class="row my-2" id="password">
           <div class="col">
-          <label for="pwd" class="form-label">Contraseña:</label>
+            <label for="pwd" class="form-label">Contraseña:</label>
             <input
               type="password"
               class="form-control"
@@ -91,8 +91,8 @@
             />
           </div>
         </div>
-        <button type="submit" class="btn btn-dark">Enviar</button>
-      </form> 
+        <button type="submit" class="btn btn-outline-dark mt-3">Enviar</button>
+      </form>
     </div>
   </div>
 </main>
