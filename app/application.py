@@ -63,6 +63,7 @@ class Promanager:
 
     def register(self, request):
         import auth
+        from models import prefijos_telefonicos
 
         register_template = "auth/register.html"
         errors = []
@@ -87,4 +88,10 @@ class Promanager:
             if not errors:
                 return redirect("/")
 
-        return self.render_template(register_template, errors=errors)
+        country_codes = prefijos_telefonicos.read_all()
+
+        return self.render_template(
+            register_template,
+            errors=errors,
+            country_codes=country_codes,
+        )

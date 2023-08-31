@@ -28,10 +28,30 @@
           <label for="pwd" class="form-label">Contraseña:</label>
           <input type="password" class="form-control" id="pwd" placeholder="Ingresar contraseña" name="password">
         </div>
-        <div class="form-check mb-3 mt-3">
-          <label class="form-check-label">
-            <input class="form-check-input" type="checkbox" name="remember"> Recordarme
-          </label>
+
+        <div class="row my-2" id="phonenumber">
+          <label class="form-label">Número de teléfono:</label>
+          <div class="col-3">
+            <select
+              class="custom-select"
+              id="inputGroupSelect02"
+              name="country_code"
+            >
+              <option selected>Código de país</option>
+              {% for code in country_codes %}
+              <!-- prettier-ignore -->
+              <option value="{{code['prefijo']}}">{{code['pais']}} {{code['prefijo']}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Número de teléfono"
+              name="phonenumber"
+            />
+          </div>
         </div>
         <button type="submit" class="btn btn-dark">Enviar</button>
       </form> 
