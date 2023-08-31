@@ -1,6 +1,34 @@
 from db import get_connection
 
 
+class usuario:
+    tablename = "usuario"
+    fields = ("ID_usuario", "nombre", "apellido", "mail", "contraseña")
+
+    def __init__(
+        self,
+        id: int = None,
+        nombre: str = None,
+        apellido: str = None,
+        mail: str = None,
+        contraseña: str = None,
+    ) -> None:
+        self.id = id
+        self.nombre = nombre
+        self.apellido = apellido
+        self.mail = mail
+        self._contraseña = contraseña
+
+    def __tuple__(self) -> tuple:
+        """Retornar atributos de usuario como tupla
+
+
+        Returns:
+            tuple: (id, nombre, apellido, mail)
+        """
+        return (self.id, self.nombre, self.apellido, self.mail)
+
+
 class prefijos_telefonicos:
     """Clase encargada de obtener los prefijos telefonicos"""
 
