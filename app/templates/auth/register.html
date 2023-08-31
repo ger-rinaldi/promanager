@@ -1,20 +1,18 @@
 {% extends 'base.html' %}
-
-{% block title %}
-  REGISTRARSE
-{% endblock %}
-
-
-
+<!-- prettier-ignore -->
+{% block title %}REGISTRARSE{% endblock %}
+<!-- prettier-ignore -->
 {% block base_body %}
 
 <main class="form-signing my-5 mx-5 pt-3">
   <div class="container">
     <!-- Mostrar errores de autenticación -->
       {% if errors %}
+    <!-- prettier-ignore  -->
         {% for e in errors %}
         <div class="alert alert-danger">{{ e }}</div>
         {% endfor %}
+    <!-- prettier-ignore  -->
       {% endif %}
     
     <!-- Form de registro de usuario -->
@@ -98,6 +96,5 @@
     </div>
   </div>
 </main>
-
 
 {% endblock %}
