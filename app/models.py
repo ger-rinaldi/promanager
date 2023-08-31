@@ -4,6 +4,8 @@ from db import get_connection
 class usuario:
     tablename = "usuario"
     fields = ("ID_usuario", "nombre", "apellido", "mail", "contraseña")
+    all_fields: str = ", ".join(fields)
+    no_id_fields: str = ", ".join(fields[1:])
 
     def __init__(
         self,
