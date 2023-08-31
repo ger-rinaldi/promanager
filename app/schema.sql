@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS usuario(
     nombre VARCHAR(60) NOT NULL DEFAULT 'no_name',
     apellido VARCHAR(60) NOT NULL DEFAULT 'no_surname',
     mail VARCHAR(320) UNIQUE NOT NULL,
-    contraseña VARCHAR(60) NOT NULL
+    contraseña VARCHAR(72) NOT NULL
 );
 -- table
 CREATE TABLE IF NOT EXISTS prefijo_telefono (

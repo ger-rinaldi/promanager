@@ -1,4 +1,5 @@
 astroid==2.15.6
+bcrypt==4.0.1
 black==23.7.0
 click==8.1.7
 dill==0.3.7
