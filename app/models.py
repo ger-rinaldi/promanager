@@ -73,7 +73,7 @@ class prefijos_telefonicos:
         cnx = get_connection()
         cursor_getall = cnx.cursor(dictionary=True)
         cursor_getall.execute(
-            f"SELECT prefijo, pais FROM {prefijos_telefonicos.tablename}"
+            f"SELECT ID_prefijo, prefijo, pais FROM {prefijos_telefonicos.tablename}"
         )
 
         return cursor_getall.fetchall()
