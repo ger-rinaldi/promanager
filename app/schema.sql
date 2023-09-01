@@ -1,6 +1,12 @@
 -- los comentarios 'table' permiten a db.crear_schemas separar cada CREATE statement
 -- para manejar individualmente cada creacion y sus posibles errores
 -- table
+CREATE TABLE IF NOT EXISTS prefijo_telefono (
+    ID_prefijo INT AUTO_INCREMENT PRIMARY KEY,
+    prefijo VARCHAR(8) NOT NULL,
+    pais VARCHAR(60) NOT NULL
+);
+-- table
 CREATE TABLE IF NOT EXISTS proyecto(
     ID_proyecto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
@@ -17,22 +23,11 @@ CREATE TABLE IF NOT EXISTS usuario(
     nombre VARCHAR(60) NOT NULL DEFAULT 'no_name',
     apellido VARCHAR(60) NOT NULL DEFAULT 'no_surname',
     mail VARCHAR(320) UNIQUE NOT NULL,
-    contraseña VARCHAR(72) NOT NULL
-);
--- table
-CREATE TABLE IF NOT EXISTS prefijo_telefono (
-    ID_prefijo INT AUTO_INCREMENT PRIMARY KEY,
-    prefijo VARCHAR(8) NOT NULL,
-    pais VARCHAR(60) NOT NULL
-);
--- table
-CREATE TABLE IF NOT EXISTS numero_telefono (
-    ID_telefono INT AUTO_INCREMENT PRIMARY KEY,
-    ID_usuario INT NOT NULL,
-    ID_prefijo INT NOT NULL,
-    telefono VARCHAR(30),
-    FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario),
-    FOREIGN KEY (ID_prefijo) REFERENCES prefijo_telefono(ID_prefijo)
+    prefijo_tel INT NOT NULL,
+    telefono_num VARCHAR(30) NOT NULL,
+    contraseña VARCHAR(72) NOT NULL,
+    FOREIGN KEY (prefijo_tel) REFERENCES prefijo_telefono(ID_prefijo)
+
 );
 -- table
 CREATE TABLE IF NOT EXISTS roles_proyecto (

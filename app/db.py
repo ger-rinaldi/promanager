@@ -117,7 +117,6 @@ def tirar_tablas_raiz(test_db: bool = False):
 
     try:
         cursor.execute("DROP TABLE IF EXISTS proyecto")
-        cursor.execute("DROP TABLE IF EXISTS usuario")
         cursor.execute("DROP TABLE IF EXISTS prefijo_telefono")
         cursor.execute("DROP TABLE IF EXISTS roles_equipo")
         cursor.execute("DROP TABLE IF EXISTS roles_proyecto")
@@ -136,6 +135,7 @@ def tirar_tablas_rama(test_db: bool = False):
     cursor = cnx.cursor()
 
     try:
+        cursor.execute("DROP TABLE IF EXISTS usuario")
         cursor.execute("DROP TABLE IF EXISTS equipo")
         cursor.execute("DROP TABLE IF EXISTS hito")
     except dbError as exception:
@@ -154,7 +154,6 @@ def tirar_tablas_hoja(test_db: bool = False):
     try:
         cursor.execute("DROP TABLE IF EXISTS detalle_proyecto")
         cursor.execute("DROP TABLE IF EXISTS detalle_equipo")
-        cursor.execute("DROP TABLE IF EXISTS numero_telefono")
         cursor.execute("DROP TABLE IF EXISTS ticket")
         cursor.execute("DROP TABLE IF EXISTS unidad_trabajo")
     except dbError as exception:
