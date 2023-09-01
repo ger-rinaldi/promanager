@@ -22,6 +22,7 @@
           <div class="col">
             <label for="email" class="form-label">Email:</label>
             <input
+              required
               type="email"
               class="form-control"
               id="email"
@@ -35,6 +36,7 @@
           <div class="col">
             <label for="pwd" class="form-label">Contraseña:</label>
             <input
+              required
               type="password"
               class="form-control"
               id="pwd"
@@ -49,6 +51,7 @@
             <label for="username" class="form-label">Nombre:</label>
 
             <input
+              required
               type="text"
               class="form-control"
               placeholder="Nombre"
@@ -59,6 +62,7 @@
             <label for="surname" class="form-label">Apellido:</label>
 
             <input
+              required
               type="text"
               class="form-control"
               placeholder="Apellido"
@@ -71,11 +75,12 @@
           <label class="form-label">Número de teléfono:</label>
           <div class="col-3">
             <select
+              required
               class="custom-select"
               id="inputGroupSelect02"
               name="country_code"
             >
-              <option selected>Código de país</option>
+              <option selected value="">Código de país</option>
               {% for code in country_codes %}
               <!-- prettier-ignore -->
               <option value="{{code['prefijo']}}">{{code['pais']}} {{code['prefijo']}}</option>
@@ -84,6 +89,7 @@
           </div>
           <div class="col">
             <input
+              required
               type="text"
               class="form-control"
               placeholder="Número de teléfono"
