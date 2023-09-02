@@ -70,8 +70,8 @@ class Promanager:
 
         if request.method == "POST":
             form = request.form
-            email = form["email"]
-            password = form["password"]
+            email = form["mail"]
+            password = form["contraseña"]
 
             if not auth.email_address_validator(email):
                 errors.append(auth.Errors.invalid_email)
@@ -86,12 +86,7 @@ class Promanager:
                 errors.append(auth.Errors.pass_too_simple)
 
             if not errors:
-                nombre = form["username"]
-                apellido = form["surname"]
-
-                usuario.create(
-                    nombre=nombre, apellido=apellido, mail=email, contraseña=password
-                )
+                usuario.create(**form)
                 return redirect("/")
 
         country_codes = prefijos_telefonicos.read_all()
