@@ -4,7 +4,7 @@
 <!-- prettier-ignore -->
 {% block base_body %}
 
-<main class="form-signing my-5 mx-5 pt-3">
+<main class="form-signing my-5 pt-3">
   <div class="container">
     <!-- Mostrar errores de autenticación -->
     {% if errors %}
@@ -113,5 +113,13 @@
     </div>
   </div>
 </main>
+
+<style>
+  .form-signing {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
 
 {% endblock %}
