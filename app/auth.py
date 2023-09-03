@@ -4,6 +4,9 @@ import re
 class validate_user:
     password_required_length = 12
     character_complexity = 3
+    name_max_length = 60
+    name_min_length = 2
+    phone_max_length = 15
 
     def password_complexity_validator(password: str = None) -> bool:
         if password is None:
@@ -99,6 +102,17 @@ class validate_user:
         else:
             return False
 
+    def valid_name_length(name: str = None) -> bool:
+        if (
+            validate_user.name_max_length < len(name)
+            or len(name) < validate_user.name_min_length
+        ):
+            return False
+        return True
+
+    def valid_phonenumber(phonenumber: str) -> bool:
+        return phonenumber.isnumeric() and len(phonenumber) <= 15
+
 
 class Errors:
     pass_too_short = f"La contraseña debe tener un mínimo de\
@@ -111,3 +125,9 @@ class Errors:
     invalid_email = "La dirección de email ingresada no es válida"
 
     email_alreay_registered = "La dirección de email ingresada ya está sido registrada."
+
+    username_too_long_short = f"Tanto nombre como apellido deben tener entre\
+        {validate_user.name_min_length} y {validate_user.name_max_length} caracteres."
+
+    phonetoolong = f"El número de teléfono no puede ser mayor a\
+        {validate_user.phone_max_length} caracteres"
