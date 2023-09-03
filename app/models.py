@@ -55,6 +55,8 @@ class usuario:
         nombre: str = None,
         apellido: str = None,
         mail: str = None,
+        telef_prefix: str = None,
+        telef_num: str = None,
         contraseña: str = None,
     ) -> None:
         self.id = id
@@ -62,6 +64,8 @@ class usuario:
         self.apellido = apellido
         self.mail = mail
         self._contraseña = contraseña
+        self.prefijo_telefono = telef_prefix
+        self.numero_telefono = telef_num
 
     def __tuple__(self) -> tuple:
         """Retornar atributos de usuario como tupla
