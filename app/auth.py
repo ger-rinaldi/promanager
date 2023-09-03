@@ -99,3 +99,15 @@ class validate_user:
         else:
             return False
 
+
+class Errors:
+    pass_too_short = f"La contraseña debe tener un mínimo de\
+                        {validate_user.password_required_length} caractéres"
+
+    pass_too_simple = f"La contraseña debe contener {validate_user.character_complexity}\
+    de los siguientes tipos de caracteres \
+    minúscula, mayúscula, numéricos y especiales."
+
+    invalid_email = "La dirección de email ingresada no es válida"
+
+    email_alreay_registered = "La dirección de email ingresada ya está sido registrada."
