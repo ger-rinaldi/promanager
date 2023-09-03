@@ -62,7 +62,7 @@ class Promanager:
         return self.render_template("home.html")
 
     def register(self, request):
-        import auth
+        from auth import Errors, validate_user
         from models import prefijos_telefonicos, usuario
 
         register_template = "auth/register.html"
@@ -73,17 +73,17 @@ class Promanager:
             email = form["mail"]
             password = form["contraseña"]
 
-            if not auth.email_address_validator(email):
-                errors.append(auth.Errors.invalid_email)
+            if not validate_user.email_address_validator(email):
+                errors.append(Errors.invalid_email)
 
-            if not auth.check_email_not_registered(email):
-                errors.append(auth.Errors.email_alreay_registered)
+            if not validate_user.check_email_not_registered(email):
+                errors.append(Errors.email_alreay_registered)
 
-            if not auth.password_length_validator(password):
-                errors.append(auth.Errors.pass_too_short)
+            if not validate_user.password_length_validator(password):
+                errors.append(Errors.pass_too_short)
 
-            if not auth.password_complexity_validator(password):
-                errors.append(auth.Errors.pass_too_simple)
+            if not validate_user.password_complexity_validator(password):
+                errors.append(Errors.pass_too_simple)
 
             if not errors:
                 usuario.create(**form)
