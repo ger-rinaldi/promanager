@@ -15,6 +15,7 @@ class usuario:
     )
     all_fields: str = ", ".join(fields)
     no_id_fields: str = ", ".join(fields[1:])
+    no_pass_fields: str = ", ".join(fields[: len(fields) - 1])
 
     @classmethod
     def create(
@@ -48,6 +49,25 @@ class usuario:
         cnx.commit()
         cursor_create.close()
         cnx.close()
+
+    @classmethod
+    def load_user(cls, id: int) -> "usuario":
+        sql = f"SELECT {cls.no_pass_fields} FROM {cls.tablename} WHERE ID_usuario = %s"
+
+        cnx = get_connection()
+        cursor = cnx.cursor()
+
+        loaded_user = usuario()
+        cursor.execute(sql, (id,))
+
+        (
+            loaded_user.id,
+            loaded_user.nombre,
+            loaded_user.apellido,
+            loaded_user.mail,
+        ) = cursor.fetchone()
+
+        return loaded_user
 
     def __init__(
         self,
