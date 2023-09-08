@@ -93,3 +93,16 @@ class prefijos_telefonicos:
         )
 
         return cursor_getall.fetchall()
+
+    @classmethod
+    def get_prefix_of_id(self, id: int):
+        """Obtener todos los paises y sus codigos sin ID"""
+
+        cnx = get_connection()
+        cursor_prefix = cnx.cursor()
+        cursor_prefix.execute(
+            f"SELECT prefijo FROM {prefijos_telefonicos.tablename} WHERE ID_prefijo = %s",
+            (id,),
+        )
+
+        return cursor_prefix.fetchone()
