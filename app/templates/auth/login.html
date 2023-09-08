@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+<!-- prettier-ignore  -->
+{% block title %}LOGIN{% endblock %}
+<!-- prettier-ignore  -->
+{% block base_body %}
+<main class="form-signing my-5 pt-3">
+  <div class="container">
+    <!-- Mostrar errores de autenticación -->
+    {% if errors %}
+    <!-- prettier-ignore  -->
+    {% for e in errors %}
+    <div class="alert alert-danger">{{ e }}</div>
+    {% endfor %}
+    <!-- prettier-ignore  -->
+    {% endif %}
+
+    <div class="container mt-3">
+      <form action="" method="POST">
+        <!-- DIV de EMAIL input -->
+        <div class="row my-2">
+          <div class="col">
+            <label for="email" class="form-label">Email:</label>
+            <input
+              required
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="promanager@example.com"
+              name="mail"
+            />
+          </div>
+        </div>
+
+        <!-- DIV de PASSWORD input -->
+
+        <div class="row my-2">
+          <div class="col">
+            <label for="password" class="form-label">Contraseña:</label>
+            <input
+              required
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="Ingresar contraseña"
+              name="contraseña"
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<style>
+  .form-signing {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
+
+{% endblock %}

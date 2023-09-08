@@ -30,6 +30,7 @@ class Promanager:
             [
                 Rule("/", endpoint="home_page"),
                 Rule("/register", endpoint="register"),
+                Rule("/login", endpoint="login"),
             ]
         )
 
@@ -107,3 +108,7 @@ class Promanager:
             errors=errors,
             country_codes=country_codes,
         )
+
+    def login(self, request):
+        login_template = "auth/login.html"
+        return self.render_template(login_template)
