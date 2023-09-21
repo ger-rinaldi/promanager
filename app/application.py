@@ -61,7 +61,7 @@ class Promanager:
         return self.render_template("home.html")
 
     def register(self, request):
-        from auth import Errors, validate_user
+        from input_validation import Errors, validate_user
         from models import Usuario, prefijos_telefonicos
 
         register_template = "auth/register.html"
