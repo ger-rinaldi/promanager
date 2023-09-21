@@ -69,11 +69,11 @@ class Promanager:
 
         if request.method == "POST":
             form = request.form
-            email = form["mail"]
-            password = form["contraseña"]
+            email = form["email"]
+            password = form["contrasena"]
             name = form["nombre"]
             surname = form["apellido"]
-            phone = form["telefono"]
+            phone = form["telefono_numero"]
 
             errors = validate_user.validate_all(
                 password=password,

@@ -28,7 +28,7 @@
               class="form-control"
               id="email"
               placeholder="promanager@example.com"
-              name="mail"
+              name="email"
             />
           </div>
         </div>
@@ -44,7 +44,7 @@
               class="form-control"
               id="password"
               placeholder="Ingresar contraseña"
-              name="contraseña"
+              name="contrasena"
             />
           </div>
         </div>
@@ -87,13 +87,13 @@
             <select
               required
               class="custom-select"
-              name="prefijo_tel"
+              name="telefono_prefijo"
               id="country_code"
             >
               <option selected value="">Código de país</option>
               {% for code in country_codes %}
               <!-- prettier-ignore -->
-              <option value="{{code['ID_prefijo']}}">{{code['pais']}} {{code['prefijo']}}</option>
+              <option value="{{code['id']}}">{{code['pais']}} {{code['prefijo']}}</option>
               {% endfor %}
             </select>
           </div>
@@ -103,7 +103,7 @@
               type="text"
               class="form-control"
               placeholder="Número de teléfono"
-              name="telefono"
+              name="telefono_numero"
               id="phonenumber"
             />
           </div>
