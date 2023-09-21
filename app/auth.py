@@ -1,4 +1,5 @@
 import re
+from typing import Union
 
 
 class validate_user:
@@ -7,6 +8,32 @@ class validate_user:
     name_max_length: int = 60
     name_min_length: int = 2
     phone_max_length: int = 15
+
+    @classmethod
+    def validate_all(
+        cls, password: str, email: str, name: str, surname: str, phonenumber: str
+    ) -> list[str]:
+        errors = []
+
+        if not cls.email_address_validator(email):
+            errors.append(Errors.invalid_email)
+
+        if not cls.check_email_not_registered(email):
+            errors.append(Errors.email_alreay_registered)
+
+        if not cls.password_length_validator(password):
+            errors.append(Errors.pass_too_short)
+
+        if not cls.password_complexity_validator(password):
+            errors.append(Errors.pass_too_simple)
+
+        if not cls.valid_name_length(name) or not cls.valid_name_length(surname):
+            errors.append(Errors.username_too_long_short)
+
+        if not cls.valid_phonenumber(phonenumber):
+            errors.append(Errors.phonetoolong)
+
+        return errors
 
     @classmethod
     def password_complexity_validator(cls, password: str) -> bool:

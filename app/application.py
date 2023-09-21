@@ -75,25 +75,13 @@ class Promanager:
             surname = form["apellido"]
             phone = form["telefono"]
 
-            if not validate_user.email_address_validator(email):
-                errors.append(Errors.invalid_email)
-
-            if not validate_user.check_email_not_registered(email):
-                errors.append(Errors.email_alreay_registered)
-
-            if not validate_user.password_length_validator(password):
-                errors.append(Errors.pass_too_short)
-
-            if not validate_user.password_complexity_validator(password):
-                errors.append(Errors.pass_too_simple)
-
-            if not validate_user.valid_name_length(
-                name
-            ) or not validate_user.valid_name_length(surname):
-                errors.append(Errors.username_too_long_short)
-
-            if not validate_user.valid_phonenumber(phone):
-                errors.append(Errors.phonetoolong)
+            errors = validate_user.validate_all(
+                password=password,
+                email=email,
+                name=name,
+                surname=surname,
+                phonenumber=phone,
+            )
 
             if not errors:
                 usuario.create(**form)
