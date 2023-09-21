@@ -2,26 +2,24 @@ import re
 
 
 class validate_user:
-    password_required_length = 12
-    character_complexity = 3
-    name_max_length = 60
-    name_min_length = 2
-    phone_max_length = 15
+    password_required_length: int = 12
+    character_complexity: int = 3
+    name_max_length: int = 60
+    name_min_length: int = 2
+    phone_max_length: int = 15
 
-    def password_complexity_validator(password: str = None) -> bool:
-        if password is None:
-            return
-
+    @classmethod
+    def password_complexity_validator(cls, password: str) -> bool:
         def _correct_match_times(
             password: str,
-            *patterns: re,
-            times: int = validate_user.character_complexity,
+            *patterns: re.Pattern,
+            times: int = cls.character_complexity,
         ) -> list[bool]:
-            match_amount_per_pattern = []
+            match_amount_per_pattern: list[bool] = []
 
             for pattern in patterns:
-                found_matches = re.findall(pattern, password)
-                total_matches = len(found_matches)
+                found_matches: list[str] = re.findall(pattern, password)
+                total_matches: int = len(found_matches)
 
                 if total_matches >= times:
                     match_amount_per_pattern.append(True)
@@ -30,10 +28,10 @@ class validate_user:
 
             return match_amount_per_pattern
 
-        minuscula = re.compile(r"[a-z]")
-        mayuscula = re.compile(r"[A-Z]")
-        numeros = re.compile(r"[0-9]")
-        especiales = re.compile(r"[!-\.:-@\[-_]")
+        minuscula: re.Pattern = re.compile(r"[a-z]")
+        mayuscula: re.Pattern = re.compile(r"[A-Z]")
+        numeros: re.Pattern = re.compile(r"[0-9]")
+        especiales: re.Pattern = re.compile(r"[!-\.:-@\[-_]")
 
         match_result = _correct_match_times(
             password, minuscula, mayuscula, numeros, especiales
@@ -41,22 +39,18 @@ class validate_user:
 
         return all(match_result)
 
-    def password_length_validator(password: str = None) -> bool:
-        if password is None:
-            return
-
-        required_length: int = validate_user.password_required_length
+    @classmethod
+    def password_length_validator(cls, password: str) -> bool:
+        required_length: int = cls.password_required_length
 
         if len(password) < required_length:
             return False
         else:
             return True
 
-    def email_address_validator(mail_address: str = None) -> bool:
-        if mail_address is None:
-            return
-
-        regex = re.compile(
+    @classmethod
+    def email_address_validator(cls, mail_address: str) -> bool:
+        regex: re.Pattern = re.compile(
             r"""
             ^                       # el string debe comenzar con
             [a-zA-Z_0-9\\"“”]+      # 1:N caracteres que se hallen dentro de este rango
@@ -75,17 +69,15 @@ class validate_user:
             """,
             re.VERBOSE,
         )
-        is_valid_mail = regex.fullmatch(mail_address)
+        is_valid_mail: re.Match[str] | None = regex.fullmatch(mail_address)
 
         if is_valid_mail is None:
             return False
         else:
             return True
 
-    def check_email_not_registered(email: str = None) -> bool:
-        if email is None:
-            return
-
+    @classmethod
+    def check_email_not_registered(cls, email: str) -> bool:
         from db import get_connection
 
         cnx = get_connection()
@@ -97,37 +89,41 @@ class validate_user:
 
         email_exists = cursor.fetchone()
 
+        cnx.close()
+        cursor.close()
+
         if not email_exists:
             return True
         else:
             return False
 
-    def valid_name_length(name: str = None) -> bool:
-        if (
-            validate_user.name_max_length < len(name)
-            or len(name) < validate_user.name_min_length
-        ):
+    @classmethod
+    def valid_name_length(cls, name: str) -> bool:
+        if cls.name_max_length < len(name) or len(name) < cls.name_min_length:
             return False
         return True
 
-    def valid_phonenumber(phonenumber: str) -> bool:
+    @classmethod
+    def valid_phonenumber(cls, phonenumber: str) -> bool:
         return phonenumber.isnumeric() and len(phonenumber) <= 15
 
 
 class Errors:
-    pass_too_short = f"La contraseña debe tener un mínimo de\
+    pass_too_short: str = f"La contraseña debe tener un mínimo de\
                         {validate_user.password_required_length} caractéres"
 
-    pass_too_simple = f"La contraseña debe contener {validate_user.character_complexity}\
+    pass_too_simple: str = f"La contraseña debe contener {validate_user.character_complexity}\
     de los siguientes tipos de caracteres \
     minúscula, mayúscula, numéricos y especiales."
 
-    invalid_email = "La dirección de email ingresada no es válida"
+    invalid_email: str = "La dirección de email ingresada no es válida"
 
-    email_alreay_registered = "La dirección de email ingresada ya está sido registrada."
+    email_alreay_registered: str = (
+        "La dirección de email ingresada ya está sido registrada."
+    )
 
-    username_too_long_short = f"Tanto nombre como apellido deben tener entre\
+    username_too_long_short: str = f"Tanto nombre como apellido deben tener entre\
         {validate_user.name_min_length} y {validate_user.name_max_length} caracteres."
 
-    phonetoolong = f"El número de teléfono no puede ser mayor a\
+    phonetoolong: str = f"El número de teléfono no puede ser mayor a\
         {validate_user.phone_max_length} caracteres"
