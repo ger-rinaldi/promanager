@@ -69,9 +69,10 @@ class usuario:
         self.id = id
         self.nombre = nombre
         self.apellido = apellido
-        self.mail = email
-        self.prefijo_telefono = telefono_prefijo
-        self.numero_telefono = telefono_numero
+        if contrasena is not None and not contrasena[0:3] == "$2b":
+            self.contrasena = hashpw(contrasena.encode("utf8"), gensalt())
+        else:
+            self.contrasena = contrasena
 
     def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla
