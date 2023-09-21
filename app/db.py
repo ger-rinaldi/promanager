@@ -184,9 +184,3 @@ def get_connection(
     connection = mysql.connector.connect(**DB_CONFIG)
 
     return connection
-
-
-def close_cursors(*cursors: object | list):
-    """Close one or many mysql-connector cursors"""
-    for cursor in cursors:
-        cursor.close()
