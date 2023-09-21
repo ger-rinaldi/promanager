@@ -1,4 +1,4 @@
-from typing import Any, Sequence, Union
+from typing import Any, Optional, Sequence, Union
 
 from bcrypt import gensalt, hashpw
 from db import get_connection
@@ -17,7 +17,7 @@ class usuario:
         "email",
         "telefono_prefijo",
         "telefono_numero",
-        "contraseña",
+        "contrasena",
     )
     all_fields: str = ", ".join(fields)
     no_id_fields: str = ", ".join(fields[1:])
@@ -59,16 +59,21 @@ class usuario:
 
     def __init__(
         self,
-        id: int,
         nombre: str,
         apellido: str,
         email: str,
         telefono_prefijo: str,
         telefono_numero: str,
+        contrasena: Optional[str] = None,
+        id: Optional[int] = None,
     ) -> None:
         self.id = id
         self.nombre = nombre
         self.apellido = apellido
+        self.email = email
+        self.telefono_prefijo = telefono_prefijo
+        self.telefono_numero = telefono_numero
+
         if contrasena is not None and not contrasena[0:3] == "$2b":
             self.contrasena = hashpw(contrasena.encode("utf8"), gensalt())
         else:
