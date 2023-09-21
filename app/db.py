@@ -7,9 +7,12 @@ import os
 import mysql.connector
 from config import DB_CONFIG, DB_NAME, TEST_DB
 from mysql.connector import Error as dbError
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.cursor import CursorBase
+from mysql.connector.pooling import PooledMySQLConnection
 
 
-def crear_base_de_datos(test_db: bool = False):
+def crear_base_de_datos(test_db: bool = False) -> None:
     """Crear la base de datos al:
         - inicializar la aplicación
         - en caso de que la base de datos no exista previamente
@@ -27,7 +30,7 @@ def crear_base_de_datos(test_db: bool = False):
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {TEST_DB}")
         else:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
-            return 0
+            return None
     except dbError as exception:
         # TODO: Loggear este output a algun lugar
         print(f"There was an error while creating the database:\n {exception}")
@@ -37,7 +40,7 @@ def crear_base_de_datos(test_db: bool = False):
         cnx.close()
 
 
-def crear_schemas(test_db: bool = False):
+def crear_schemas(test_db: bool = False) -> None:
     """Crear las tablas de la base de datos al:
         - inicializar la aplicación
         - en caso de que la base de datos no exista previamente
@@ -92,7 +95,7 @@ def crear_schemas(test_db: bool = False):
     cnx.close()
 
 
-def tirar_base_de_datos(test_db: bool = False):
+def tirar_base_de_datos(test_db: bool = False) -> None:
     cnx = mysql.connector.connect(**DB_CONFIG)
     cursor = cnx.cursor()
 
@@ -101,7 +104,7 @@ def tirar_base_de_datos(test_db: bool = False):
             cursor.execute(f"DROP DATABASE IF EXISTS {TEST_DB}")
         else:
             cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
-            return 0
+            return None
     except dbError as exception:
         # TODO: Loggear este output a algun lugar
         print(f"There was an error while dropping the database:\n {exception}")
@@ -111,7 +114,7 @@ def tirar_base_de_datos(test_db: bool = False):
         cnx.close()
 
 
-def tirar_tablas_raiz(test_db: bool = False):
+def tirar_tablas_raiz(test_db: bool = False) -> None:
     cnx = get_connection(connect_test_db=test_db)
     cursor = cnx.cursor()
 
@@ -130,7 +133,7 @@ def tirar_tablas_raiz(test_db: bool = False):
         cnx.close()
 
 
-def tirar_tablas_rama(test_db: bool = False):
+def tirar_tablas_rama(test_db: bool = False) -> None:
     cnx = get_connection(connect_test_db=test_db)
     cursor = cnx.cursor()
 
@@ -147,7 +150,7 @@ def tirar_tablas_rama(test_db: bool = False):
         cnx.close()
 
 
-def tirar_tablas_hoja(test_db: bool = False):
+def tirar_tablas_hoja(test_db: bool = False) -> None:
     cnx = get_connection(connect_test_db=test_db)
     cursor = cnx.cursor()
 
@@ -165,7 +168,9 @@ def tirar_tablas_hoja(test_db: bool = False):
         cnx.close()
 
 
-def get_connection(connect_test_db: bool = False):
+def get_connection(
+    connect_test_db: bool = False,
+) -> MySQLConnection | PooledMySQLConnection:
     """Obtain a mysql-connector connection object
 
     return: mysql.connector.connect(config)
