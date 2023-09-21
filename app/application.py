@@ -84,7 +84,8 @@ class Promanager:
             )
 
             if not errors:
-                usuario.create(**form)
+                new_user: "usuario" = usuario(**form)
+                new_user.create()
                 return redirect("/")
 
         country_codes = prefijos_telefonicos.read_all()
