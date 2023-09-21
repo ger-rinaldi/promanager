@@ -88,14 +88,29 @@ class usuario:
         self.prefijo_telefono = telefono_prefijo
         self.numero_telefono = telefono_numero
 
-    def __tuple__(self) -> tuple:
+    def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla
 
 
         Returns:
-            tuple: (id, nombre, apellido, mail)
+            tuple: (id, nombre, apellido, email)
         """
-        return (self.id, self.nombre, self.apellido, self.mail)
+
+        atributos_usuario: list[Any] = [
+            self.nombre,
+            self.apellido,
+            self.email,
+            self.telefono_prefijo,
+            self.telefono_numero,
+        ]
+
+        if with_id:
+            atributos_usuario.insert(0, self.id)
+
+        if self.contrasena:
+            atributos_usuario.append(self.contrasena)
+
+        return tuple(atributos_usuario)
 
 
 class prefijos_telefonicos:
