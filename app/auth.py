@@ -110,7 +110,7 @@ class validate_user:
         cnx = get_connection()
         cursor = cnx.cursor()
 
-        sql = "SELECT 1 FROM usuario WHERE mail = %s;"
+        sql = "SELECT 1 FROM usuario WHERE email = %s;"
 
         cursor.execute(sql, (email,))
 
