@@ -23,24 +23,6 @@ class Usuario:
     _str_no_id_fields: str = ", ".join(__fields__[1:])
     _str_no_pwd_fields: str = ", ".join(__fields__[: len(__fields__) - 1])
 
-    def create(self) -> None:
-        """Crear nuevo registro de usuario en la base de datos
-        con el objeto usuario ya instanciado"""
-
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor_create: CursorBase = cnx.cursor()
-
-        sql = f"INSERT INTO {Usuario.__tablename__}({Usuario._str_no_id_fields})\
-                VALUES  (%s, %s, %s, %s, %s, %s)"
-
-        values = self.__tuple__()
-
-        cursor_create.execute(sql, values)
-
-        cnx.commit()
-        cursor_create.close()
-        cnx.close()
-
     @classmethod
     def get_user_by_id(cls, id: int) -> Union["Usuario", None]:
         sql = f"SELECT {cls._str_no_pwd_fields} FROM {cls.__tablename__} WHERE id = %s"
@@ -78,6 +60,24 @@ class Usuario:
             self.contrasena = hashpw(contrasena.encode("utf8"), gensalt())
         else:
             self.contrasena = contrasena
+
+    def create(self) -> None:
+        """Crear nuevo registro de usuario en la base de datos
+        con el objeto usuario ya instanciado"""
+
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor_create: CursorBase = cnx.cursor()
+
+        sql = f"INSERT INTO {Usuario.__tablename__}({Usuario._str_no_id_fields})\
+                VALUES  (%s, %s, %s, %s, %s, %s)"
+
+        values = self.__tuple__()
+
+        cursor_create.execute(sql, values)
+
+        cnx.commit()
+        cursor_create.close()
+        cnx.close()
 
     def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla
