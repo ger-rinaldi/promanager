@@ -184,3 +184,17 @@ def get_connection(
     connection = mysql.connector.connect(**DB_CONFIG)
 
     return connection
+
+
+def close_conn_cursor(
+    connection: MySQLConnection, cursor: CursorBase | list[CursorBase]
+) -> None:
+    """Función para facilitar el cierre de conexión y cursores de MYSQL"""
+
+    if isinstance(cursor, list):
+        for c in cursor:
+            cursor.close()
+    else:
+        cursor.close()
+
+    connection.close()
