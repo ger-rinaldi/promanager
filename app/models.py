@@ -5,12 +5,12 @@ from db import get_connection
 class usuario:
     tablename = "usuario"
     fields = (
-        "ID_usuario",
+        "id",
         "nombre",
         "apellido",
-        "mail",
-        "prefijo_tel",
-        "telefono_num",
+        "email",
+        "telefono_prefijo",
+        "telefono_numero",
         "contraseña",
     )
     all_fields: str = ", ".join(fields)
@@ -20,13 +20,13 @@ class usuario:
     @classmethod
     def create(
         cls,
-        nombre: str = None,
-        apellido: str = None,
-        mail: str = None,
-        prefijo_tel: int = None,
-        telefono: str = None,
-        contraseña: str = None,
-    ):
+        nombre: str,
+        apellido: str,
+        mail: str,
+        prefijo_tel: int,
+        telefono: str,
+        contraseña: str,
+    ) -> None:
         "Crear nuevo registro de usuario en la base de datos"
 
         cnx = get_connection()
@@ -52,7 +52,7 @@ class usuario:
 
     @classmethod
     def load_user(cls, id: int) -> "usuario":
-        sql = f"SELECT {cls.no_pass_fields} FROM {cls.tablename} WHERE ID_usuario = %s"
+        sql = f"SELECT {cls.no_pass_fields} FROM {cls.tablename} WHERE id = %s"
 
         cnx = get_connection()
         cursor = cnx.cursor()
@@ -109,7 +109,7 @@ class prefijos_telefonicos:
         cnx = get_connection()
         cursor_getall = cnx.cursor(dictionary=True)
         cursor_getall.execute(
-            f"SELECT ID_prefijo, prefijo, pais FROM {prefijos_telefonicos.tablename}"
+            f"SELECT id, prefijo, pais FROM {prefijos_telefonicos.tablename}"
         )
 
         return cursor_getall.fetchall()
@@ -121,7 +121,7 @@ class prefijos_telefonicos:
         cnx = get_connection()
         cursor_prefix = cnx.cursor()
         cursor_prefix.execute(
-            f"SELECT prefijo FROM {prefijos_telefonicos.tablename} WHERE ID_prefijo = %s",
+            f"SELECT prefijo FROM {prefijos_telefonicos.tablename} WHERE id = %s",
             (id,),
         )
 
