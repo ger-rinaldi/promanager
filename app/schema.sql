@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS usuario(
     email VARCHAR(320) UNIQUE NOT NULL,
     telefono_prefijo INT NOT NULL,
     telefono_numero VARCHAR(30) NOT NULL,
-    contraseña VARCHAR(72) NOT NULL,
+    contrasena VARCHAR(72) NOT NULL,
     FOREIGN KEY (telefono_prefijo) REFERENCES prefijo_telefono(id)
 
 );
