@@ -62,7 +62,7 @@ class Promanager:
 
     def register(self, request):
         from auth import Errors, validate_user
-        from models import prefijos_telefonicos, usuario
+        from models import Usuario, prefijos_telefonicos
 
         register_template = "auth/register.html"
         errors = []
@@ -84,7 +84,7 @@ class Promanager:
             )
 
             if not errors:
-                new_user: "usuario" = usuario(**form)
+                new_user: "Usuario" = Usuario(**form)
                 new_user.create()
                 return redirect("/")
 

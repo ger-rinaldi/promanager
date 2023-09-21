@@ -8,7 +8,7 @@ from mysql.connector.pooling import PooledMySQLConnection
 from mysql.connector.types import RowType
 
 
-class usuario:
+class Usuario:
     __tablename__ = "usuario"
     __fields__ = (
         "id",
@@ -30,7 +30,7 @@ class usuario:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_create: CursorBase = cnx.cursor()
 
-        sql = f"INSERT INTO {usuario.__tablename__}({usuario._str_no_id_fields})\
+        sql = f"INSERT INTO {Usuario.__tablename__}({Usuario._str_no_id_fields})\
                 VALUES  (%s, %s, %s, %s, %s, %s)"
 
         values = self.__tuple__()
@@ -42,7 +42,7 @@ class usuario:
         cnx.close()
 
     @classmethod
-    def get_user_by_id(cls, id: int) -> Union["usuario", None]:
+    def get_user_by_id(cls, id: int) -> Union["Usuario", None]:
         sql = f"SELECT {cls._str_no_pwd_fields} FROM {cls.__tablename__} WHERE id = %s"
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
@@ -53,7 +53,7 @@ class usuario:
         loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
         if loaded_user is not None:
-            return_user: "usuario" = usuario(**loaded_user)  # type: ignore
+            return_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
 
         return return_user  # type: ignore
 
