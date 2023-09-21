@@ -9,8 +9,8 @@ from mysql.connector.types import RowType
 
 
 class usuario:
-    tablename = "usuario"
-    fields = (
+    __tablename__ = "usuario"
+    __fields__ = (
         "id",
         "nombre",
         "apellido",
@@ -19,9 +19,9 @@ class usuario:
         "telefono_numero",
         "contrasena",
     )
-    all_fields: str = ", ".join(fields)
-    no_id_fields: str = ", ".join(fields[1:])
-    no_pass_fields: str = ", ".join(fields[: len(fields) - 1])
+    _str_all_fields: str = ", ".join(__fields__)
+    _str_no_id_fields: str = ", ".join(__fields__[1:])
+    _str_no_pwd_fields: str = ", ".join(__fields__[: len(__fields__) - 1])
 
     def create(self) -> None:
         """Crear nuevo registro de usuario en la base de datos
@@ -30,7 +30,7 @@ class usuario:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_create: CursorBase = cnx.cursor()
 
-        sql = f"INSERT INTO {usuario.tablename}({usuario.no_id_fields})\
+        sql = f"INSERT INTO {usuario.__tablename__}({usuario._str_no_id_fields})\
                 VALUES  (%s, %s, %s, %s, %s, %s)"
 
         values = self.__tuple__()
@@ -42,8 +42,8 @@ class usuario:
         cnx.close()
 
     @classmethod
-    def load_user(cls, id: int) -> Union["usuario", None]:
-        sql = f"SELECT {cls.no_pass_fields} FROM {cls.tablename} WHERE id = %s"
+    def get_user_by_id(cls, id: int) -> Union["usuario", None]:
+        sql = f"SELECT {cls._str_no_pwd_fields} FROM {cls.__tablename__} WHERE id = %s"
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
