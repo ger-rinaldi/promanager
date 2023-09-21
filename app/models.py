@@ -1,7 +1,7 @@
 from typing import Any, Optional, Sequence, Union
 
-from bcrypt import gensalt, hashpw
-from db import get_connection
+from bcrypt import checkpw, gensalt, hashpw
+from db import close_conn_cursor, get_connection
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.cursor import CursorBase
 from mysql.connector.pooling import PooledMySQLConnection
@@ -38,6 +38,26 @@ class Usuario:
             return_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
 
         return return_user  # type: ignore
+
+    @classmethod
+    def get_user_auth(cls, email: str, passwd: str) -> Union["Usuario", None]:
+        if not cls._authenticate(email=email, passwd=passwd):
+            return None
+
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        query_by_email: str = (
+            f"SELECT {cls._str_no_pwd_fields} FROM {cls.__tablename__} WHERE email = %s"
+        )
+
+        cursor.execute(query_by_email, (email,))
+
+        authenticated_user_info: dict = cursor.fetchone()
+
+        close_conn_cursor(cnx, cursor)
+
+        return Usuario(**authenticated_user_info)
 
     @classmethod
     def _authenticate(cls, email: str, passwd: str) -> bool:
