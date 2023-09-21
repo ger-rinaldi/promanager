@@ -39,6 +39,26 @@ class Usuario:
 
         return return_user  # type: ignore
 
+    @classmethod
+    def _authenticate(cls, email: str, passwd: str) -> bool:
+        query_by_email = f"SELECT contrasena FROM {cls.__tablename__} WHERE email = %s"
+
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        cursor.execute(query_by_email, (email,))
+
+        query_result: dict | None = cursor.fetchone()
+
+        if query_result is None:
+            return False
+
+        fetched_passwd: str = query_result["contrasena"]
+
+        close_conn_cursor(cnx, cursor)
+
+        return checkpw(passwd.encode("utf8"), fetched_passwd.encode("utf8"))
+
     def __init__(
         self,
         nombre: str,
