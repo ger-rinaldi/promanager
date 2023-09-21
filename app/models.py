@@ -23,32 +23,17 @@ class usuario:
     no_id_fields: str = ", ".join(fields[1:])
     no_pass_fields: str = ", ".join(fields[: len(fields) - 1])
 
-    @classmethod
-    def create(
-        cls,
-        nombre: str,
-        apellido: str,
-        mail: str,
-        prefijo_tel: int,
-        telefono: str,
-        contraseña: str,
-    ) -> None:
-        "Crear nuevo registro de usuario en la base de datos"
+    def create(self) -> None:
+        """Crear nuevo registro de usuario en la base de datos
+        con el objeto usuario ya instanciado"""
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_create: CursorBase = cnx.cursor()
 
-        sql = f"INSERT INTO {cls.tablename}({cls.no_id_fields})\
+        sql = f"INSERT INTO {usuario.tablename}({usuario.no_id_fields})\
                 VALUES  (%s, %s, %s, %s, %s, %s)"
 
-        values = (
-            nombre,
-            apellido,
-            mail,
-            prefijo_tel,
-            telefono,
-            hashpw(password=contraseña.encode("utf8"), salt=gensalt()),
-        )
+        values = self.__tuple__()
 
         cursor_create.execute(sql, values)
 
