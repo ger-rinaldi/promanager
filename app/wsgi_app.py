@@ -27,18 +27,19 @@ class Blueprint:
         # else:
         self.default = default
 
-    def add_route(self, func, route):
-        @functools.wraps()
-        def wrapped_endpoint(route, *args, **kwargs):
-            endpoint_name = func.__name__
-
-            if not route[0] == "/":
-                route = f"/{route}"
+    def add_route(self, route):
+        if not route[0] == "/":
+            route = f"/{route}"
 
             route = f"{self.default}{route}"
 
+        def wrapped_endpoint(func, *args, **kwargs):
+            endpoint_name = func.__name__
+
             self.url_map.add(Rule(route, endpoint=endpoint_name))
             self.endpoints.append(func)
+
+        return wrapped_endpoint
 
     def get_endpoints(self):
         return self.endpoints
