@@ -20,12 +20,13 @@ class Blueprint:
         self.url_map = Map()
         self.default = default
         self.endpoints = []
+        self.set_default(self.default)
 
     def set_default(self, default):
-        # if not default[0] == "/":
-        #     self.default = f"/{default}"
-        # else:
-        self.default = default
+        if not default[0] == "/":
+            self.default = f"/{default}"
+        else:
+            self.default = default
 
     def add_route(self, route):
         if not route[0] == "/":
