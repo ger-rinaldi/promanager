@@ -71,11 +71,14 @@ class wsgi:
 
     def add_route(self, route):
         def wrapped_endpoint(func, *args, **kwargs):
-            endpoint_name = func.__name__
-            self.__setattr__(endpoint_name, func)
-            self.url_map.add(Rule(route, endpoint=endpoint_name))
+            self._add_endpoint(func, route)
 
         return wrapped_endpoint
+
+    def _add_endpoint(self, endpoint, route):
+        endpoint_name = endpoint.__name__
+        self.__setattr__(endpoint_name, endpoint)
+        self.url_map.add(Rule(route, endpoint=endpoint_name))
 
     def add_blueprint(self, blueprint: Blueprint):
         bp_map = blueprint.get_map()
@@ -83,7 +86,7 @@ class wsgi:
 
         for e in bp_endpoints:
             for r in bp_map.iter_rules(endpoint=e.__name__):
-                self.add_route(e, r)
+                self._add_endpoint(e, str(r))
 
     def __call__(self, environ, start_response):
         return self.app(environ, start_response)
