@@ -18,6 +18,10 @@ def create_app(with_static=True):
     def home_page(request):
         return render_template("home.html")
 
+    import auth
+
+    new_app.add_blueprint(auth.bp)
+
     return new_app
 
 
