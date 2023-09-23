@@ -73,7 +73,9 @@ class wsgi:
 
     def add_route(self, route):
         def wrapped_endpoint(func, *args, **kwargs):
-            self._add_endpoint(func, route)
+            if isinstance(route, list):
+                for r in route:
+                    self._add_endpoint(func, r)
 
         return wrapped_endpoint
 

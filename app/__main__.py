@@ -14,7 +14,7 @@ def create_app(with_static=True):
             {"/static": os.path.join(os.path.dirname(__file__), "static")},
         )
 
-    @new_app.add_route("/")
+    @new_app.add_route(["/", "/home"])
     def home_page(request):
         return render_template("home.html")
 
