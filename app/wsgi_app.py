@@ -31,7 +31,7 @@ class Blueprint:
         if not route[0] == "/":
             route = f"/{route}"
 
-            route = f"{self.default}{route}"
+        route = f"{self.default}{route}"
 
         def wrapped_endpoint(func, *args, **kwargs):
             endpoint_name = func.__name__
