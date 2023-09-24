@@ -25,9 +25,18 @@ def _get_endpoint_name(endpoint):
 
 
 class Blueprint:
-    def __init__(self, default: str) -> None:
+    def __init__(self, base_prefix: str, prefix_endpoint: str = None) -> None:
         self.url_map = Map()
-        self.default = default
+        self.base_prefix = self._add_root_to_route(base_prefix)
+
+        if prefix_endpoint is None:
+            self.prefix_endpoint = prefix_endpoint
+        else:
+            self.prefix_endpoint = self._add_prefix_to_route(prefix_endpoint)
+
+        if self.base_prefix is not None and self.prefix_endpoint is not None:
+            self._add_rule(self.base_prefix, self.prefix_endpoint)
+
         self.endpoints = []
 
     def _add_root_to_route(self, route):
