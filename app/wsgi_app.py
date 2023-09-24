@@ -20,22 +20,20 @@ class Blueprint:
         self.url_map = Map()
         self.default = default
         self.endpoints = []
-        self.set_default(self.default)
 
-    def set_default(self, default):
-        if not default[0] == "/":
-            self.default = f"/{default}"
-        else:
-            self.default = default
-
-    def add_route(self, route):
+    def _add_root_to_route(self, route):
         if not route[0] == "/":
-            route = f"/{route}"
+            return f"/{route}"
 
-        route = f"{self.default}{route}"
+        return route
 
-        def wrapped_endpoint(func, *args, **kwargs):
-            endpoint_name = func.__name__
+    def _add_prefix_to_route(self, route):
+        route = self._add_root_to_route(route)
+
+        if not route.startswith(self.base_prefix):
+            return f"{self.base_prefix}{route}"
+
+        return route
 
             self.url_map.add(Rule(route, endpoint=endpoint_name))
             self.endpoints.append(func)
