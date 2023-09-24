@@ -7,6 +7,11 @@ from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import Map, Rule
 from werkzeug.wrappers import Request, Response
 
+
+def url_for(endpoint: str):
+    return "/" + endpoint.replace(".", "/")
+
+
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
 
