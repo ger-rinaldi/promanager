@@ -143,8 +143,12 @@ class wsgi:
 
     def _add_endpoint(self, endpoint, route):
         endpoint_name = _get_endpoint_name(endpoint)
-        self.__setattr__(endpoint_name, endpoint)
-        self.url_map.add(Rule(route, endpoint=endpoint_name))
+
+        if isinstance(endpoint, str):
+            self.url_map.add(Rule(route, redirect_to=endpoint_name))
+        else:
+            self.__setattr__(endpoint_name, endpoint)
+            self.url_map.add(Rule(route, endpoint=endpoint_name))
 
     def add_blueprint(self, blueprint: Blueprint):
         bp_map = blueprint.get_map()
