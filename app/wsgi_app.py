@@ -1,5 +1,6 @@
 import functools
 import os
+import types
 
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.exceptions import HTTPException, NotFound
