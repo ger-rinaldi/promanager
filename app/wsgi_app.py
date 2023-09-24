@@ -35,8 +35,11 @@ class Blueprint:
 
         return route
 
-            self.url_map.add(Rule(route, endpoint=endpoint_name))
-            self.endpoints.append(func)
+    def _add_rule(self, route, endpoint):
+        endpoint_name = _get_endpoint_name(endpoint)
+
+        self.url_map.add(Rule(route, endpoint=endpoint_name))
+        self.endpoints.append(endpoint)
 
         return wrapped_endpoint
 
