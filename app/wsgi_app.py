@@ -15,6 +15,15 @@ def render_template(template_name, **context):
     return Response(template.render(context), mimetype="text/html")
 
 
+def _get_endpoint_name(endpoint):
+    if isinstance(endpoint, types.FunctionType):
+        return endpoint.__name__
+    elif isinstance(endpoint, str):
+        return endpoint
+
+    raise Exception("_get_endpoint_name expects either a Function or a str")
+
+
 class Blueprint:
     def __init__(self, default: str) -> None:
         self.url_map = Map()
