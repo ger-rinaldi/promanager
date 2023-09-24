@@ -41,6 +41,11 @@ class Blueprint:
         self.url_map.add(Rule(route, endpoint=endpoint_name))
         self.endpoints.append(endpoint)
 
+    def set_base_prefix(self, prefix_base_of_bp):
+        self.base_prefix = self._add_root_to_route(prefix_base_of_bp)
+
+    def set_prefix_endpoint(self, endpoint_for_bp_prefix):
+        self.prefix_endpoint = endpoint_for_bp_prefix
         return wrapped_endpoint
 
     def get_endpoints(self):
