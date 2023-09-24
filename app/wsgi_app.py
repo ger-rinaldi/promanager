@@ -46,6 +46,43 @@ class Blueprint:
 
     def set_prefix_endpoint(self, endpoint_for_bp_prefix):
         self.prefix_endpoint = endpoint_for_bp_prefix
+
+    def route(self, endpoint_route=None, is_prefix_endpoint: bool = False):
+        # cases to handle
+
+        if endpoint_route is not None:
+            endpoint_route = self._add_prefix_to_route(endpoint_route)
+
+        def wrapped_endpoint(endpoint_function, *args, **kwargs):
+            # if a route has been passed, take it along with the function
+            # and add it as a Rule to the url_map
+            if endpoint_route is not None:
+                self._add_rule(endpoint_route, endpoint_function)
+
+            # if a route has been passed, and this is to be the endpoint of bp prefix
+            # then it is the route, not the function, that has to added as
+            # the endpoint
+            if (
+                endpoint_route is not None
+                and is_prefix_endpoint
+                and self.prefix_endpoint is None
+            ):
+                self.set_prefix_endpoint(endpoint_route)
+
+            # if no route was passed, and this is to be the endpoint of bp prefix
+            # then it is the function that has to be added as the endpoint
+            if (
+                endpoint_route is None
+                and is_prefix_endpoint
+                and self.prefix_endpoint is None
+            ):
+                self.set_prefix_endpoint(endpoint_function)
+
+            # once the endpoint of the bp have been set,
+            # add the prefix and its endpoint as a rule
+            if is_prefix_endpoint and self.prefix_endpoint is not None:
+                self._add_rule(self.base_prefix, self.prefix_endpoint)
+
         return wrapped_endpoint
 
     def get_endpoints(self):
