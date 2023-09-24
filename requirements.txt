@@ -21,6 +21,7 @@ pyflakes==3.1.0
 pylama==8.4.1
 pylint==2.17.5
 python-dateutil==2.8.2
+secure-cookie==0.2.0
 six==1.16.0
 snowballstemmer==2.2.0
 tomli==2.0.1
