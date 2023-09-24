@@ -142,7 +142,7 @@ class wsgi:
         return wrapped_endpoint
 
     def _add_endpoint(self, endpoint, route):
-        endpoint_name = endpoint.__name__
+        endpoint_name = _get_endpoint_name(endpoint)
         self.__setattr__(endpoint_name, endpoint)
         self.url_map.add(Rule(route, endpoint=endpoint_name))
 
@@ -151,7 +151,7 @@ class wsgi:
         bp_endpoints = blueprint.get_endpoints()
 
         for e in bp_endpoints:
-            for r in bp_map.iter_rules(endpoint=e.__name__):
+            for r in bp_map.iter_rules(endpoint=_get_endpoint_name(e)):
                 self._add_endpoint(e, str(r))
 
     def __call__(self, environ, start_response):
