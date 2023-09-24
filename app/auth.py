@@ -1,10 +1,10 @@
 from werkzeug.utils import redirect
 from wsgi_app import Blueprint, render_template
 
-bp = Blueprint(default="auth")
+bp = Blueprint(base_prefix="auth")
 
 
-@bp.add_route(route="/register")
+@bp.route(endpoint_route="/register", is_prefix_endpoint=True)
 def register(request):
     from input_validation import validate_user
     from models import Usuario, prefijos_telefonicos
@@ -42,7 +42,7 @@ def register(request):
     )
 
 
-@bp.add_route(route="/login")
+@bp.route(endpoint_route="/login")
 def login(request):
     login_template = "auth/login.html"
     return render_template(login_template)
