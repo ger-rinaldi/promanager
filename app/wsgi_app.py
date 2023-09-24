@@ -14,6 +14,7 @@ def url_for(endpoint: str):
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
+jinja_env.globals.update(url_for=url_for)
 
 
 def render_template(template_name, **context):
