@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS usuario(
     telefono_prefijo INT NOT NULL,
     telefono_numero VARCHAR(30) NOT NULL,
     contrasena VARCHAR(72) NOT NULL,
+    llave_sesion VARCHAR(80) NOT NULL DEFAULT 'not_logged',
     FOREIGN KEY (telefono_prefijo) REFERENCES prefijo_telefono(id)
 
 );
