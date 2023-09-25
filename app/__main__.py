@@ -2,7 +2,7 @@ import os
 
 from config import APP_CONFIG
 from werkzeug.middleware.shared_data import SharedDataMiddleware
-from wsgi_app import render_template, wsgi
+from wsgi_app import make_response, render_template, wsgi
 
 
 def create_app(with_static=True):
@@ -16,7 +16,7 @@ def create_app(with_static=True):
 
     @new_app.add_route(["/", "/home"])
     def home_page(request):
-        return render_template("home.html")
+        return make_response(render_template("home.html"))
 
     import auth
 
