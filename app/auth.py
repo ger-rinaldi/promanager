@@ -36,10 +36,12 @@ def register(request):
 
     country_codes = prefijos_telefonicos.read_all()
 
-    return render_template(
-        register_template,
-        errors=errors,
-        country_codes=country_codes,
+    return make_response(
+        render_template(
+            register_template,
+            errors=errors,
+            country_codes=country_codes,
+        )
     )
 
 
