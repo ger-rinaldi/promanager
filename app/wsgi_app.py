@@ -1,7 +1,10 @@
+import datetime
 import functools
 import os
+import secrets
 import types
 
+from config import DOMAIN
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import Map, Rule
@@ -13,7 +16,31 @@ jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
 
 def render_template(template_name, **context):
     template = jinja_env.get_template(template_name)
-    return Response(template.render(context), mimetype="text/html")
+    return {"response": template.render(context), "mimetype": "text/html"}
+
+
+def get_session_cookies():
+    now = datetime.datetime.now(datetime.timezone.utc)
+    max_age = datetime.timedelta(days=5)
+    expires = datetime.datetime.now(datetime.timezone.utc) + max_age
+
+    session_cookies = {
+        "key": "sessionId",
+        "value": secrets.token_urlsafe(16),
+        "max_age": max_age,
+        "expires": expires,
+        "path": "/",
+        "domain": DOMAIN,
+        "secure": True,
+        "httponly": True,
+        "samesite": "lax",
+    }
+
+    return session_cookies
+
+
+def make_response(response_attr: dict):
+    return Response(**response_attr)
 
 
 def _get_endpoint_name(endpoint):
