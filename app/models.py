@@ -9,6 +9,12 @@ from mysql.connector.types import RowType
 
 
 class Usuario:
+    # todo
+    # todo
+    # TODO: AGREGAR METODO PARA ESTABLECER ID DE SESION DE USUARIO
+    # TODO: AGREGAR METODO PARA VALIDAR ID DE SESION
+    # todo
+    # todo
     __tablename__ = "usuario"
     __fields__ = (
         "id",
