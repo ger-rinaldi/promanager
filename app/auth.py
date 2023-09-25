@@ -1,6 +1,6 @@
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
-from wsgi_app import Blueprint, render_template
+from wsgi_app import Blueprint, get_session_cookies, make_response, render_template
 
 bp = Blueprint(base_prefix="auth")
 
@@ -45,7 +45,8 @@ def register(request):
 
 @bp.route(endpoint_route="/login")
 def login(request: Request):
-    login_template = "auth/login.html"
+    template_name = "auth/login.html"
+    response = make_response(render_template(template_name))
     errors = []
 
     if request.method == "POST":
@@ -58,8 +59,10 @@ def login(request: Request):
         if not logged_user:
             errors.append("Error al autenticar. Contraseña o e-mail erróneos.")
 
-        if not errors:
-            # TODO: set response cookies
-            pass
+        response = make_response(render_template(template_name, errors=errors))
 
-    return render_template(login_template, errors=errors)
+        if not errors:
+            # TODO: establecer id de session en tabla de usuario
+            response.set_cookie(**get_session_cookies())
+
+    return response
