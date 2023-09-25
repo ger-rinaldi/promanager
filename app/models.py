@@ -40,8 +40,8 @@ class Usuario:
         return return_user  # type: ignore
 
     @classmethod
-    def get_user_auth(cls, email: str, passwd: str) -> Union["Usuario", None]:
-        if not cls._authenticate(email=email, passwd=passwd):
+    def get_user_auth(cls, email: str, contrasena: str) -> Union["Usuario", None]:
+        if not cls._authenticate(email=email, passwd=contrasena):
             return None
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
