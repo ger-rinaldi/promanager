@@ -48,7 +48,7 @@ def required_login(func):
         if "sessionId" in request.cookies.keys():
             sessionId = request.cookies["sessionId"]
         else:
-            return redirect("/login_required")
+            return redirect("/auth/login_required")
 
         from db import close_conn_cursor, get_connection
 
@@ -63,7 +63,7 @@ def required_login(func):
         close_conn_cursor(cnx, cursor)
 
         if query_result is None:
-            return redirect("/login_required")
+            return redirect("/auth/login_required")
 
         return func(*args, **kwargs)
 
