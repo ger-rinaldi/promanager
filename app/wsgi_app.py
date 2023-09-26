@@ -5,7 +5,7 @@ import secrets
 import types
 
 from config import DOMAIN
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
@@ -15,12 +15,36 @@ template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
 
 
-def render_template(template_name, **context):
+def render_template(template_name: str, **context) -> dict[Template, str]:
+    """Retorna un template jinja renderizado.
+
+    Args:
+        template_name (str): Nombre y path de template dentro de app/templates
+        context (kwargs): Valores que el template pueda requerir para su renderización.
+    Returns:
+        dict: retorna un diccionario con el template como 'response' y mimetype de text/html
+    """
+
     template = jinja_env.get_template(template_name)
     return {"response": template.render(context), "mimetype": "text/html"}
 
 
-def get_session_cookies():
+def get_session_cookies() -> dict:
+    """Función para generar las cookies de sesión de usuario.
+    "key": "sessionId",
+    "value": id de sesión,
+    "max_age": 5 días,
+    "expires": 5 días,
+    "path": "/",
+    "domain": dominio del sitio,
+    "secure": True,
+    "httponly": True,
+    "samesite": "lax",
+
+    Returns:
+        dict: con los valores previamente expresados.
+    """
+
     now = datetime.datetime.now(datetime.timezone.utc)
     max_age = datetime.timedelta(days=5)
     expires = datetime.datetime.now(datetime.timezone.utc) + max_age
@@ -40,9 +64,18 @@ def get_session_cookies():
     return session_cookies
 
 
-def required_login(func):
+def required_login(func: types.FunctionType) -> Response:
+    """Decorador de verificación de sesion de usuario en cliente.
+    Recibe la función de un endpoint/vista y la ejecuta solamente
+    si el usuarió cuenta con cookies de sesión y dicha sesión
+    esta registrada en la base de datos.
+
+    Returns:
+        Function: ejecuta la funcion de endpoint y retorna su respuesta (response).
+    """
+
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Response:
         request: Request = args[0]
 
         if "sessionId" in request.cookies.keys():
@@ -70,11 +103,37 @@ def required_login(func):
     return wrapper
 
 
-def make_response(response_attr: dict):
+def make_response(response_attr: dict) -> Response:
+    """_summary_
+
+    Args:
+    response_attr: atributos con los que la respuesta del servidor
+    debe ser instanciada.
+
+    Returns:
+        Response: respuesta de servidor.
+    """
+
     return Response(**response_attr)
 
 
-def _get_endpoint_name(endpoint):
+def _get_endpoint_name(endpoint: str | types.FunctionType) -> str:
+    """Obtiene el nombre de los endpoints que recibe,
+    permite abtrae el manejo de la situación de enpoints que sean
+    strings o funciones.
+
+    Visibilidad privada, sólo del módulo.
+
+    Args:
+        endpoint (str, Function): endpoint del cual debe obtenerse el nombre, si str, retornar sin cambios.
+
+    Raises:
+        Exception: Solo acepta str y Function
+
+    Returns:
+        str: nombre del endpoint
+    """
+
     if isinstance(endpoint, types.FunctionType):
         return endpoint.__name__
     elif isinstance(endpoint, str):
