@@ -164,6 +164,21 @@ class Usuario:
         return tuple(atributos_usuario)
 
 
+    def __iter__(self) -> None:
+        """Dunder Method para permitir iterar sobre ciertos atributos del objeto usuario.
+        id, nombre, apellido, email, telefono.
+
+        Yields:
+            None: la funcion no usa return, sino yield para cada atributo.
+        """
+
+        yield "id", self.id,
+        yield "nombre", self.nombre,
+        yield "apellido", self.apellido,
+        yield "email", self.email,
+        yield "telefono", f"{self.telefono_prefijo}-{self.telefono_numero}",
+
+
 class prefijos_telefonicos:
     """Clase encargada de obtener los prefijos telefonicos"""
 
