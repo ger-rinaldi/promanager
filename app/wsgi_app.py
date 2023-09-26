@@ -1,3 +1,10 @@
+"""Modulo de funcionalidades generales de webapp WSGI y Jinja Engine.
+    Funciones de creación de cookies y validación de sesión, 
+    Generación de motor y renderizado de templates Jinja,
+    Creación de Blueprints de rutas
+    y apliación WSGI encargada de manejar solicitudes y respuestas.
+"""
+
 import datetime
 import functools
 import os
