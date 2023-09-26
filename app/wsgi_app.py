@@ -9,7 +9,13 @@ from werkzeug.wrappers import Request, Response
 
 
 def url_for(endpoint: str):
-    return "/" + endpoint.replace(".", "/")
+    # TODO: obtener la current app, luego de implementar
+    # el sistema de cache
+    for r in app.url_map.iter_rules():
+        if r.endpoint is not None and endpoint == r.endpoint:
+            return r.rule
+        elif r.rule is not None and endpoint == r.rule:
+            return r.redirect_to
 
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
