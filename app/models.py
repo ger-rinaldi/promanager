@@ -163,6 +163,23 @@ class Usuario:
 
         return tuple(atributos_usuario)
 
+    def __repr__(self) -> str:
+        """Dunder Method para convertir al objeto usuario (su información)
+        en un string.
+
+        Returns:
+            str: string con informacion de objeto usuario.
+        """
+
+        # Para reducir el largo de linea
+        # se crean dos strings por separado
+        id_name_sur = (
+            f"Id: {self.id}, Nombre: {self.nombre}, Apellido: {self.apellido}, "
+        )
+
+        mail_phone = f"e-mail: {self.email}, teléfono: {self.telefono_prefijo}-{self.telefono_numero}"
+
+        return id_name_sur + mail_phone
 
     def __iter__(self) -> None:
         """Dunder Method para permitir iterar sobre ciertos atributos del objeto usuario.
