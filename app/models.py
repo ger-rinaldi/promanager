@@ -199,17 +199,13 @@ class Usuario:
 class prefijos_telefonicos:
     """Clase encargada de obtener los prefijos telefonicos"""
 
-    tablename = "prefijo_telefono"
-
     @classmethod
     def read_all(cls):
         """Obtener todos los paises y sus codigos sin ID"""
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_getall = cnx.cursor(dictionary=True)
-        cursor_getall.execute(
-            f"SELECT id, prefijo, pais FROM {prefijos_telefonicos.tablename}"
-        )
+        cursor_getall.execute(f"SELECT id, prefijo, pais FROM prefijo_telefono")
 
         return cursor_getall.fetchall()
 
@@ -220,7 +216,7 @@ class prefijos_telefonicos:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_prefix: CursorBase = cnx.cursor()
         cursor_prefix.execute(
-            f"SELECT prefijo FROM {prefijos_telefonicos.tablename} WHERE id = %s",
+            f"SELECT prefijo FROM prefijo_telefono WHERE id = %s",
             (id,),
         )
 
