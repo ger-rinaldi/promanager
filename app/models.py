@@ -125,6 +125,33 @@ class Usuario:
         cursor_create.close()
         cnx.close()
 
+    def set_session_id(self, sessionId):
+        update_session_query = (
+            f"UPDATE {self.__tablename__} SET llave_sesion = %s WHERE id = %s"
+        )
+
+        verify_session_update = (
+            f"SELECT llave_sesion FROM {self.__tablename__} WHERE id = %s"
+        )
+
+        values = (sessionId, self.id)
+
+        cnx = get_connection()
+        cursor = cnx.cursor()
+
+        cursor.execute(update_session_query, values)
+        cnx.commit()
+        cursor.execute(verify_session_update, (self.id,))
+
+        queried_session_id = cursor.fetchone()
+
+        close_conn_cursor(cnx, cursor)
+
+        if queried_session_id is not None and sessionId == queried_session_id[0]:
+            return True
+
+        return False
+
     def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla
 
