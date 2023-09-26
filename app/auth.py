@@ -61,10 +61,16 @@ def login(request: Request):
         if not logged_user:
             errors.append("Error al autenticar. Contraseña o e-mail erróneos.")
 
-        response = make_response(render_template(template_name, errors=errors))
+        session_cookie = get_session_cookies()
 
-        if not errors:
-            # TODO: establecer id de session en tabla de usuario
-            response.set_cookie(**get_session_cookies())
+        if logged_user.set_session_id(session_cookie["value"]):
+            response.set_cookie(**session_cookie)
+        else:
+            errors.append("Hubo un error al establecer su sesión.")
+
+        redered_template = render_template(template_name, errors=errors)
+
+        response.response = redered_template["response"]
+        response.mimetype = redered_template["mimetype"]
 
     return response
