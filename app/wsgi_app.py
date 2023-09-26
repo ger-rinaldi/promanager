@@ -20,13 +20,25 @@ from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 
+"""
+Variables de contexto de ejecución de aplicación y
+sus Proxies locales para facilitar su acceso a través
+del tiempo de vida de las instancias de aplicación.
 
-_request_ctx_var: ContextVar = ContextVar("request")
-request: Request = LocalProxy(_request_ctx_var)
+_request_ctx_var: definicion de variable de contexto de request (solicitud)
+request: LocalProxy de _request_ctx_var
+
+_session_ctx_var: definicion de variable de contexto para diccionario de sesión de usuaro
+session: LocalProxy de diccionario de sesión
+
+"""
+
+_request_ctx_var: ContextVar[str] = ContextVar("request")
+request: LocalProxy[Request] = LocalProxy(_request_ctx_var)
 
 
-_session_ctx_var: ContextVar = ContextVar("user_session", default={})
-session: LocalProxy = LocalProxy(_session_ctx_var)
+_session_ctx_var: ContextVar[dict] = ContextVar("user_session", default={})
+session: LocalProxy[dict] = LocalProxy(_session_ctx_var)
 
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
