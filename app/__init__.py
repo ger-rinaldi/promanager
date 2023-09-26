@@ -1,7 +1,7 @@
 import os
 
 from werkzeug.middleware.shared_data import SharedDataMiddleware
-from wsgi_app import make_response, render_template, wsgi
+from wsgi_app import make_response, render_template, request, wsgi
 
 
 def create_app(with_static=True):
@@ -14,7 +14,7 @@ def create_app(with_static=True):
         )
 
     @new_app.route(["/", "/home"])
-    def home_page(request):
+    def home_page():
         return make_response(render_template("home.html"))
 
     import auth

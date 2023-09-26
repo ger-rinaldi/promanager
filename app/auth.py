@@ -1,12 +1,18 @@
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
-from wsgi_app import Blueprint, get_session_cookies, make_response, render_template
+from wsgi_app import (
+    Blueprint,
+    get_session_cookies,
+    make_response,
+    render_template,
+    request,
+)
 
 bp = Blueprint(base_prefix="auth")
 
 
 @bp.route(endpoint_route="/register", is_prefix_endpoint=True)
-def register(request):
+def register():
     from input_validation import validate_user
     from models import Usuario, prefijos_telefonicos
 
@@ -46,7 +52,7 @@ def register(request):
 
 
 @bp.route(endpoint_route="/login")
-def login(request: Request):
+def login():
     template_name = "auth/login.html"
     response = make_response(render_template(template_name))
     errors = []
@@ -77,7 +83,7 @@ def login(request: Request):
 
 
 @bp.route("/login_required")
-def ask_login(request):
+def ask_login():
     response = make_response(render_template("login_required.html"))
     response.status = 401
 

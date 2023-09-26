@@ -10,13 +10,19 @@ import functools
 import os
 import secrets
 import types
+from contextvars import ContextVar
 
 from config import DOMAIN
 from jinja2 import Environment, FileSystemLoader, Template
 from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.local import LocalProxy
 from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
+
+_request_ctx_var: ContextVar = ContextVar("request")
+request: Request = LocalProxy(_request_ctx_var)
+
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
@@ -339,8 +345,10 @@ class wsgi:
         """
 
         self.url_map = Map()
+        self._request_ctx_var = _request_ctx_var
+        self.request = request
 
-    def dispatch_request(self, request: Response) -> Response | Exception:
+    def dispatch_request(self) -> Response | Exception:
         """
         Despacha la solicitud al endpoint apropiado.
 
@@ -354,10 +362,12 @@ class wsgi:
             Response: El objeto de respuesta.
         """
 
-        adapter = self.url_map.bind_to_environ(request.environ)
+        adapter = self.url_map.bind_to_environ(self.request.environ)
+
         try:
             endpoint, values = adapter.match()
-            return getattr(self, f"{endpoint}")(request, **values)
+            return getattr(self, f"{endpoint}")(**values)
+
         except HTTPException as thisExept:
             return thisExept
 
@@ -376,7 +386,9 @@ class wsgi:
         """
 
         request = Request(environ)
-        response = self.dispatch_request(request)
+        self._request_ctx_var.set(request)
+        response = self.dispatch_request()
+
         return response(environ, start_response)
 
     def run(self, **app_config) -> None:
