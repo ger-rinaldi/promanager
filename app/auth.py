@@ -74,3 +74,11 @@ def login(request: Request):
         response.mimetype = redered_template["mimetype"]
 
     return response
+
+
+@bp.route("/login_required")
+def ask_login(request):
+    response = make_response(render_template("login_required.html"))
+    response.status = 401
+
+    return response
