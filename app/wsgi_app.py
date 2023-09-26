@@ -20,8 +20,13 @@ from werkzeug.routing import Map, Rule
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 
+
 _request_ctx_var: ContextVar = ContextVar("request")
 request: Request = LocalProxy(_request_ctx_var)
+
+
+_session_ctx_var: ContextVar = ContextVar("user_session", default={})
+session: LocalProxy = LocalProxy(_session_ctx_var)
 
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
