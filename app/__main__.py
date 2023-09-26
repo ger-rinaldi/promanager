@@ -14,13 +14,13 @@ def create_app(with_static=True):
             {"/static": os.path.join(os.path.dirname(__file__), "static")},
         )
 
-    @new_app.add_route(["/", "/home"])
+    @new_app.route(["/", "/home"])
     def home_page(request):
         return make_response(render_template("home.html"))
 
     import auth
 
-    new_app.add_blueprint(auth.bp)
+    new_app.register_blueprint(auth.bp)
 
     return new_app
 

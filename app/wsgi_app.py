@@ -191,15 +191,17 @@ class wsgi:
 
         run_simple(application=self, **app_config)
 
-    def add_route(self, route):
+    def route(self, route):
         def wrapped_endpoint(func, *args, **kwargs):
             if isinstance(route, list):
                 for r in route:
-                    self._add_endpoint(func, r)
+                    self._add_rule(func, r)
+            else:
+                self._add_rule(func, route)
 
         return wrapped_endpoint
 
-    def _add_endpoint(self, endpoint, route):
+    def _add_rule(self, endpoint, route):
         endpoint_name = _get_endpoint_name(endpoint)
 
         if isinstance(endpoint, str):
@@ -208,13 +210,13 @@ class wsgi:
             self.__setattr__(endpoint_name, endpoint)
             self.url_map.add(Rule(route, endpoint=endpoint_name))
 
-    def add_blueprint(self, blueprint: Blueprint):
+    def register_blueprint(self, blueprint: Blueprint):
         bp_map = blueprint.get_map()
         bp_endpoints = blueprint.get_endpoints()
 
         for e in bp_endpoints:
             for r in bp_map.iter_rules(endpoint=_get_endpoint_name(e)):
-                self._add_endpoint(e, str(r))
+                self._add_rule(e, str(r))
 
     def __call__(self, environ, start_response):
         return self.app(environ, start_response)
