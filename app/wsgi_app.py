@@ -143,27 +143,66 @@ def _get_endpoint_name(endpoint: str | types.FunctionType) -> str:
 
 
 class Blueprint:
+
+    """Clase que permite crear un objeto Map con sus respectivas Rule
+    todas bajo un prefijo determinado (/auth, /user, etc). Permitiendo
+    luego ser registradas en una aplicación con lazy loading.
+    """
+
     def __init__(self, base_prefix: str, prefix_endpoint: str = None) -> None:
+        """Instanciación de objeto Blueprint.
+
+        Args:
+            base_prefix (str): prefijo de las rutas de blueprint
+            prefix_endpoint (str): nombre del endpoint correspondiente a la base de la blueprint
+        """
+
+        # Map que contendrá las Rule de la Blueprint instanciada
         self.url_map = Map()
+
+        # Prefijo base de la BP, como /auth, /user
         self.base_prefix = self._add_root_to_route(base_prefix)
 
+        # Si se ha definido un endpoint para el prefijo de la BP
+        # agregarle el prefijo, caso contrario, dejarlo en None
         if prefix_endpoint is None:
             self.prefix_endpoint = prefix_endpoint
         else:
             self.prefix_endpoint = self._add_prefix_to_route(prefix_endpoint)
 
+        # Si se ha definido un endpoint para el prefijo
+        # cargar la Rule al Map
         if self.base_prefix is not None and self.prefix_endpoint is not None:
             self._add_rule(self.base_prefix, self.prefix_endpoint)
 
+        # Lista que permitira a la wsgi_app obtener los endpoints
+        # para luego consultar a url_map las rutas correspondientes
         self.endpoints = []
 
-    def _add_root_to_route(self, route):
+    def _add_root_to_route(self, route: str) -> str:
+        """Agregar slash inicial a las rutas recibidas,
+        en caso que no lo tengan.
+
+        Args:
+            route (str): nombre de ruta
+
+        Returns:
+            str: nombre de ruta precedido de un '/' slash
+        """
+
         if not route[0] == "/":
             return f"/{route}"
 
         return route
 
-    def _add_prefix_to_route(self, route):
+    def _add_prefix_to_route(self, route: str) -> str:
+        """Agregar prefijo (base) de la BP a las rutas recibidas
+        y slash previo a nombre de la ruta, en caso que no lo tuviesen.
+
+        Returns:
+            str: nombre de ruta precedido del prefijo de BP
+        """
+
         route = self._add_root_to_route(route)
 
         if not route.startswith(self.base_prefix):
@@ -171,16 +210,34 @@ class Blueprint:
 
         return route
 
-    def _add_rule(self, route, endpoint):
+    def _add_rule(self, route: str, endpoint: str | types.FunctionType) -> None:
+        """Agregar regla (Rule) a url_map (Map).
+
+        Args:
+            route (str): direccion, url, nombre de la ruta.
+            endpoint (str | types.FunctionType): endpoint o nombre de enpoint a unir con la ruta.
+        """
         endpoint_name = _get_endpoint_name(endpoint)
 
         self.url_map.add(Rule(route, endpoint=endpoint_name))
         self.endpoints.append(endpoint)
 
-    def set_base_prefix(self, prefix_base_of_bp):
+    def set_base_prefix(self, prefix_base_of_bp: str) -> None:
+        """Establecer prefijo de BP de manera lazy.
+
+        Args:
+            prefix_base_of_bp (str): nombre del prefijo.
+        """
+
         self.base_prefix = self._add_root_to_route(prefix_base_of_bp)
 
-    def set_prefix_endpoint(self, endpoint_for_bp_prefix):
+    def set_prefix_endpoint(self, endpoint_for_bp_prefix: str) -> None:
+        """Establecer endpoint para el prefijo de BP de manera lazy.
+
+        Args:
+            endpoint_for_bp_prefix (str): endpoint del prefijo.
+        """
+
         self.prefix_endpoint = endpoint_for_bp_prefix
 
     def route(self, endpoint_route=None, is_prefix_endpoint: bool = False):
@@ -221,10 +278,23 @@ class Blueprint:
 
         return wrapped_endpoint
 
-    def get_endpoints(self):
+    def get_endpoints(self) -> list[str | types.FunctionType]:
+        """Retornar lista compuesta de enpoints (referencias a las funciones),
+        o nombres de endpoints.
+
+        Returns:
+            list[str | types.FunctionType]: endpoints de la blueprint.
+        """
+
         return self.endpoints
 
-    def get_map(self):
+    def get_map(self) -> Map:
+        """Retornar objeto Map compuesto de las Rule de la Blueprint.
+
+        Returns:
+            Map: objeto Map con Rules de BP.
+        """
+
         return self.url_map
 
 
