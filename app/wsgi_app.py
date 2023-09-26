@@ -299,10 +299,54 @@ class Blueprint:
 
 
 class wsgi:
+    """
+    Controlador de aplicación WSGI para el manejo de solicitudes y respuestas.
+
+    Esta clase gestiona el procesamiento de solicitudes y respuestas para una
+    aplicación web implementada utilizando Werkzeug.
+
+    Atributos:
+        url_map (werkzeug.routing.Map): Mapa de enrutamiento de URL.
+
+    Métodos:
+        __init__: Instancia un objeto de la aplicación WSGI.
+        dispatch_request: Despacha la solicitud al endpoint apropiado.
+        app: Función de aplicación WSGI.
+        run: Ejecuta la aplicación WSGI utilizando el servidor de desarrollo de Werkzeug.
+        route: Decorador para agregar rutas a los endpoints.
+        _add_rule: Agrega una regla de ruta para un endpoint.
+        register_blueprint: Registra un "blueprint" con la aplicación.
+    """
+
     def __init__(self) -> None:
+        """
+        Inicializa la aplicación WSGI.
+
+        Inicializa la aplicación WSGI creando un mapa de enrutamiento de URL.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+
         self.url_map = Map()
 
-    def dispatch_request(self, request):
+    def dispatch_request(self, request: Response) -> Response | Exception:
+        """
+        Despacha la solicitud al endpoint apropiado.
+
+        Este método coincide la URL de la solicitud con un endpoint y llama
+        a la función de endpoint correspondiente.
+
+        Args:
+            request (Request): El objeto de solicitud.
+
+        Returns:
+            Response: El objeto de respuesta.
+        """
+
         adapter = self.url_map.bind_to_environ(request.environ)
         try:
             endpoint, values = adapter.match()
@@ -310,17 +354,54 @@ class wsgi:
         except HTTPException as thisExept:
             return thisExept
 
-    def app(self, environ, start_response):
+    def app(self, environ, start_response) -> Response:
+        """
+        Función de aplicación WSGI.
+
+        Este método procesa la aplicación WSGI utilizando la solicitud despachada.
+
+        Args:
+            environ (dict): El entorno WSGI.
+            start_response : La función de inicio de respuesta.
+
+        Returns:
+            Response: Respuesta generada por el endpoint llamado.
+        """
+
         request = Request(environ)
         response = self.dispatch_request(request)
         return response(environ, start_response)
 
-    def run(self, **app_config):
+    def run(self, **app_config) -> None:
+        """
+        Ejecuta la aplicación WSGI utilizando el servidor de desarrollo de Werkzeug.
+
+        Este método inicia el servidor de desarrollo y ejecuta la aplicación WSGI.
+
+        Args:
+            **app_config: Opciones de configuración adicionales para el servidor.
+
+        Returns:
+            None
+        """
+
         from werkzeug.serving import run_simple
 
         run_simple(application=self, **app_config)
 
-    def route(self, route):
+    def route(self, route: str | list) -> types.FunctionType:
+        """
+        Decorador para agregar rutas a los endpoints.
+
+        Este método es un decorador que agrega rutas a las funciones de endpoint.
+
+        Args:
+            route (str or list): La(s) ruta(s) para agregar.
+
+        Returns:
+            Function: La función del decorador.
+        """
+
         def wrapped_endpoint(func, *args, **kwargs):
             if isinstance(route, list):
                 for r in route:
@@ -330,7 +411,21 @@ class wsgi:
 
         return wrapped_endpoint
 
-    def _add_rule(self, endpoint, route):
+    def _add_rule(self, endpoint: str | types.FunctionType, route: str) -> None:
+        """
+        Agrega una regla de ruta para un punto final.
+
+        Este método agrega una regla de ruta para un punto final al mapa de
+        enrutamiento de URL.
+
+        Args:
+            endpoint (str | Function): El nombre del punto final o la función.
+            route (str): La ruta para agregar.
+
+        Returns:
+            None
+        """
+
         endpoint_name = _get_endpoint_name(endpoint)
 
         if isinstance(endpoint, str):
@@ -340,6 +435,19 @@ class wsgi:
             self.url_map.add(Rule(route, endpoint=endpoint_name))
 
     def register_blueprint(self, blueprint: Blueprint):
+        """
+        Registra un "blueprint" con la aplicación.
+
+        Este método registra un "blueprint" con la aplicación agregando sus
+        endpoints y rutas al mapa de enrutamiento de URL.
+
+        Args:
+            blueprint (Blueprint): El "blueprint" para registrar.
+
+        Returns:
+            None
+        """
+
         bp_map = blueprint.get_map()
         bp_endpoints = blueprint.get_endpoints()
 
@@ -347,5 +455,19 @@ class wsgi:
             for r in bp_map.iter_rules(endpoint=_get_endpoint_name(e)):
                 self._add_rule(e, str(r))
 
-    def __call__(self, environ, start_response):
+    def __call__(self, environ: dict, start_response) -> Response:
+        """
+        Función invocable de la aplicación WSGI.
+
+        Este método es una función invocable que procesa la aplicación WSGI
+        utilizando la solicitud despachada.
+
+        Args:
+            environ (dict): El entorno WSGI.
+            start_response (): La función de inicio de respuesta.
+
+        Returns:
+            Response: Respuesta generada por la aplicación.
+        """
+
         return self.app(environ, start_response)
