@@ -8,6 +8,7 @@ from config import DOMAIN
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import Map, Rule
+from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
@@ -37,6 +38,36 @@ def get_session_cookies():
     }
 
     return session_cookies
+
+
+def required_login(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        request: Request = args[0]
+
+        if "sessionId" in request.cookies.keys():
+            sessionId = request.cookies["sessionId"]
+        else:
+            return redirect("/login_required")
+
+        from db import close_conn_cursor, get_connection
+
+        cnx = get_connection()
+
+        cursor = cnx.cursor()
+
+        cursor.execute("SELECT 1 FROM usuario WHERE llave_sesion = %s", (sessionId,))
+
+        query_result = cursor.fetchone()
+
+        close_conn_cursor(cnx, cursor)
+
+        if query_result is None:
+            return redirect("/login_required")
+
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 def make_response(response_attr: dict):
