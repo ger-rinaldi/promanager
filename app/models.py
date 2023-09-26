@@ -9,34 +9,20 @@ from mysql.connector.types import RowType
 
 
 class Usuario:
-    # todo
-    # todo
-    # TODO: AGREGAR METODO PARA ESTABLECER ID DE SESION DE USUARIO
-    # TODO: AGREGAR METODO PARA VALIDAR ID DE SESION
-    # todo
-    # todo
-    __tablename__ = "usuario"
-    __fields__ = (
-        "id",
-        "nombre",
-        "apellido",
-        "email",
-        "telefono_prefijo",
-        "telefono_numero",
-        "contrasena",
-    )
-    _str_all_fields: str = ", ".join(__fields__)
-    _str_no_id_fields: str = ", ".join(__fields__[1:])
-    _str_no_pwd_fields: str = ", ".join(__fields__[: len(__fields__) - 1])
-
     @classmethod
     def get_user_by_id(cls, id: int) -> Union["Usuario", None]:
-        sql = f"SELECT {cls._str_no_pwd_fields} FROM {cls.__tablename__} WHERE id = %s"
+        user_info_query_by_id = """SELECT
+            u.id, nombre, apellido, email,
+            prefijo AS telefono_prefijo, telefono_numero
+            FROM usuario AS u INNER JOIN prefijo_telefono AS p
+            ON u.telefono_prefijo = p.id
+            WHERE u.id = %s
+            """
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
-        cursor.execute(sql, (id,))
+        cursor.execute(user_info_query_by_id, (id,))
 
         loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
@@ -53,11 +39,15 @@ class Usuario:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
-        query_by_email: str = (
-            f"SELECT {cls._str_no_pwd_fields} FROM {cls.__tablename__} WHERE email = %s"
-        )
+        user_info_query_by_email = """SELECT
+            u.id, nombre, apellido, email,
+            prefijo AS telefono_prefijo, telefono_numero
+            FROM usuario AS u INNER JOIN prefijo_telefono AS p
+            ON u.telefono_prefijo = p.id
+            WHERE u.email = %s
+            """
 
-        cursor.execute(query_by_email, (email,))
+        cursor.execute(user_info_query_by_email, (email,))
 
         authenticated_user_info: dict = cursor.fetchone()
 
@@ -67,12 +57,12 @@ class Usuario:
 
     @classmethod
     def _authenticate(cls, email: str, passwd: str) -> bool:
-        query_by_email = f"SELECT contrasena FROM {cls.__tablename__} WHERE email = %s"
+        query_pass_by_email = "SELECT contrasena FROM usuario WHERE email = %s"
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
-        cursor.execute(query_by_email, (email,))
+        cursor.execute(query_pass_by_email, (email,))
 
         query_result: dict | None = cursor.fetchone()
 
@@ -114,8 +104,9 @@ class Usuario:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_create: CursorBase = cnx.cursor()
 
-        sql = f"INSERT INTO {Usuario.__tablename__}({Usuario._str_no_id_fields})\
-                VALUES  (%s, %s, %s, %s, %s, %s)"
+        sql = """INSERT INTO
+                usuario(nombre, apellido, email, telefono_prefijo, telefono_numero)
+                VALUES  (%s, %s, %s, %s, %s, %s)"""
 
         values = self.__tuple__()
 
@@ -126,13 +117,9 @@ class Usuario:
         cnx.close()
 
     def set_session_id(self, sessionId):
-        update_session_query = (
-            f"UPDATE {self.__tablename__} SET llave_sesion = %s WHERE id = %s"
-        )
+        update_session_query = "UPDATE usuario SET llave_sesion = %s WHERE id = %s"
 
-        verify_session_update = (
-            f"SELECT llave_sesion FROM {self.__tablename__} WHERE id = %s"
-        )
+        verify_session_update = "SELECT llave_sesion FROM usuario WHERE id = %s"
 
         values = (sessionId, self.id)
 
