@@ -126,8 +126,6 @@ def required_login(func: types.FunctionType) -> Response:
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> Response:
-        request: Request = args[0]
-
         if "sessionId" in request.cookies.keys():
             sessionId = request.cookies["sessionId"]
         else:
