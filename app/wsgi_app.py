@@ -38,7 +38,7 @@ request: LocalProxy[Request] = LocalProxy(_request_ctx_var)
 
 
 _session_ctx_var: ContextVar[dict] = ContextVar("user_session", default={})
-session: LocalProxy[dict] = LocalProxy(_session_ctx_var)
+session: dict = LocalProxy(_session_ctx_var)
 
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
