@@ -41,6 +41,26 @@ _session_ctx_var: ContextVar[dict] = ContextVar("user_session", default={})
 session: dict = LocalProxy(_session_ctx_var)
 
 
+def set_session_values(new_session_values: iter) -> None:
+    """
+    Esta función establece los valores de la sesión con los datos proporcionados en `new_session_values`.
+
+    Args:
+        new_session_values (iter): Iterable que contiene los nuevos valores de sesión en pares clave-valor.
+
+    Raises:
+        TypeError: Si `new_session_values` no es un objeto iterable.
+
+    Returns:
+        None: Esta función no devuelve ningún valor.
+    """
+    if not hasattr(new_session_values, "__iter__"):
+        raise TypeError("_set_session_values solo acepta objetos iterables")
+
+    for k, v in new_session_values:
+        session[k] = v
+
+
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
 

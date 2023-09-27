@@ -6,6 +6,7 @@ from wsgi_app import (
     make_response,
     render_template,
     request,
+    set_session_values,
 )
 
 bp = Blueprint(base_prefix="auth")
@@ -71,6 +72,7 @@ def login():
 
         if logged_user.set_session_id(session_cookie["value"]):
             response.set_cookie(**session_cookie)
+            set_session_values(logged_user)
         else:
             errors.append("Hubo un error al establecer su sesión.")
 
