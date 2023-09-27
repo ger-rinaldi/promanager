@@ -2,7 +2,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from wsgi_app import (
     Blueprint,
-    get_session_cookies,
+    generate_session_cookies,
     make_response,
     render_template,
     request,
@@ -68,7 +68,7 @@ def login():
         if not logged_user:
             errors.append("Error al autenticar. Contraseña o e-mail erróneos.")
 
-        session_cookie = get_session_cookies()
+        session_cookie = generate_session_cookies()
 
         if logged_user.set_session_id(session_cookie["value"]):
             response.set_cookie(**session_cookie)

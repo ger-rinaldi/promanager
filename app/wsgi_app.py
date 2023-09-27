@@ -79,7 +79,7 @@ def render_template(template_name: str, **context) -> dict[Template, str]:
     return {"response": template.render(context), "mimetype": "text/html"}
 
 
-def get_session_cookies() -> dict:
+def generate_session_cookies() -> dict:
     """Función para generar las cookies de sesión de usuario.
     "key": "sessionId",
     "value": id de sesión,
