@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS roles_proyecto (
     nombre VARCHAR(60) UNIQUE NOT NULL
 );
 -- table
-CREATE TABLE IF NOT EXISTS detalle_proyecto(
+CREATE TABLE IF NOT EXISTS integrantes_proyecto(
     id INT AUTO_INCREMENT PRIMARY KEY,
     proyecto INT NOT NULL,    /*FORANEA*/
     integrante INT NOT NULL, /*FORANEA*/
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS roles_equipo (
     nombre VARCHAR(60) UNIQUE NOT NULL
 );
 -- table
-CREATE TABLE IF NOT EXISTS detalle_equipo(
+CREATE TABLE IF NOT EXISTS miembros_equipo(
     id INT AUTO_INCREMENT PRIMARY KEY,
     equipo INT NOT NULL,  /*FORANEA*/
     miembro INT NOT NULL, /*FORANEA*/
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS detalle_equipo(
     FOREIGN KEY (equipo) REFERENCES equipo(id),
     FOREIGN KEY (miembro) REFERENCES usuario(id),
     FOREIGN KEY (rol) REFERENCES roles_equipo(id),
-    CONSTRAINT integrante_equipo UNIQUE (equipo, miembro)
+    CONSTRAINT miembro_equipo UNIQUE (equipo, miembro)
 );
 -- table
 CREATE TABLE IF NOT EXISTS estado(
@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS hito(
 -- table
 CREATE TABLE IF NOT EXISTS ticket(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    hito INT NOT NULL,    /*FORANEA*/
-    responsable INT NOT NULL, /*FORANEA*/
+    proyecto INT NOT NULL,    /*FORANEA*/
+    equipo INT NOT NULL, /*FORANEA*/
     nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
     estado INT NOT NULL,
     descripcion TINYTEXT,
@@ -107,22 +107,19 @@ CREATE TABLE IF NOT EXISTS ticket(
     fecha_asignacion DATE NOT NULL DEFAULT '1000-01-01',
     fecha_limite DATE NOT NULL DEFAULT '1000-01-01',
     fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01',
-    FOREIGN KEY (responsable) REFERENCES usuario(id),
-    FOREIGN KEY (hito) REFERENCES hito(id),
+    FOREIGN KEY (proyecto) REFERENCES proyecto(id),
+    FOREIGN KEY (equipo) REFERENCES equipo(id),
     FOREIGN KEY (estado) REFERENCES estado(id)
 );
 -- table
-CREATE TABLE IF NOT EXISTS unidad_trabajo(
+CREATE TABLE IF NOT EXISTS asignacion_tarea(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    proyecto INT NOT NULL, /*FORANEA*/
-    equipo INT NOT NULL,  /*FORANEA*/
-    hito INT NOT NULL,    /*FORANEA*/
-    fecha_creacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
-    fecha_asignacion DATE NOT NULL DEFAULT '1000-01-01',
+    ticket_tarea INT NOT NULL, /*FORANEA*/
+    miembro INT NOT NULL,  /*FORANEA*/
+    fecha_asignacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
     fecha_limite DATE NOT NULL DEFAULT '1000-01-01',
     fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01',
-    FOREIGN KEY (proyecto) REFERENCES proyecto(id),
-    FOREIGN KEY (equipo) REFERENCES equipo(id),
-    FOREIGN KEY (hito) REFERENCES hito(id),
-    CONSTRAINT unidad_equipo_hito UNIQUE (equipo, hito)
+    FOREIGN KEY (ticket_tarea) REFERENCES ticket_tarea(id),
+    FOREIGN KEY (miembro) REFERENCES miembros_equipo(id),
+    CONSTRAINT asignacion UNIQUE (ticket_tarea, miembro)
 );
