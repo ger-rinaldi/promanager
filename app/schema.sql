@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS estado(
     nombre_estado VARCHAR(25) UNIQUE NOT NULL
 );
 -- table
-CREATE TABLE IF NOT EXISTS ticket(
+CREATE TABLE IF NOT EXISTS ticket_tarea(
     id INT AUTO_INCREMENT PRIMARY KEY,
     proyecto INT NOT NULL,    /*FORANEA*/
     equipo INT NOT NULL, /*FORANEA*/
