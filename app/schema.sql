@@ -82,20 +82,6 @@ CREATE TABLE IF NOT EXISTS estado(
     nombre_estado VARCHAR(25) UNIQUE NOT NULL
 );
 -- table
-CREATE TABLE IF NOT EXISTS hito(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    proyecto INT NOT NULL,    /*FORANEA*/
-    nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
-    estado INT NOT NULL,
-    descripcion TINYTEXT,
-    progreso DECIMAL(4,2) NOT NULL DEFAULT 0,
-    fecha_creacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
-    fecha_limite DATE NOT NULL DEFAULT '1000-01-01',
-    fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01',
-    FOREIGN KEY (proyecto) REFERENCES proyecto(id),
-    FOREIGN KEY (estado) REFERENCES estado(id)
-);
--- table
 CREATE TABLE IF NOT EXISTS ticket(
     id INT AUTO_INCREMENT PRIMARY KEY,
     proyecto INT NOT NULL,    /*FORANEA*/
