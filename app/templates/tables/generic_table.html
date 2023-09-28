@@ -1,0 +1,25 @@
+{% extends 'nav_foot.html' %}
+
+<!-- prettier-ignore -->
+{% block nf_content %}
+
+<div class="container-fluid my-4">
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        {% for field in data_keys %}
+        <th class="text-center">{{ field }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    {% for row in data %}
+    <tr>
+      {% for value in row.values() %}
+      <td class="text-center">{{ value }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% endblock %}
