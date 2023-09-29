@@ -1,0 +1,165 @@
+{% extends "nav_foot.html" %}
+
+<!-- prettier-ignore -->
+{% block nf_content %}
+
+<div class="container">
+  <!-- Mostrar errores de validación -->
+  {% if errors %}
+  <!-- prettier-ignore  -->
+  {% for e in errors %}
+  <div class="alert alert-danger">{{ e }}</div>
+  {% endfor %}
+  <!-- prettier-ignore  -->
+  {% endif %}
+
+  <form class="needs-validation was-validated" novalidate="" method="POST">
+    <input
+      type="number"
+      name="dueno_id"
+      id=""
+      value="{{ session['id'] }}"
+      hidden
+    />
+    <div class="row my-4">
+      <div class="col-4">
+        <label for="dueno" class="form-label">Dueño</label>
+        <div class="input-group">
+          <span class="input-group-text">@</span>
+          <input
+            type="text"
+            class="form-control"
+            id="dueno"
+            name="dueno"
+            placeholder="nombre de usuario"
+            value="{{ session['nombre'] }}"
+            required
+            readonly
+          />
+        </div>
+      </div>
+
+      <div class="col">
+        <label for="nombre" class="form-label">Nombre de proyecto</label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Nombre de tu proyecto"
+          id="nombre"
+          name="nombre"
+          required
+        />
+        <div class="invalid-feedback">¡Tu proyecto necesita un nombre!</div>
+      </div>
+    </div>
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
+        <input
+          type="date"
+          class="form-control"
+          id="fecha_inicio"
+          name="fecha_inicio"
+          required
+        />
+        {% if validation_advice %}
+
+        <!-- prettier-ignore -->
+        {% for e in validation_advice['fecha_inicio'] %}
+        <div class="invalid-feedback">{{ e }}</div>
+        {% endfor %}
+
+        <!-- prettier-ignore -->
+        {% endif %}
+      </div>
+
+      <div class="col-sm-6">
+        <label for="fecha_finalizacion" class="form-label"
+          >Fecha de finalización</label
+        >
+        <input
+          type="date"
+          class="form-control"
+          id="fecha_finalizacion"
+          name="fecha_finalizacion"
+          required
+        />
+        {% if validation_advice %}
+
+        <!-- prettier-ignore -->
+        {% for e in validation_advice['fecha_finalizacion'] %}
+        <div class="invalid-feedback">{{ e }}</div>
+        {% endfor %}
+
+        <!-- prettier-ignore -->
+        {% endif %}
+      </div>
+
+      <div class="">
+        <label for="presupuesto" class="form-label">Presupuesto</label>
+        <input
+          type="text"
+          class="form-control"
+          id="presupuesto"
+          name="presupuesto"
+          placeholder="999999.99"
+          value=""
+          required
+        />
+        {% if validation_advice %}
+
+        <!-- prettier-ignore -->
+        {% for e in validation_advice['presupuesto'] %}
+        <div class="invalid-feedback">{{ e }}</div>
+        {% endfor %}
+
+        <!-- prettier-ignore -->
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea
+          class="form-control"
+          id="descripcion"
+          name="descripcion"
+          placeholder="Descripción de tu proyecto"
+          rows="3"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          id="es_publico"
+          name="es_publico"
+        />
+        <label class="form-check-label" for="es_publico"
+          >Público: cualquiera puede ver este proyecto.</label
+        >
+      </div>
+
+      <div class="form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          id="activo"
+          name="activo"
+        />
+        <label class="form-check-label" for="activo"
+          >Activo: se esta trabajando en el proyecto. No está bloqueado.</label
+        >
+      </div>
+
+      <hr class="my-4" />
+
+      <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
+        Crear nuevo proyecto
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock nf_content %}
