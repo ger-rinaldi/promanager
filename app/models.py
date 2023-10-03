@@ -105,7 +105,7 @@ class Usuario:
         cursor_create: CursorBase = cnx.cursor()
 
         sql = """INSERT INTO
-                usuario(nombre, apellido, email, telefono_prefijo, telefono_numero)
+                usuario(nombre, apellido, email, telefono_prefijo, telefono_numero, contrasena)
                 VALUES  (%s, %s, %s, %s, %s, %s)"""
 
         values = self.__tuple__()
