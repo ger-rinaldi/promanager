@@ -20,16 +20,9 @@
         <label for="dueno" class="form-label">Dueño</label>
         <div class="input-group">
           <span class="input-group-text">@</span>
-          <input
-            type="text"
-            class="form-control"
-            id="dueno"
-            name="dueno"
-            placeholder="nombre de usuario"
-            value="{{ session['nombre'] }}"
-            required
-            readonly
-          />
+          <div class="form-control" id="nombre_dueno" readonly>
+            {{ session['nombre'] }}
+          </div>
         </div>
       </div>
 
