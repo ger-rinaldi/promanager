@@ -1,0 +1,119 @@
+{% extends "nav_foot.html" %}
+
+<!-- prettier-ignore -->
+{% block nf_content %}
+
+<div class="container">
+  <!-- Mostrar errores de autenticación -->
+  {% include '/error_display.html' %}
+
+  <h4 class="mb-3">Creación de equipo</h4>
+
+  <form class="needs-validation was-validated" novalidate="" method="POST">
+    <!-- nombre y proyecto padre -->
+    <div class="row mt-4">
+      <!-- Input: nombre equipo -->
+      <div class="col">
+        <label for="nombre" class="form-label">Nombre de equipo</label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Nombre del equipo"
+          id="nombre"
+          name="nombre"
+          required
+        />
+        <div class="invalid-feedback">¡Este equipo necesita un nombre!</div>
+      </div>
+
+      <!-- Input: nombre proyecto padre de equipo -->
+      <div class="col">
+        <label for="proyecto_nombre" class="form-label">Proyecto</label>
+        <div class="form-control" id="proyecto_nombre" readonly>
+          {{ proyect['nombre'] }}
+        </div>
+      </div>
+
+      <!-- Input: id proyecto padre de equipo, oculto -->
+      <input
+        class="form-control"
+        type="text"
+        value="{{ proyect['id'] }}"
+        id="proyecto_id"
+        name="proyecto_id"
+        hidden
+        readonly
+      />
+    </div>
+
+    <!-- lider y miembros -->
+    <div class="row mt-4">
+      <!-- Input: select miembro encargado de tarea -->
+      <div class="col">
+        <label for="lider_equipo" class="form-label"
+          >Líder (singular o múltiple)</label
+        >
+        <select
+          required
+          class="form-select"
+          name="lider_equipo"
+          id="lider_equipo"
+          aria-label=".form-select"
+          multiple
+        >
+          {% for member in proyect_members %}
+          <!-- prettier-ignore -->
+          <option value="{{ member['id'] }}">{{ member['nombre'] }} </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          ¡El equipo debe tener un miembro que lo lidere!
+        </div>
+        <div class="invalid-feedback">
+          Selecciona múltiples miembros con <b>control + click</b>
+        </div>
+        <div class="valid-feedback">
+          Selecciona múltiples miembros con <b>control + click</b>
+        </div>
+      </div>
+
+      <!-- miembros equipo -->
+      <div class="col">
+        <label for="miembros_equipo" class="form-label"
+          >Miembros del equipo (singular o múltiple)</label
+        >
+        <select
+          required
+          class="form-select"
+          name="miembros_equipo"
+          id="miembros_equipo"
+          aria-label=".form-select"
+          size="10"
+          multiple
+        >
+          {% for member in proyect_members %}
+          <!-- prettier-ignore -->
+          <option value="{{ member['id'] }}">{{ member['nombre'] }} </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          ¡El equipo necesita miembros que participen en él!
+        </div>
+        <div class="invalid-feedback">
+          Selecciona múltiples miembros con <b>control + click</b>
+        </div>
+        <div class="valid-feedback">
+          Selecciona múltiples miembros con <b>control + click</b>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <button class="w-100 btn btn-primary btn-lg mt-2" type="submit">
+      Crear nuevo equipo
+    </button>
+  </form>
+</div>
+
+{% endblock nf_content %}
