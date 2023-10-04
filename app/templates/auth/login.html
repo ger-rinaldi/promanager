@@ -6,13 +6,7 @@
 <main class="form-signing my-5 pt-3">
   <div class="container">
     <!-- Mostrar errores de autenticación -->
-    {% if errors %}
-    <!-- prettier-ignore  -->
-    {% for e in errors %}
-    <div class="alert alert-danger">{{ e }}</div>
-    {% endfor %}
-    <!-- prettier-ignore  -->
-    {% endif %}
+    {% include '/error_display.html' %}
 
     <div class="container mt-3">
       <form action="" method="POST">

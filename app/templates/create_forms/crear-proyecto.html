@@ -4,14 +4,8 @@
 {% block nf_content %}
 
 <div class="container">
-  <!-- Mostrar errores de validación -->
-  {% if errors %}
-  <!-- prettier-ignore  -->
-  {% for e in errors %}
-  <div class="alert alert-danger">{{ e }}</div>
-  {% endfor %}
-  <!-- prettier-ignore  -->
-  {% endif %}
+  <!-- Mostrar errores de autenticación -->
+  {% include '/error_display.html' %}
 
   <form class="needs-validation was-validated" novalidate="" method="POST">
     <input
