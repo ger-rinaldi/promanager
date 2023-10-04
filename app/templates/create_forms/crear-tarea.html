@@ -1,0 +1,169 @@
+{% extends "nav_foot.html" %}
+
+<!-- prettier-ignore -->
+{% block nf_content %}
+
+<div class="container">
+  <!-- Mostrar errores de validación -->
+  {% if errors %}
+  <!-- prettier-ignore  -->
+  {% for e in errors %}
+  <div class="alert alert-danger">{{ e }}</div>
+  {% endfor %}
+  <!-- prettier-ignore  -->
+  {% endif %}
+
+  <h4 class="mb-3">Creación de tarea</h4>
+
+  <form class="needs-validation was-validated" novalidate="" method="POST">
+    <!-- nombre y proyecto padre -->
+    <div class="row mt-4">
+      <!-- Input: nombre tarea -->
+      <div class="col">
+        <label for="nombre" class="form-label">Nombre de tarea</label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Nombre de tu tarea"
+          id="nombre"
+          name="nombre"
+          required
+        />
+        <div class="invalid-feedback">¡Tu tarea necesita un nombre!</div>
+      </div>
+
+      <!-- Input: nombre proyecto padre de tarea -->
+      <div class="col">
+        <label for="proyecto_nombre" class="form-label">Proyecto</label>
+        <div
+          class="form-control"
+          type="text"
+          id="proyecto_nombre"
+          name="proyecto_nombre"
+          readonly
+        >
+          {{ proyect['nombre'] }}
+        </div>
+      </div>
+
+      <!-- Input: id proyecto padre de tarea, oculto -->
+      <input
+        class="form-control"
+        type="text"
+        value="{{ proyect['id'] }}"
+        id="proyecto_id"
+        name="proyecto_id"
+        hidden
+        readonly
+      />
+    </div>
+
+    <!-- equipo y miembro -->
+    <div class="row mt-4">
+      <!-- Input: equipos de proyecto de tarea -->
+      <div class="col">
+        <label for="equipos_proyecto" class="form-label"
+          >Equipo encargado (singular)</label
+        >
+        <select
+          required
+          class="custom-select"
+          name="equipo"
+          id="equipos_proyecto"
+        >
+          <option selected value="">Equipos disponibles</option>
+          {% for team in teams %}
+          <!-- prettier-ignore -->
+          <option value="{{ team['id'] }}">{{ team['nombre'] }} </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          ¡Tu tarea debe asignarse a un equipo!
+        </div>
+      </div>
+
+      <!-- Input: select miembro encargado de tarea -->
+      <div class="col">
+        <label for="miembro_encargado" class="form-label"
+          >Miembros disponibles para asignar (múltiples)</label
+        >
+        <select
+          required
+          class="form-select"
+          name="miembros_encargados"
+          id="miembro_encargado"
+          aria-label=".form-select"
+          multiple
+        >
+          {% for member in team_members %}
+          <!-- prettier-ignore -->
+          <option value="{{ member['id'] }}">{{ member['nombre'] }} </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          ¡Tu tarea debe tener un miembro que la realice!
+        </div>
+      </div>
+    </div>
+
+    <!-- fecha y estado-->
+    <div class="row g-3 mt-4">
+      <!-- Input: fecha limite de tarea -->
+      <div class="col-sm-6">
+        <label for="fecha_limite" class="form-label">Fecha de Límite</label>
+        <input
+          type="date"
+          class="form-control"
+          id="fecha_limite"
+          name="fecha_limite"
+          required
+        />
+        <div class="invalid-feedback">
+          Fecha estimativa de finalización de tarea.
+        </div>
+      </div>
+
+      <!-- Input: estado tarea -->
+      <div class="col">
+        <label for="estados_tarea" class="form-label">Estado (singular)</label>
+        <select
+          required
+          class="custom-select"
+          name="estados_tarea"
+          id="estados_tarea"
+        >
+          <option selected value="">Estados disponibles</option>
+          {% for state in states %}
+          <!-- prettier-ignore -->
+          <option value="{{state['id']}}">{{state['nombre'] }} </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">Estado en que se encuentra tu tarea.</div>
+      </div>
+    </div>
+
+    <!-- Input: descripcion de tarea -->
+    <div class="row g-3 mt-4">
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea
+          class="form-control"
+          id="descripcion"
+          name="descripcion"
+          placeholder="Descripción de tu proyecto"
+          rows="3"
+          required
+        ></textarea>
+        <div class="invalid-feedback">
+          Brinda una breve explicación de la tarea.
+        </div>
+      </div>
+
+      <button class="w-100 btn btn-primary btn-lg mt-2" type="submit">
+        Crear nueva tarea
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock nf_content %}
