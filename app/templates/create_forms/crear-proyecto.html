@@ -15,7 +15,10 @@
       value="{{ session['id'] }}"
       hidden
     />
-    <div class="row my-4">
+
+    <!-- Nombre de creador y proyecto -->
+    <div class="row g-3 mt-1">
+      <!-- Nombre de creador de proyecto -->
       <div class="col-4">
         <label for="dueno" class="form-label">Dueño</label>
         <div class="input-group">
@@ -26,6 +29,7 @@
         </div>
       </div>
 
+      <!-- Nombre del proyecto -->
       <div class="col">
         <label for="nombre" class="form-label">Nombre de proyecto</label>
         <input
@@ -39,7 +43,10 @@
         <div class="invalid-feedback">¡Tu proyecto necesita un nombre!</div>
       </div>
     </div>
-    <div class="row g-3">
+
+    <!-- Fechas -->
+    <div class="row g-3 mt-1">
+      <!-- Fecha de inicio -->
       <div class="col-sm-6">
         <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
         <input
@@ -60,6 +67,7 @@
         {% endif %}
       </div>
 
+      <!-- Fecha de finalizacion -->
       <div class="col-sm-6">
         <label for="fecha_finalizacion" class="form-label"
           >Fecha de finalización</label
@@ -81,7 +89,10 @@
         <!-- prettier-ignore -->
         {% endif %}
       </div>
+    </div>
 
+    <!-- Presupuesto -->
+    <div class="row g-3 mt-1">
       <div class="">
         <label for="presupuesto" class="form-label">Presupuesto</label>
         <input
@@ -103,7 +114,10 @@
         <!-- prettier-ignore -->
         {% endif %}
       </div>
+    </div>
 
+    <!-- Descripcion -->
+    <div class="row g-3 mt-1">
       <div class="form-group">
         <label for="descripcion">Descripción</label>
         <textarea
@@ -115,7 +129,11 @@
           required
         ></textarea>
       </div>
+    </div>
 
+    <!-- checkboxes -->
+    <div class="row g-3 mt-1">
+      <!-- box publico -->
       <div class="form-check">
         <input
           type="checkbox"
@@ -128,6 +146,7 @@
         >
       </div>
 
+      <!-- box activo -->
       <div class="form-check">
         <input
           type="checkbox"
@@ -139,13 +158,13 @@
           >Activo: se esta trabajando en el proyecto. No está bloqueado.</label
         >
       </div>
-
-      <hr class="my-4" />
-
-      <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
-        Crear nuevo proyecto
-      </button>
     </div>
+
+    <hr class="my-4" />
+
+    <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
+      Crear nuevo proyecto
+    </button>
   </form>
 </div>
 
