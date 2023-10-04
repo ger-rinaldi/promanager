@@ -56,15 +56,10 @@
           name="fecha_inicio"
           required
         />
-        {% if validation_advice %}
-
-        <!-- prettier-ignore -->
-        {% for e in validation_advice['fecha_inicio'] %}
-        <div class="invalid-feedback">{{ e }}</div>
-        {% endfor %}
-
-        <!-- prettier-ignore -->
-        {% endif %}
+        <div class="invalid-feedback">Inicio de actividad de proyecto.</div>
+        <div class="invalid-feedback">
+          No puede ser posterior a su finalización.
+        </div>
       </div>
 
       <!-- Fecha de finalizacion -->
@@ -79,15 +74,8 @@
           name="fecha_finalizacion"
           required
         />
-        {% if validation_advice %}
-
-        <!-- prettier-ignore -->
-        {% for e in validation_advice['fecha_finalizacion'] %}
-        <div class="invalid-feedback">{{ e }}</div>
-        {% endfor %}
-
-        <!-- prettier-ignore -->
-        {% endif %}
+        <div class="invalid-feedback">Fecha estimativa de finalización.</div>
+        <div class="invalid-feedback">No puede ser previa a la de inicio.</div>
       </div>
     </div>
 
@@ -104,15 +92,12 @@
           value=""
           required
         />
-        {% if validation_advice %}
-
-        <!-- prettier-ignore -->
-        {% for e in validation_advice['presupuesto'] %}
-        <div class="invalid-feedback">{{ e }}</div>
-        {% endfor %}
-
-        <!-- prettier-ignore -->
-        {% endif %}
+        <div class="invalid-feedback">
+          Presupuesto con el que cuenta tu proyecto.
+        </div>
+        <div class="invalid-feedback">
+          Para indicar decimales usar punto ( <b>.</b> ).
+        </div>
       </div>
     </div>
 
@@ -155,7 +140,7 @@
           name="activo"
         />
         <label class="form-check-label" for="activo"
-          >Activo: se esta trabajando en el proyecto. No está bloqueado.</label
+          >Activo: se esta trabajando en el proyecto actualmente.</label
         >
       </div>
     </div>
