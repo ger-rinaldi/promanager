@@ -65,6 +65,8 @@ def set_session_values(new_session_values: iter) -> None:
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
 
+jinja_env.globals.update(session=session)
+
 
 def render_template(template_name: str, **context) -> dict[Template, str]:
     """Retorna un template jinja renderizado.
