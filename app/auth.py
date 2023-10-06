@@ -66,6 +66,8 @@ def login():
 
         if not logged_user:
             errors.append("Error al autenticar. Contraseña o e-mail erróneos.")
+            response = make_response(render_template(template_name, errors=errors))
+            return response
 
         session_cookie = generate_session_cookies()
 
