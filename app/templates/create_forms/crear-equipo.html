@@ -88,7 +88,7 @@
           name="miembros_equipo"
           id="miembros_equipo"
           aria-label=".form-select"
-          size="10"
+          size="{{ proyect_members|length if proyect_members|length else 5 }}"
           multiple
         >
           {% for member in proyect_members %}

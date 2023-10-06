@@ -81,6 +81,7 @@
           name="miembros_encargados"
           id="miembro_encargado"
           aria-label=".form-select"
+          size="{{ team_members|length if team_members|length else 3 }}"
           multiple
         >
           {% for member in team_members %}
