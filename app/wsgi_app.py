@@ -14,6 +14,7 @@ from contextvars import ContextVar
 
 from config import DOMAIN
 from jinja2 import Environment, FileSystemLoader, Template
+from models import Usuario
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.local import LocalProxy
 from werkzeug.routing import Map, Rule
@@ -422,6 +423,19 @@ class wsgi:
 
         request = Request(environ)
         self._request_ctx_var.set(request)
+
+        if request.cookies:
+            session_id = request.cookies.get("sessionId", None)
+
+            if session_id is not None and not session:
+                session_user = Usuario.get_user_by_session_id(session_id)
+
+                if session_user is not None:
+                    set_session_values(session_user)
+
+        elif session:
+            session.clear()
+
         response = self.dispatch_request()
 
         return response(environ, start_response)
