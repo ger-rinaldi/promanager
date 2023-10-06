@@ -35,7 +35,7 @@ session: LocalProxy de diccionario de sesión
 """
 
 _request_ctx_var: ContextVar[str] = ContextVar("request")
-request: LocalProxy[Request] = LocalProxy(_request_ctx_var)
+request: Request = LocalProxy(_request_ctx_var)
 
 
 _session_ctx_var: ContextVar[dict] = ContextVar("user_session", default={})
