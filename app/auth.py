@@ -39,7 +39,7 @@ def register():
         if not errors:
             new_user: "Usuario" = Usuario(**form)
             new_user.create()
-            return redirect("/")
+            return redirect("/auth/login")
 
     country_codes = prefijos_telefonicos.read_all()
 
@@ -55,7 +55,6 @@ def register():
 @bp.route(endpoint_route="/login")
 def login():
     template_name = "auth/login.html"
-    response = make_response(render_template(template_name))
     errors = []
 
     if request.method == "POST":
@@ -71,16 +70,16 @@ def login():
         session_cookie = generate_session_cookies()
 
         if logged_user.set_session_id(session_cookie["value"]):
-            response.set_cookie(**session_cookie)
             set_session_values(logged_user)
+            response = redirect("/usuario/dashboard")
+            response.set_cookie(**session_cookie)
+
+            return response
+
         else:
             errors.append("Hubo un error al establecer su sesión.")
 
-        redered_template = render_template(template_name, errors=errors)
-
-        response.response = redered_template["response"]
-        response.mimetype = redered_template["mimetype"]
-
+    response = make_response(render_template(template_name, errors=errors))
     return response
 
 
