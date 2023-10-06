@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS miembros_equipo(
 -- table
 CREATE TABLE IF NOT EXISTS estado(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_estado VARCHAR(25) UNIQUE NOT NULL
+    nombre VARCHAR(25) UNIQUE NOT NULL
 );
 -- table
 CREATE TABLE IF NOT EXISTS ticket_tarea(
