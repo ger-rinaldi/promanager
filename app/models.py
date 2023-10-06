@@ -32,6 +32,28 @@ class Usuario:
         return return_user  # type: ignore
 
     @classmethod
+    def get_user_by_session_id(self, session_id: str) -> Union["Usuario", None]:
+        user_info_query_by_id = """SELECT
+            u.id, nombre, apellido, email,
+            prefijo AS telefono_prefijo, telefono_numero
+            FROM usuario AS u INNER JOIN prefijo_telefono AS p
+            ON u.telefono_prefijo = p.id
+            WHERE u.llave_sesion = %s
+            """
+
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        cursor.execute(user_info_query_by_id, (session_id,))
+
+        loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
+
+        if loaded_user is not None:
+            return_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
+
+        return return_user  # type: ignore
+
+    @classmethod
     def get_user_auth(cls, email: str, contrasena: str) -> Union["Usuario", None]:
         if not cls._authenticate(email=email, passwd=contrasena):
             return None
