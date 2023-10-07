@@ -349,7 +349,7 @@ class Proyecto:
         cursor.close()
         cnx.close()
 
-    def _fetch_all_participants(self) -> list[RowType]:
+    def _fetch_all_participants(self, as_dicts: bool) -> list[RowType]:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
@@ -371,13 +371,16 @@ class Proyecto:
 
         all_integrantes = cursor.fetchall()
 
-        for i in all_integrantes:
-            self.participantes.append(Usuario(**i))
-
         cursor.close()
         cnx.close()
 
-    def _fetch_all_teams(self) -> list[RowType]:
+        if as_dicts:
+            self.participantes = all_integrantes
+        else:
+            for i in all_integrantes:
+                self.participantes.append(Usuario(**i))
+
+    def _fetch_all_teams(self, as_dicts: bool) -> list[RowType]:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
@@ -387,13 +390,16 @@ class Proyecto:
 
         all_teams = cursor.fetchall()
 
-        for t in all_teams:
-            self.equipos.append(Equipo(**t))
-
         cursor.close()
         cnx.close()
 
-    def _fetch_all_tasks(self) -> list[RowType]:
+        if as_dicts:
+            self.equipos = all_teams
+        else:
+            for t in all_teams:
+                self.equipos.append(Equipo(**t))
+
+    def _fetch_all_tasks(self, as_dicts: bool) -> list[RowType]:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
@@ -403,11 +409,14 @@ class Proyecto:
 
         all_tasks = cursor.fetchall()
 
-        for t in all_tasks:
-            self.tareas.append(Ticket_Tarea(**t))
-
         cursor.close()
         cnx.close()
+
+        if as_dicts:
+            self.tareas = all_tasks
+        else:
+            for t in all_tasks:
+                self.tareas.append(Ticket_Tarea(**t))
 
     def __tuple__(self, with_id: bool = False) -> tuple:
         self_as_tuple: list[Any] = [
