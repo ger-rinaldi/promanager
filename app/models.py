@@ -248,3 +248,25 @@ class prefijos_telefonicos:
             return str(prefix[0])
 
         return None
+
+
+class Proyecto:
+    def __init__(
+        self,
+        nombre: str,
+        descripcion: str,
+        es_publico: bool,
+        activo: bool,
+        presupuesto: float,
+        fecha_inicio: date,
+        fecha_finalizacion: date,
+        id: Optional[int] = None,
+    ) -> None:
+        self.id = id
+        self.nombre = nombre
+        self.descripcion = descripcion
+        self.es_publico = es_publico
+        self.activo = activo
+        self.presupuesto = presupuesto
+        self.fecha_inicio = fecha_inicio
+        self.fecha_finalizacion = fecha_finalizacion
