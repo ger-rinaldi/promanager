@@ -39,7 +39,7 @@ class validate_user:
 
         if not cls.valid_phonenumber(phonenumber):
             errors.append(Errors.phonetoolong)
-        if not cls.unique_username(username):
+        if not cls.username_not_registered(username):
             errors.append(Errors.non_unique_username)
         if not cls.username_length(username):
             errors.append(Errors.username_bad_length)
@@ -146,7 +146,7 @@ class validate_user:
         return phonenumber.isnumeric() and len(phonenumber) <= 15
 
     @classmethod
-    def unique_username(cls, username: str) -> bool:
+    def username_not_registered(cls, username: str) -> bool:
         from db import get_connection
 
         cnx = get_connection()
