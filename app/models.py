@@ -289,3 +289,91 @@ class Proyecto:
         self.presupuesto = presupuesto
         self.fecha_inicio = fecha_inicio
         self.fecha_finalizacion = fecha_finalizacion
+        self.participantes = []
+        self._fetch_all_participants()
+
+    def create(self) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        insert_query: str = """INSERT INTO 
+        proyecto(nombre, descripcion, es_publico, activo,
+        presupuesto, fecha_inicio, fecha_finalizacion)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+
+        cursor.execute(insert_query, (self.__tuple__(),))
+
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+    def delete(self) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        delete_query: str = "DELETE FROM proyecto WHERE id = %s"
+
+        cursor.execute(delete_query, (self.id,))
+
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
+    def _fetch_all_participants(self) -> list[RowType]:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_intg_query: str = """SELECT
+            i.id as id_integrante, rp.nombre as rol_proyecto,
+            u.id as id, u.nombre, u.apellido, u.email, u.telefono_prefijo, u.telefono_numero
+            FROM
+            integrantes_proyecto as i
+            INNER JOIN
+            usuario as u
+            ON i.integrante = u.id
+            INNER JOIN
+            roles_proyecto as rp
+            ON rp.id = i.rol
+            WHERE i.proyecto = %s
+        """
+
+        cursor.execute(select_intg_query, (self.id,))
+
+        all_integrantes = cursor.fetchall()
+
+        for i in all_integrantes:
+            self.participantes.append(Usuario(**i))
+
+        cursor.close()
+        cnx.close()
+
+    def __tuple__(self, with_id: bool = False) -> tuple:
+        self_as_tuple: list[Any] = [
+            self.nombre,
+            self.descripcion,
+            self.es_publico,
+            self.activo,
+            self.presupuesto,
+            self.fecha_inicio,
+            self.fecha_finalizacion,
+        ]
+
+        if with_id:
+            self_as_tuple.insert(0, self.id)
+
+        return tuple(self_as_tuple)
+
+    def __repr__(self) -> str:
+        return f"id: {self.id}, nombre: {self.nombre}, presupuesto: {self.presupuesto}, inicio: {self.fecha_inicio}"
+
+    def __iter__(self) -> None:
+        yield "id", self.id
+        yield "nombre", self.nombre
+        yield "descripcion", self.descripcion
+        yield "es_publico", self.es_publico
+        yield "activo", self.activo
+        yield "presupuesto", self.presupuesto
+        yield "fecha_inicio", self.fecha_inicio
+        yield "fecha_finalizacion", self.fecha_finalizacion
+        yield "participantes", self.participantes
+        yield "equipos", self.equipos
