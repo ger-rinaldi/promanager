@@ -448,3 +448,43 @@ class Proyecto:
         yield "fecha_finalizacion", self.fecha_finalizacion
         yield "participantes", self.participantes
         yield "equipos", self.equipos
+
+
+class Ticket_Tarea:
+    def __init__(
+        self,
+        proyecto: Union[int, "Proyecto"],
+        equipo: Union[int, "Equipo"],
+        nombre: str,
+        estado: int | str,
+        descripcion: str,
+        fecha_creacion: date,
+        fecha_asignacion: date,
+        fecha_limite: date,
+        fecha_finalizacion: date,
+        id: Optional[int] = None,
+    ) -> None:
+        self.id = id
+        self.proyecto = proyecto
+        self.equipo = equipo
+        self.nombre = nombre
+        self.estado = estado
+        self.descripcion = descripcion
+        self.fecha_creacion = fecha_creacion
+        self.fecha_asignacion = fecha_asignacion
+        self.fecha_limite = fecha_limite
+        self.fecha_finalizacion = fecha_finalizacion
+
+
+class Equipo:
+    def __init__(
+        self,
+        nombre: str,
+        fecha_creacion: date,
+        proyecto: Union[int, "Proyecto"],
+        id: Optional[int] = None,
+    ) -> None:
+        self.id = id
+        self.nombre = nombre
+        self.fecha_creacion = fecha_creacion
+        self.proyecto = proyecto
