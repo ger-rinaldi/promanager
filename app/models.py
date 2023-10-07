@@ -291,6 +291,8 @@ class Proyecto:
         self.fecha_finalizacion = fecha_finalizacion
         self.participantes = []
         self._fetch_all_participants()
+        self.equipos = []
+        self._fetch_all_teams()
 
     def create(self) -> None:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
@@ -343,6 +345,22 @@ class Proyecto:
 
         for i in all_integrantes:
             self.participantes.append(Usuario(**i))
+
+        cursor.close()
+        cnx.close()
+
+    def _fetch_all_teams(self) -> list[RowType]:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_teams_query: str = """SELECT * from equipo WHERE proyecto = %s"""
+
+        cursor.execute(select_teams_query, (self.id,))
+
+        all_teams = cursor.fetchall()
+
+        for t in all_teams:
+            self.equipos.append(Equipo(**t))
 
         cursor.close()
         cnx.close()
