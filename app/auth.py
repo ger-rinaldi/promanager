@@ -27,6 +27,7 @@ def register():
         name = form["nombre"]
         surname = form["apellido"]
         phone = form["telefono_numero"]
+        username = form["username"]
 
         errors = validate_user.validate_all(
             password=password,
@@ -34,6 +35,7 @@ def register():
             name=name,
             surname=surname,
             phonenumber=phone,
+            username=username,
         )
 
         if not errors:
