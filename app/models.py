@@ -316,6 +316,8 @@ class Proyecto:
         self._fetch_all_participants()
         self.equipos = []
         self._fetch_all_teams()
+        self.tareas = []
+        self._fetch_all_tasks()
 
     def create(self) -> None:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
@@ -384,6 +386,22 @@ class Proyecto:
 
         for t in all_teams:
             self.equipos.append(Equipo(**t))
+
+        cursor.close()
+        cnx.close()
+
+    def _fetch_all_tasks(self) -> list[RowType]:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_tasks_query: str = """SELECT * from ticket_tarea WHERE proyecto = %s"""
+
+        cursor.execute(select_tasks_query, (self.id,))
+
+        all_tasks = cursor.fetchall()
+
+        for t in all_tasks:
+            self.tareas.append(Ticket_Tarea(**t))
 
         cursor.close()
         cnx.close()
