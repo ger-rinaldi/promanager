@@ -220,11 +220,25 @@ class Usuario:
             None: la funcion no usa return, sino yield para cada atributo.
         """
 
-        yield "id", self.id,
-        yield "nombre", self.nombre,
-        yield "apellido", self.apellido,
-        yield "email", self.email,
-        yield "telefono", f"{self.telefono_prefijo}-{self.telefono_numero}",
+        yield "nombre", self.nombre
+        yield "apellido", self.apellido
+        yield "email", self.email
+        yield "telefono", f"{self.telefono_prefijo}-{self.telefono_numero}"
+
+        if self.id is not None:
+            yield "id", self.id
+
+        if self.id_integrante is not None:
+            yield "id_integrante", self.id_integrante
+
+        if self.id_miembro is not None:
+            yield "id_miembro", self.id_miembro
+
+        if self.rol_proyecto is not None:
+            yield "rol_proyecto", self.rol_proyecto
+
+        if self.rol_equipo is not None:
+            yield "rol_equipo", self.rol_equipo
 
 
 class prefijos_telefonicos:
