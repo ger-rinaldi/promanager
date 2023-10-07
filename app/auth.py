@@ -61,15 +61,21 @@ def login():
     if request.method == "POST":
         user_auth_info = request.form
 
-        if not validate_user.email_address_validator(user_auth_info["identif"]):
-            errors.append(Errors.invalid_email)
-        elif validate_user.check_email_not_registered(user_auth_info["identif"]):
-            errors.append("El email ingresado no esta registrado")
+        valid_email = validate_user.email_address_validator(user_auth_info["identif"])
+        registered_email = validate_user.check_email_not_registered(
+            user_auth_info["identif"]
+        )
+        valid_username = validate_user.username_length(user_auth_info["identif"])
+        registered_username = not validate_user.username_not_registered(
+            user_auth_info["identif"]
+        )
 
-        if not validate_user.username_length(user_auth_info["identif"]):
-            errors.append(Errors.email_alreay_registered)
-        elif validate_user.username_not_registered(user_auth_info["identif"]):
-            errors.append("El nombre de usuario ingresado no esta registrado")
+        if not valid_email and not valid_username:
+            errors.append("La identificación ingresada no es válida")
+        elif valid_username and not registered_username:
+            errors.append("Nombre de usuario no registrado.")
+        elif valid_email and not registered_email:
+            errors.append("Email no registrado")
 
         if errors:
             response = make_response(render_template(template_name, errors=errors))
