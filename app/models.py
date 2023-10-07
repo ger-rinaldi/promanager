@@ -55,8 +55,8 @@ class Usuario:
         return loaded_user  # type: ignore
 
     @classmethod
-    def get_user_auth(cls, email: str, contrasena: str) -> Union["Usuario", None]:
-        if not cls._authenticate(email=email, passwd=contrasena):
+    def get_user_auth(cls, identif: str, contrasena: str) -> Union["Usuario", None]:
+        if not cls._authenticate(identif=identif, passwd=contrasena):
             return None
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
@@ -67,10 +67,10 @@ class Usuario:
             prefijo AS telefono_prefijo, telefono_numero
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
-            WHERE u.email = %s
+            WHERE %s IN (email, username)
             """
 
-        cursor.execute(user_info_query_by_email, (email,))
+        cursor.execute(user_info_query_by_email, (identif,))
 
         authenticated_user_info: dict = cursor.fetchone()
 
@@ -79,13 +79,18 @@ class Usuario:
         return Usuario(**authenticated_user_info)
 
     @classmethod
-    def _authenticate(cls, email: str, passwd: str) -> bool:
-        query_pass_by_email = "SELECT contrasena FROM usuario WHERE email = %s"
+    def _authenticate(cls, identif: str, passwd: str) -> bool:
+        query_pass_by_email = (
+            "SELECT contrasena FROM usuario WHERE %s IN (email, username)"
+        )
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
-        cursor.execute(query_pass_by_email, (email,))
+        cursor.execute(
+            query_pass_by_email,
+            (identif,),
+        )
 
         query_result: dict | None = cursor.fetchone()
 
