@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS usuario(
     telefono_numero VARCHAR(30) NOT NULL,
     contrasena VARCHAR(72) NOT NULL,
     llave_sesion VARCHAR(80) NOT NULL DEFAULT 'not_logged',
-    FOREIGN KEY (telefono_prefijo) REFERENCES prefijo_telefono(id)
+    FOREIGN KEY (telefono_prefijo) REFERENCES prefijo_telefono(id) ON DELETE CASCADE
 
 );
 -- table
@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS integrantes_proyecto(
     fecha_inicio_participacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
     fecha_baja DATE NOT NULL DEFAULT '1000-01-01', 
     suspendido BOOLEAN NOT NULL DEFAULT false,
-    FOREIGN KEY (proyecto) REFERENCES proyecto(id),
-    FOREIGN KEY (integrante) REFERENCES usuario(id),
-    FOREIGN KEY (rol) REFERENCES roles_proyecto(id),
+    FOREIGN KEY (proyecto) REFERENCES proyecto(id) ON DELETE CASCADE,
+    FOREIGN KEY (integrante) REFERENCES usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol) REFERENCES roles_proyecto(id) ON DELETE CASCADE,
     CONSTRAINT integrante_proyecto UNIQUE (proyecto, integrante)
 );
 -- table
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS equipo(
     proyecto INT NOT NULL,    /*FORANEA*/
     nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
     fecha_creacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
-    FOREIGN KEY (proyecto) REFERENCES proyecto(id)
+    FOREIGN KEY (proyecto) REFERENCES proyecto(id) ON DELETE CASCADE
 );
 -- table
 CREATE TABLE IF NOT EXISTS roles_equipo (
@@ -71,9 +71,9 @@ CREATE TABLE IF NOT EXISTS miembros_equipo(
     fecha_inicio_participacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
     fecha_baja DATE NOT NULL DEFAULT '1000-01-01',
     suspendido BOOLEAN NOT NULL DEFAULT false,
-    FOREIGN KEY (equipo) REFERENCES equipo(id),
-    FOREIGN KEY (miembro) REFERENCES usuario(id),
-    FOREIGN KEY (rol) REFERENCES roles_equipo(id),
+    FOREIGN KEY (equipo) REFERENCES equipo(id) ON DELETE CASCADE,
+    FOREIGN KEY (miembro) REFERENCES usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol) REFERENCES roles_equipo(id) ON DELETE CASCADE,
     CONSTRAINT miembro_equipo UNIQUE (equipo, miembro)
 );
 -- table
@@ -93,9 +93,9 @@ CREATE TABLE IF NOT EXISTS ticket_tarea(
     fecha_asignacion DATE NOT NULL DEFAULT '1000-01-01',
     fecha_limite DATE NOT NULL DEFAULT '1000-01-01',
     fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01',
-    FOREIGN KEY (proyecto) REFERENCES proyecto(id),
-    FOREIGN KEY (equipo) REFERENCES equipo(id),
-    FOREIGN KEY (estado) REFERENCES estado(id)
+    FOREIGN KEY (proyecto) REFERENCES proyecto(id) ON DELETE CASCADE,
+    FOREIGN KEY (equipo) REFERENCES equipo(id) ON DELETE CASCADE,
+    FOREIGN KEY (estado) REFERENCES estado(id) ON DELETE CASCADE
 );
 -- table
 CREATE TABLE IF NOT EXISTS asignacion_tarea(
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS asignacion_tarea(
     fecha_asignacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
     fecha_limite DATE NOT NULL DEFAULT '1000-01-01',
     fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01',
-    FOREIGN KEY (ticket_tarea) REFERENCES ticket_tarea(id),
-    FOREIGN KEY (miembro) REFERENCES miembros_equipo(id),
+    FOREIGN KEY (ticket_tarea) REFERENCES ticket_tarea(id) ON DELETE CASCADE,
+    FOREIGN KEY (miembro) REFERENCES miembros_equipo(id) ON DELETE CASCADE,
     CONSTRAINT asignacion UNIQUE (ticket_tarea, miembro)
 );
