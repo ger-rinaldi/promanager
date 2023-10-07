@@ -50,9 +50,9 @@ class Usuario:
         loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
         if loaded_user is not None:
-            return_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
+            loaded_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
 
-        return return_user  # type: ignore
+        return loaded_user  # type: ignore
 
     @classmethod
     def get_user_auth(cls, email: str, contrasena: str) -> Union["Usuario", None]:
