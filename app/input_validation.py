@@ -8,10 +8,17 @@ class validate_user:
     name_max_length: int = 60
     name_min_length: int = 2
     phone_max_length: int = 15
+    username_max_length: int = 20
 
     @classmethod
     def validate_all(
-        cls, password: str, email: str, name: str, surname: str, phonenumber: str
+        cls,
+        password: str,
+        email: str,
+        name: str,
+        surname: str,
+        phonenumber: str,
+        username: str,
     ) -> list[str]:
         errors = []
 
@@ -32,6 +39,10 @@ class validate_user:
 
         if not cls.valid_phonenumber(phonenumber):
             errors.append(Errors.phonetoolong)
+        if not cls.unique_username(username):
+            errors.append(Errors.non_unique_username)
+        if not cls.username_length(username):
+            errors.append(Errors.username_bad_length)
 
         return errors
 
@@ -134,8 +145,42 @@ class validate_user:
     def valid_phonenumber(cls, phonenumber: str) -> bool:
         return phonenumber.isnumeric() and len(phonenumber) <= 15
 
+    @classmethod
+    def unique_username(cls, username: str) -> bool:
+        from db import get_connection
+
+        cnx = get_connection()
+        cursor = cnx.cursor()
+
+        sql = "SELECT 1 FROM usuario WHERE username = %s;"
+
+        cursor.execute(sql, (username,))
+
+        username_exists = cursor.fetchone()
+
+        cnx.close()
+        cursor.close()
+
+        if not username_exists:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def username_length(cls, username: str) -> bool:
+        if (
+            len(username) > cls.username_max_length
+            or len(username) < cls.name_min_length
+        ):
+            return False
+        return True
+
 
 class Errors:
+    non_unique_username: str = "El nombre de usuario ingresado ya está registrado"
+
+    username_bad_length: str = f"El nombre de usuario no puede exceder los {validate_user.username_max_length} y debe superar los {validate_user.name_min_length}"
+
     pass_too_short: str = f"La contraseña debe tener un mínimo de\
                         {validate_user.password_required_length} caractéres"
 
