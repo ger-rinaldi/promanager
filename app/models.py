@@ -13,7 +13,7 @@ class Usuario:
     @classmethod
     def get_user_by_id(cls, id: int) -> Union["Usuario", None]:
         user_info_query_by_id = """SELECT
-            u.id, nombre, apellido, email,
+            u.id, username, nombre, apellido, email,
             prefijo AS telefono_prefijo, telefono_numero
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
@@ -35,7 +35,7 @@ class Usuario:
     @classmethod
     def get_user_by_session_id(self, session_id: str) -> Union["Usuario", None]:
         user_info_query_by_id = """SELECT
-            u.id, nombre, apellido, email,
+            u.id, username, nombre, apellido, email,
             prefijo AS telefono_prefijo, telefono_numero
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
@@ -63,7 +63,7 @@ class Usuario:
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
         user_info_query_by_email = """SELECT
-            u.id, nombre, apellido, email,
+            u.id, username, nombre, apellido, email,
             prefijo AS telefono_prefijo, telefono_numero
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
@@ -100,6 +100,7 @@ class Usuario:
 
     def __init__(
         self,
+        username: str,
         nombre: str,
         apellido: str,
         email: str,
@@ -113,6 +114,7 @@ class Usuario:
         rol_equipo: Optional[str] = None,
     ) -> None:
         self.id = id
+        self.username = username
         self.nombre = nombre
         self.apellido = apellido
         self.email = email
@@ -136,8 +138,8 @@ class Usuario:
         cursor_create: CursorBase = cnx.cursor()
 
         sql = """INSERT INTO
-                usuario(nombre, apellido, email, telefono_prefijo, telefono_numero, contrasena)
-                VALUES  (%s, %s, %s, %s, %s, %s)"""
+                usuario(username, nombre, apellido, email, telefono_prefijo, telefono_numero, contrasena)
+                VALUES  (%s, %s, %s, %s, %s, %s, %s)"""
 
         values = self.__tuple__()
 
@@ -175,10 +177,11 @@ class Usuario:
 
 
         Returns:
-            tuple: (id, nombre, apellido, email)
+            tuple: (id, username, nombre, apellido, email)
         """
 
         atributos_usuario: list[Any] = [
+            self.username,
             self.nombre,
             self.apellido,
             self.email,
@@ -204,9 +207,7 @@ class Usuario:
 
         # Para reducir el largo de linea
         # se crean dos strings por separado
-        id_name_sur = (
-            f"Id: {self.id}, Nombre: {self.nombre}, Apellido: {self.apellido}, "
-        )
+        id_name_sur = f"Id: {self.id}, Username: {self.username}, Nombre: {self.nombre}, Apellido: {self.apellido}, "
 
         mail_phone = f"e-mail: {self.email}, teléfono: {self.telefono_prefijo}-{self.telefono_numero}"
 
@@ -220,6 +221,7 @@ class Usuario:
             None: la funcion no usa return, sino yield para cada atributo.
         """
 
+        yield "username", self.username
         yield "nombre", self.nombre
         yield "apellido", self.apellido
         yield "email", self.email
