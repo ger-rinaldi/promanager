@@ -251,6 +251,25 @@ class prefijos_telefonicos:
 
 
 class Proyecto:
+    @classmethod
+    def get_by_id(cls, id) -> Union["Proyecto", None]:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_query: str = "SELECT * FROM proyecto WHERE id = %s"
+
+        cursor.execute(select_query, (id,))
+
+        loaded_proyect: RowType | None = cursor.fetchone()
+
+        if loaded_proyect is not None:
+            loaded_proyect: "Proyecto" = Proyecto(**loaded_proyect)
+
+        cursor.close()
+        cnx.close()
+
+        return loaded_proyect
+
     def __init__(
         self,
         nombre: str,
