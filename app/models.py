@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Optional, Sequence, Union
 
 from bcrypt import checkpw, gensalt, hashpw
