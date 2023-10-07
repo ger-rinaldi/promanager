@@ -1,3 +1,5 @@
+from input_validation import Errors, validate_user
+from models import Usuario, prefijos_telefonicos
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 from wsgi_app import (
@@ -14,9 +16,6 @@ bp = Blueprint(base_prefix="auth")
 
 @bp.route(endpoint_route="/register", is_prefix_endpoint=True)
 def register():
-    from input_validation import validate_user
-    from models import Usuario, prefijos_telefonicos
-
     register_template = "auth/register.html"
     errors = []
 
@@ -60,9 +59,21 @@ def login():
     errors = []
 
     if request.method == "POST":
-        from models import Usuario
-
         user_auth_info = request.form
+
+        if not validate_user.email_address_validator(user_auth_info["identif"]):
+            errors.append(Errors.invalid_email)
+        elif validate_user.check_email_not_registered(user_auth_info["identif"]):
+            errors.append("El email ingresado no esta registrado")
+
+        if not validate_user.username_length(user_auth_info["identif"]):
+            errors.append(Errors.email_alreay_registered)
+        elif validate_user.username_not_registered(user_auth_info["identif"]):
+            errors.append("El nombre de usuario ingresado no esta registrado")
+
+        if errors:
+            response = make_response(render_template(template_name, errors=errors))
+            return response
 
         logged_user = Usuario.get_user_auth(**user_auth_info)
 
