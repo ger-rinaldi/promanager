@@ -303,6 +303,8 @@ class Proyecto:
         fecha_inicio: date,
         fecha_finalizacion: date,
         id: Optional[int] = None,
+        instatiate_components: Optional[bool] = True,
+        components_as_dicts: Optional[bool] = True,
     ) -> None:
         self.id = id
         self.nombre = nombre
@@ -312,12 +314,13 @@ class Proyecto:
         self.presupuesto = presupuesto
         self.fecha_inicio = fecha_inicio
         self.fecha_finalizacion = fecha_finalizacion
-        self.participantes = []
-        self._fetch_all_participants()
-        self.equipos = []
-        self._fetch_all_teams()
-        self.tareas = []
-        self._fetch_all_tasks()
+        if instatiate_components:
+            self.participantes = []
+            self._fetch_all_participants(as_dicts=components_as_dicts)
+            self.equipos = []
+            self._fetch_all_teams(as_dicts=components_as_dicts)
+            self.tareas = []
+            self._fetch_all_tasks(as_dicts=components_as_dicts)
 
     def create(self) -> None:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
