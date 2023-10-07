@@ -107,6 +107,10 @@ class Usuario:
         telefono_numero: str,
         contrasena: Optional[str] = None,
         id: Optional[int] = None,
+        id_integrante: Optional[int] = None,
+        id_miembro: Optional[int] = None,
+        rol_proyecto: Optional[str] = None,
+        rol_equipo: Optional[str] = None,
     ) -> None:
         self.id = id
         self.nombre = nombre
@@ -114,6 +118,10 @@ class Usuario:
         self.email = email
         self.telefono_prefijo = telefono_prefijo
         self.telefono_numero = telefono_numero
+        self.id_integrante = id_integrante
+        self.id_miembro = id_miembro
+        self.rol_proyecto = rol_proyecto
+        self.rol_equipo = rol_equipo
 
         if contrasena is not None and not contrasena[0:3] == "$2b":
             self.contrasena = hashpw(contrasena.encode("utf8"), gensalt())
