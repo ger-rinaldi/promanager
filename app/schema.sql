@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS proyecto(
 -- table
 CREATE TABLE IF NOT EXISTS usuario(
     id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(60) NOT NULL DEFAULT 'no_name',
     apellido VARCHAR(60) NOT NULL DEFAULT 'no_surname',
     email VARCHAR(320) UNIQUE NOT NULL,
