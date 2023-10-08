@@ -381,7 +381,7 @@ class Proyecto:
         presupuesto, fecha_inicio, fecha_finalizacion)
         VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 
-        cursor.execute(insert_query, (self.__tuple__(),))
+        cursor.execute(insert_query, self.__tuple__())
 
         cnx.commit()
         cursor.close()
