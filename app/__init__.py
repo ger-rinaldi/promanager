@@ -21,4 +21,8 @@ def create_app(with_static=True):
 
     new_app.register_blueprint(auth.bp)
 
+    import user_endpoints
+
+    new_app.register_blueprint(user_endpoints.bp)
+
     return new_app
