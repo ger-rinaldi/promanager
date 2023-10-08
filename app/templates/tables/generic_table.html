@@ -26,7 +26,9 @@
     {% for row in data %}
     <tr>
       {% for value in row.values() %}
-      <td class="text-center">{{ value }}</td>
+        <td class="text-center">
+          {{ "Sí" if value == 1 else "No" if value == 0 else value }}
+        </td>
       {% endfor %}
     </tr>
     {% endfor %}
