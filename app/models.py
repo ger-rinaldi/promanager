@@ -521,7 +521,8 @@ class Ticket_Tarea:
             inner join
             usuario as u
             on m.miembro = u.id
-            where u.id = %s;
+            where u.id = %s
+            order by t.id;
         """
 
         cursor.execute(select_query, (user_id,))
@@ -575,7 +576,8 @@ class Equipo:
                 INNER JOIN
                 roles_equipo as re
                 ON re.id = m.rol
-                WHERE m.miembro = %s;
+                WHERE m.miembro = %s
+                ORDER BY e.id;
         """
 
         cursor.execute(select_query, (member_id,))
