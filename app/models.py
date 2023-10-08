@@ -294,6 +294,37 @@ class prefijos_telefonicos:
 
 class Proyecto:
     @classmethod
+    def get_by_participant(cls, participant_id):
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_query: str = """SELECT
+                p.id as 'id proyecto', p.nombre as 'nombre proyecto'
+                , p.es_publico as "publico", p.activo, p.presupuesto
+                , p.fecha_inicio as "fecha inicio", p.fecha_finalizacion as "fecha finalizacion"
+                , i.id as 'id integrante', rp.nombre as 'rol'
+                FROM
+                proyecto as  p
+                INNER JOIN
+                integrantes_proyecto as i
+                ON p.id = i.proyecto
+                INNER JOIN
+                roles_proyecto as rp
+                ON rp.id = i.rol
+                WHERE i.integrante = %s
+                ORDER BY p.id
+        """
+
+        cursor.execute(select_query, (participant_id,))
+
+        proyects_of_participant: RowType | None = cursor.fetchall()
+
+        cursor.close()
+        cnx.close()
+
+        return proyects_of_participant
+
+    @classmethod
     def get_by_id(cls, id) -> Union["Proyecto", None]:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
@@ -470,6 +501,38 @@ class Proyecto:
 
 
 class Ticket_Tarea:
+    @classmethod
+    def get_by_asigned_user(cls, user_id):
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_query: str = """select
+            t.id as "id tarea", t.proyecto as "proyecto padre", t.equipo as "equipo encargado"
+            , t.nombre, t.estado, t.fecha_asignacion as "asignada a equipo", t.fecha_limite as "limite"
+            , a.id as "asignacion nº", a.fecha_asignacion as "asignada a usuario"
+            from
+            ticket_tarea as t
+            inner join
+            asignacion_tarea as a
+            on t.id = a.ticket_tarea
+            inner join
+            miembros_equipo as m
+            on a.miembro = m.id
+            inner join
+            usuario as u
+            on m.miembro = u.id
+            where u.id = %s;
+        """
+
+        cursor.execute(select_query, (user_id,))
+
+        tasks_of_user: RowType | None = cursor.fetchall()
+
+        cursor.close()
+        cnx.close()
+
+        return tasks_of_user
+
     def __init__(
         self,
         proyecto: Union[int, "Proyecto"],
@@ -496,6 +559,34 @@ class Ticket_Tarea:
 
 
 class Equipo:
+    @classmethod
+    def get_by_member(cls, member_id):
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        select_query: str = """SELECT
+                e.id as "id equipo", e.nombre as "nombre equipo", e.proyecto as "proyecto padre"
+                , m.id as "id miembro", re.nombre as "rol", m.suspendido
+                FROM
+                equipo as  e
+                INNER JOIN
+                miembros_equipo as m
+                ON e.id = m.equipo
+                INNER JOIN
+                roles_equipo as re
+                ON re.id = m.rol
+                WHERE m.miembro = %s;
+        """
+
+        cursor.execute(select_query, (member_id,))
+
+        teams_of_member: RowType | None = cursor.fetchall()
+
+        cursor.close()
+        cnx.close()
+
+        return teams_of_member
+
     def __init__(
         self,
         nombre: str,
