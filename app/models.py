@@ -415,7 +415,7 @@ class Proyecto:
 
         return self.id
 
-    def _fetch_all_participants(self, as_dicts: bool) -> list[RowType]:
+    def _fetch_all_participants(self, as_dicts: bool = True) -> list[RowType]:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
