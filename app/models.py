@@ -400,6 +400,20 @@ class Proyecto:
         cursor.close()
         cnx.close()
 
+    def register_new_participant(self, participant_id: int, role_id: int) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        insert_participant = """INSERT INTO 
+        integrantes_proyecto(proyecto, integrante, rol ) 
+        VALUES (%s, %s, %s)"""
+
+        cursor.execute(insert_participant, (self.id, participant_id, role_id))
+
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        self._fetch_all_participants()
 
     def _query_id(self):
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
