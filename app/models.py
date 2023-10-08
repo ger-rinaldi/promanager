@@ -386,6 +386,7 @@ class Proyecto:
         cnx.commit()
         cursor.close()
         cnx.close()
+        self._query_id()
 
     def delete(self) -> None:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
@@ -398,6 +399,21 @@ class Proyecto:
         cnx.commit()
         cursor.close()
         cnx.close()
+
+
+    def _query_id(self):
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        fetch_id = """SELECT id FROM proyecto WHERE nombre = %s"""
+
+        cursor.execute(fetch_id, (self.nombre,))
+        self.id = cursor.fetchone()[0]
+
+        cursor.close()
+        cnx.close()
+
+        return self.id
 
     def _fetch_all_participants(self, as_dicts: bool) -> list[RowType]:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
