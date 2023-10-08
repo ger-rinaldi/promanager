@@ -14,6 +14,16 @@ endblock %}
 </form>
 
 <div class="container-fluid my-4">
+  <a href="/usuario/{{resource}}/crear"
+    ><button
+      class="btn btn-info mb-3 w-100"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Crea un nuevo {{resource}}"
+    >
+      Crear nuevo {{resource|title}}
+    </button></a
+  >
   {% if data %}
 
   <table class="table table-striped table-bordered table-hover">
