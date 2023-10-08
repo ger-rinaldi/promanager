@@ -103,6 +103,18 @@ class Usuario:
 
         return checkpw(passwd.encode("utf8"), fetched_passwd.encode("utf8"))
 
+    @classmethod
+    def remove_session(cls, user_id: int) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        sql = "UPDATE usuario SET llave_sesion = 'not_logged' WHERE id = %s"
+
+        cursor.execute(sql, (user_id,))
+
+        cursor.close()
+        cnx.close()
+
     def __init__(
         self,
         username: str,

@@ -8,6 +8,7 @@ from wsgi_app import (
     make_response,
     render_template,
     request,
+    session,
     set_session_values,
 )
 
@@ -109,4 +110,18 @@ def ask_login():
     response = make_response(render_template("login_required.html"))
     response.status = 401
 
+    return response
+
+
+@bp.route("/logout")
+def logout():
+    Usuario.remove_session(session["id"])
+
+    session.clear()
+
+    response = redirect("/")
+
+    dummy_cookies = generate_session_cookies()
+
+    response.set_cookie(**dummy_cookies)
     return response
