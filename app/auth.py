@@ -63,7 +63,7 @@ def login():
         user_auth_info = request.form
 
         valid_email = validate_user.email_address_validator(user_auth_info["identif"])
-        registered_email = validate_user.check_email_not_registered(
+        registered_email = not validate_user.check_email_not_registered(
             user_auth_info["identif"]
         )
         valid_username = validate_user.username_length(user_auth_info["identif"])
