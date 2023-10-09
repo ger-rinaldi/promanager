@@ -651,3 +651,37 @@ class Equipo:
         self.nombre = nombre
         self.fecha_creacion = fecha_creacion
         self.proyecto = proyecto
+
+
+class Roles:
+    @classmethod
+    def get_proyect_roles(cls):
+        cnx = get_connection()
+        cursor = cnx.cursor(dictionary=True)
+
+        query = "SELECT * FROM roles_proyecto"
+
+        cursor.execute(query)
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        cnx.close()
+
+        return result
+
+    @classmethod
+    def get_team_roles(cls):
+        cnx = get_connection()
+        cursor = cnx.cursor(dictionary=True)
+
+        query = "SELECT * FROM roles_equipo"
+
+        cursor.execute(query)
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        cnx.close()
+
+        return result
