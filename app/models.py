@@ -115,6 +115,27 @@ class Usuario:
         cursor.close()
         cnx.close()
 
+    @classmethod
+    def get_by_username_or_mail(cls, identif: str):
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor(dictionary=True)
+
+        user_info_query_by_email = """SELECT
+            u.id, username, nombre, apellido, email,
+            prefijo AS telefono_prefijo, telefono_numero
+            FROM usuario AS u INNER JOIN prefijo_telefono AS p
+            ON u.telefono_prefijo = p.id
+            WHERE %s IN (email, username)
+            """
+
+        cursor.execute(user_info_query_by_email, (identif,))
+
+        user_info: dict = cursor.fetchone()
+
+        close_conn_cursor(cnx, cursor)
+
+        return Usuario(**user_info)
+
     def __init__(
         self,
         username: str,
