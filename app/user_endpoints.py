@@ -1,3 +1,4 @@
+from input_validation import validate_proyect
 from models import Equipo, Proyecto, Ticket_Tarea, Usuario
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -40,6 +41,54 @@ def user_proyects():
             data=data,
             data_keys=data_keys,
             resource="proyecto",
+        )
+    )
+
+
+@bp.route("/proyecto/crear")
+@required_login
+def create_proyect():
+    errors: list = []
+
+    if request.method == "POST":
+        gerente_id: str = request.form["dueno_id"]
+
+        proyect_info: dict = {}
+
+        proyect_info["nombre"]: str = request.form["nombre"]
+        proyect_info["fecha_inicio"]: str = request.form["fecha_inicio"]
+        proyect_info["fecha_finalizacion"]: str = request.form["fecha_finalizacion"]
+        proyect_info["presupuesto"]: str = request.form["presupuesto"]
+        proyect_info["descripcion"]: str = request.form["descripcion"]
+
+        if request.form.get("es_publico", False):
+            proyect_info["es_publico"]: bool = True
+        else:
+            proyect_info["es_publico"]: bool = False
+
+        if request.form.get("activo", False):
+            proyect_info["activo"]: bool = True
+        else:
+            proyect_info["activo"]: bool = False
+
+        errors = validate_proyect.validate_all(
+            name=proyect_info["nombre"],
+            budget=proyect_info["presupuesto"],
+            start_date=proyect_info["fecha_inicio"],
+            end_date=proyect_info["fecha_finalizacion"],
+        )
+
+        if not errors:
+            new_proyect = Proyecto(**proyect_info)
+            new_proyect.create()
+            new_proyect.register_new_participant(gerente_id, 1)
+
+            return redirect(f"/usuario/proyecto/{new_proyect.id}/integrantes")
+
+    return Response(
+        **render_template(
+            "/create_forms/crear-proyecto.html",
+            errors=errors,
         )
     )
 
