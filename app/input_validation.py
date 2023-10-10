@@ -1,3 +1,4 @@
+import datetime
 import re
 from typing import Union
 
@@ -176,6 +177,71 @@ class validate_user:
         return True
 
 
+class validate_proyect:
+    name_max_len = 60
+    name_min_len = 2
+
+    @classmethod
+    def validate_all(cls, name, budget, start_date, end_date) -> list[str]:
+        errors = []
+
+        if not cls.valid_name_lenght(name):
+            errors.append(Errors.proy_bad_name)
+
+        if not cls.valid_budget_value(budget):
+            errors.append(Errors.bad_budget)
+
+        if not cls.end_after_today(end_date):
+            errors.append(Errors.end_after_today)
+
+        if not cls.start_before(start_date, end_date):
+            errors.append(Errors.start_before)
+
+        return errors
+
+    @classmethod
+    def valid_name_lenght(cls, name: str) -> bool:
+        if cls.name_min_len < len(name) < cls.name_max_len:
+            return True
+
+        return False
+
+    @classmethod
+    def valid_budget_value(cls, budget: str):
+        rgx_numbers: re.Pattern = re.compile(r"[0-9]")
+
+        total_numbers = len(re.findall(rgx_numbers, budget))
+        total_dots = len(re.findall(re.compile("\."), budget))
+
+        if not total_numbers >= len(budget) - 1:
+            return False
+
+        if not total_dots <= 1:
+            return False
+
+        return True
+
+    @classmethod
+    def start_before(cls, start_date: str, end_date: str) -> bool:
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        if start_date >= end_date:
+            return False
+
+        return True
+
+    @classmethod
+    def end_after_today(cls, end_date: str) -> bool:
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+        today = datetime.date.today()
+
+        if end_date <= today:
+            return False
+
+        return True
+
+
 class Errors:
     non_unique_username: str = "El nombre de usuario ingresado ya está registrado"
 
@@ -199,3 +265,12 @@ class Errors:
 
     phonetoolong: str = f"El número de teléfono no puede ser mayor a\
         {validate_user.phone_max_length} caracteres"
+
+    proy_bad_name: str = f"Nombre de proyecto inválido. Debe contener entre \
+    {validate_proyect.name_min_len} y {validate_proyect.name_max_len} caracteres."
+
+    bad_budget: str = "Valor de presupuesto inválido. Solo puede contener numeros y un punto para decimales"
+
+    start_before: str = f"Fechas ingresadas inválidas. La fecha de inicio debe ser anterior a la de finalización."
+
+    end_after_today: str = f"Fecha de finalización inválida. El proyecto debe terminar después de la fecha corriente."
