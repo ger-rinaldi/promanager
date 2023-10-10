@@ -41,31 +41,16 @@ endblock %}
           {% for value in row.values() %}
           <td class="text-center">{{ value }}</td>
           {% endfor %}
-          <td>
-            <a
-              href="/usuario/{{resource}}/{{row['id {{resource}}']}}/modificar"
-            >
-              <button
-                type="button"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Modificar {{resource}}"
-                class="btn btn-warning btn-sm"
-              >
-                M
-              </button>
-            </a>
-            <a href="/usuario/{{resource}}/{{row['id {{resource}}']}}/eliminar">
-              <button
-                type="button"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Eliminar {{resource}}"
-                class="btn btn-danger btn-sm"
-              >
-                X
-              </button>
-            </a>
+          <td class="d-flex justify-content-between align-items-center">
+            <!-- prettier-ignore -->
+            {% if resource=="proyecto" %}
+                {% include '/tables/proyecto_actions.html' %}
+            {% elif resource=="equipo" %}
+                {% include '/tables/equipo_actions.html' %}
+            {% elif resource=="tarea" %}
+                {% include '/tables/tarea_actions.html' %}
+            {% else %}
+            {% endif %}
           </td>
         </tr>
         {% endfor %}
