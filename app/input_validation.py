@@ -180,6 +180,8 @@ class validate_user:
 class validate_proyect:
     name_max_len = 60
     name_min_len = 2
+    max_budget = 2**63
+    min_budget = -max_budget - 1
 
     @classmethod
     def validate_all(cls, name, budget, start_date, end_date) -> list[str]:
@@ -188,14 +190,17 @@ class validate_proyect:
         if not cls.valid_name_lenght(name):
             errors.append(Errors.proy_bad_name)
 
-        if not cls.valid_budget_value(budget):
-            errors.append(Errors.bad_budget)
+        if not cls.valid_budget_type(budget):
+            errors.append(Errors.bad_budget_type)
 
         if not cls.end_after_today(end_date):
             errors.append(Errors.end_after_today)
 
         if not cls.start_before(start_date, end_date):
             errors.append(Errors.start_before)
+
+        elif not cls.valid_budget_amount(budget):
+            errors.append(Errors.bad_budget_amount)
 
         return errors
 
@@ -207,7 +212,7 @@ class validate_proyect:
         return False
 
     @classmethod
-    def valid_budget_value(cls, budget: str):
+    def valid_budget_type(cls, budget: str):
         rgx_numbers: re.Pattern = re.compile(r"[0-9]")
 
         total_numbers = len(re.findall(rgx_numbers, budget))
@@ -241,6 +246,13 @@ class validate_proyect:
 
         return True
 
+    @classmethod
+    def valid_budget_amount(cls, budget) -> bool:
+        if not cls.min_budget < float(budget) < cls.max_budget:
+            return False
+
+        return True
+
 
 class Errors:
     non_unique_username: str = "El nombre de usuario ingresado ya está registrado"
@@ -269,8 +281,10 @@ class Errors:
     proy_bad_name: str = f"Nombre de proyecto inválido. Debe contener entre \
     {validate_proyect.name_min_len} y {validate_proyect.name_max_len} caracteres."
 
-    bad_budget: str = "Valor de presupuesto inválido. Solo puede contener numeros y un punto para decimales"
+    bad_budget_type: str = "Tipo de presupuesto inválido. Solo puede contener numeros y un punto para decimales"
 
     start_before: str = f"Fechas ingresadas inválidas. La fecha de inicio debe ser anterior a la de finalización."
 
     end_after_today: str = f"Fecha de finalización inválida. El proyecto debe terminar después de la fecha corriente."
+
+    bad_budget_amount: str = f"La cantidad de presupuesto no es válida. debe encontrarse entre -2<sup>63</sup> y 2<sup>63</sup>"

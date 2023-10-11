@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS proyecto(
     descripcion TINYTEXT,
     es_publico BOOLEAN NOT NULL DEFAULT false,
     activo BOOLEAN NOT NULL DEFAULT true,
-    presupuesto INT NOT NULL DEFAULT -1,
+    presupuesto BIGINT NOT NULL DEFAULT -1,
     fecha_inicio DATE NOT NULL DEFAULT (CURRENT_DATE()),
     fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01'
 );
