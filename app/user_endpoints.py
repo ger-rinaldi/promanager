@@ -93,6 +93,49 @@ def create_proyect():
     )
 
 
+@bp.route("/proyecto/<int:proyect_id>/modificar")
+@required_login
+def modify_proyect(proyect_id):
+    errors = []
+
+    if request.method == "POST":
+        proyect_info: dict = request.form.copy()
+
+        if proyect_info.get("descripcion", False):
+            proyect_info["descripcion"] = proyect_info["descripcion"].strip()
+
+        if request.form.get("es_publico", False):
+            proyect_info["es_publico"]: bool = True
+        else:
+            proyect_info["es_publico"]: bool = False
+
+        if request.form.get("activo", False):
+            proyect_info["activo"]: bool = True
+        else:
+            proyect_info["activo"]: bool = False
+
+        errors = validate_proyect.validate_all(
+            name=proyect_info["nombre"],
+            budget=proyect_info["presupuesto"],
+            start_date=proyect_info["fecha_inicio"],
+            end_date=proyect_info["fecha_finalizacion"],
+        )
+
+        if not errors:
+            proyect_to_update = Proyecto(**proyect_info, instatiate_components=False)
+            proyect_to_update.update()
+
+    proyect_to_update = Proyecto.get_by_id(proyect_id)
+
+    return Response(
+        **render_template(
+            "/update_forms/ajustes-proyecto.html",
+            proyect=proyect_to_update,
+            errors=errors,
+        )
+    )
+
+
 @bp.route("/equipo")
 @required_login
 def user_teams():
@@ -137,4 +180,3 @@ def user_tasks():
             resource="tarea",
         )
     )
-
