@@ -1,14 +1,24 @@
 {% extends "nav_foot.html" %}
-
 <!-- prettier-ignore -->
+{% block title %}
+  Modificar Proyecto
+{% endblock %}
+
 {% block nf_content %}
+<script src="/static/confirm_del_proyect.js"></script>
 
 <div class="container">
   <!-- Mostrar errores de autenticación -->
   {% include '/error_display.html' %}
 
   <form class="needs-validation was-validated" novalidate="" method="POST">
-    <input type="number" name="id" value="{{proyect.id }}" hidden />
+    <input
+      type="number"
+      name="id"
+      id="id_recurso"
+      value="{{proyect.id }}"
+      hidden
+    />
 
     <!-- Nombre de creador y proyecto -->
     <div class="row mt-3 align-items-end">
@@ -158,6 +168,13 @@
       Actualizar proyecto
     </button>
   </form>
+  <button
+    class="w-100 btn btn-danger btn-lg mt-1"
+    type="submit"
+    onclick="delete_resource()"
+  >
+    Eliminar Proyecto
+  </button>
 </div>
 
 {% endblock nf_content %}
