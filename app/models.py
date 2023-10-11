@@ -409,6 +409,22 @@ class Proyecto:
         cnx.close()
         self._query_id()
 
+    def update(self) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        insert_query: str = """UPDATE proyecto
+        SET
+        nombre=%s, descripcion=%s, es_publico=%s, activo=%s,
+        presupuesto=%s, fecha_inicio=%s, fecha_finalizacion=%s
+        WHERE id=%s"""
+
+        cursor.execute(insert_query, (*self.__tuple__(), self.id))
+
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+
     def delete(self) -> None:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor()
