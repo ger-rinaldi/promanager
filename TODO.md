@@ -22,10 +22,6 @@ Fecha de inicio: 1/9/23
 
 ### Requisitos micro de macro actual
 
-- Modificacion de proyecto ya creado
-- Validacion de valores modificados
-- Mostrar errores
-- Vista de modificación
 - Vista de información de proyecto (sin permitir modificar)
 - Baja y confirmación de baja de proyecto
   - borrado de registros relacionados
@@ -35,3 +31,7 @@ Fecha de inicio: 1/9/23
 - creación de proyecto
 - validación de datos de creacion
 - mostrar errores de creación de proyectos
+- Modificacion de proyecto ya creado
+- Validacion de valores modificados
+- Mostrar errores
+- Vista de modificación
