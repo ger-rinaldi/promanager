@@ -1,0 +1,163 @@
+{% extends "nav_foot.html" %}
+
+<!-- prettier-ignore -->
+{% block nf_content %}
+
+<div class="container">
+  <!-- Mostrar errores de autenticación -->
+  {% include '/error_display.html' %}
+
+  <form class="needs-validation was-validated" novalidate="" method="POST">
+    <input type="number" name="id" value="{{proyect.id }}" hidden />
+
+    <!-- Nombre de creador y proyecto -->
+    <div class="row mt-3 align-items-end">
+      <!-- Nombre del proyecto -->
+      <div class="col position-relative">
+        <label for="nombre" class="form-label">Nombre de proyecto</label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Nombre de tu proyecto"
+          id="nombre"
+          value="{{proyect.nombre}}"
+          name="nombre"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          ¡Tu proyecto necesita un nombre!
+        </div>
+      </div>
+      <div
+        class="col col-lg-1 d-flex justify-content-center align-items-center"
+      >
+        <a href="/usuario/proyecto/{{proyect.id}}/integrantes">
+          <div
+            class="btn btn-info"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Ver integrantes"
+          >
+            <img
+              src="/static/view.png"
+              alt=""
+              style="width: 16px; height: 16px"
+            />
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Fechas -->
+    <div class="row g-3 mt-3">
+      <!-- Fecha de inicio -->
+      <div class="col-sm-6 position-relative">
+        <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
+        <input
+          type="date"
+          class="form-control"
+          id="fecha_inicio"
+          name="fecha_inicio"
+          value="{{proyect.fecha_inicio|string}}"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          Inicio de actividad de proyecto.
+        </div>
+        <div class="invalid-feedback position-absolute">
+          No puede ser posterior a su finalización.
+        </div>
+      </div>
+
+      <!-- Fecha de finalizacion -->
+      <div class="col-sm-6 position-relative">
+        <label for="fecha_finalizacion" class="form-label"
+          >Fecha de finalización</label
+        >
+        <input
+          type="date"
+          class="form-control"
+          id="fecha_finalizacion"
+          name="fecha_finalizacion"
+          value="{{proyect.fecha_finalizacion|string}}"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          Fecha estimativa de finalización.
+        </div>
+        <div class="invalid-feedback position-absolute">
+          No puede ser previa a la de inicio.
+        </div>
+      </div>
+    </div>
+
+    <!-- Presupuesto -->
+    <div class="row g-3 mt-3">
+      <div class="">
+        <label for="presupuesto" class="form-label">Presupuesto</label>
+        <input
+          type="text"
+          class="form-control"
+          id="presupuesto"
+          name="presupuesto"
+          placeholder="999999.99"
+          value="{{proyect.presupuesto}}"
+          required
+        />
+        <div class="invalid-feedback">
+          Presupuesto con el que cuenta tu proyecto.
+        </div>
+        <div class="invalid-feedback">
+          Para indicar decimales usar punto ( <b>.</b> ).
+        </div>
+      </div>
+    </div>
+
+    <!-- Descripcion -->
+    <div class="row g-3 mt-3">
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea
+          class="form-control"
+          id="descripcion"
+          name="descripcion"
+          placeholder="Descripción de tu proyecto"
+          rows="3"
+          required
+        >
+{{proyect.descripcion}}
+      </textarea
+        >
+      </div>
+    </div>
+
+    <!-- checkboxes -->
+    <div class="row g-3 mt-3">
+      <!-- box publico -->
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="es_publico"
+        name="es_publico" {{ "checked" if proyect.es_publico }} />
+        <label class="form-check-label" for="es_publico"
+          >Público: cualquiera puede ver este proyecto.</label
+        >
+      </div>
+
+      <!-- box activo -->
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="activo"
+        name="activo" {{ "checked" if proyect.activo }} />
+        <label class="form-check-label" for="activo"
+          >Activo: se esta trabajando en el proyecto actualmente.</label
+        >
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
+      Actualizar proyecto
+    </button>
+  </form>
+</div>
+
+{% endblock nf_content %}
