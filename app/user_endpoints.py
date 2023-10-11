@@ -136,6 +136,15 @@ def modify_proyect(proyect_id):
     )
 
 
+@bp.route("/proyecto/<int:proyect_id>/eliminar")
+@required_login
+def delete_proyect(proyect_id):
+    if request.method == "POST":
+        proyect_to_delete = Proyecto.get_by_id(proyect_id)
+        proyect_to_delete.delete()
+    return redirect("/usuario/proyecto")
+
+
 @bp.route("/equipo")
 @required_login
 def user_teams():
