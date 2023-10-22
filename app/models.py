@@ -14,7 +14,8 @@ class Usuario:
     def get_user_by_id(cls, id: int) -> Union["Usuario", None]:
         user_info_query_by_id = """SELECT
             u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero
+            prefijo AS telefono_prefijo, telefono_numero,
+            llave_sesion
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
             WHERE u.id = %s
@@ -36,7 +37,8 @@ class Usuario:
     def get_user_by_session_id(self, session_id: str) -> Union["Usuario", None]:
         user_info_query_by_id = """SELECT
             u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero
+            prefijo AS telefono_prefijo, telefono_numero,
+            llave_sesion
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
             WHERE u.llave_sesion = %s
@@ -64,7 +66,8 @@ class Usuario:
 
         user_info_query_by_email = """SELECT
             u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero
+            prefijo AS telefono_prefijo, telefono_numero,
+            llave_sesion
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
             WHERE %s IN (email, username)
@@ -122,7 +125,8 @@ class Usuario:
 
         user_info_query_by_email = """SELECT
             u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero
+            prefijo AS telefono_prefijo, telefono_numero,
+            llave_sesion
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
             WHERE %s IN (email, username)
@@ -150,6 +154,7 @@ class Usuario:
         id_miembro: Optional[int] = None,
         rol_proyecto: Optional[str] = None,
         rol_equipo: Optional[str] = None,
+        llave_sesion: Optional[str] = None,
     ) -> None:
         self.id = id
         self.username = username
@@ -162,6 +167,7 @@ class Usuario:
         self.id_miembro = id_miembro
         self.rol_proyecto = rol_proyecto
         self.rol_equipo = rol_equipo
+        self.llave_sesion = llave_sesion
 
         if contrasena is not None and not contrasena[0:3] == "$2b":
             self.contrasena = hashpw(contrasena.encode("utf8"), gensalt())
@@ -284,6 +290,9 @@ class Usuario:
 
         if self.rol_equipo is not None:
             yield "rol_equipo", self.rol_equipo
+
+        if self.llave_sesion is not None:
+            yield "llave_sesion", self.llave_sesion
 
 
 class prefijos_telefonicos:
