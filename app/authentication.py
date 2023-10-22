@@ -45,6 +45,30 @@ def generate_session_cookies() -> dict:
     return session_cookies
 
 
+def _is_logged() -> bool:
+    request_session_id = request.cookies.get("sessionId", False)
+
+    if not request_session_id:
+        return False
+
+    cnx = get_connection()
+
+    cursor = cnx.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT 1 FROM usuario WHERE llave_sesion = %s",
+        (request_session_id,),
+    )
+
+    key_exists = cursor.fetchone()
+
+    close_conn_cursor(cnx, cursor)
+
+    if key_exists is None:
+        return False
+
+    return True
+
 
 def required_login(func: types.FunctionType) -> Response:
     """Decorador de verificación de sesion de usuario en cliente.
@@ -58,24 +82,7 @@ def required_login(func: types.FunctionType) -> Response:
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> Response:
-        if "sessionId" in request.cookies.keys():
-            sessionId = request.cookies["sessionId"]
-        else:
-            return redirect("/auth/login_required")
-
-        from db import close_conn_cursor, get_connection
-
-        cnx = get_connection()
-
-        cursor = cnx.cursor()
-
-        cursor.execute("SELECT 1 FROM usuario WHERE llave_sesion = %s", (sessionId,))
-
-        query_result = cursor.fetchone()
-
-        close_conn_cursor(cnx, cursor)
-
-        if query_result is None:
+        if not _is_logged():
             return redirect("/auth/login_required")
 
         return func(*args, **kwargs)
