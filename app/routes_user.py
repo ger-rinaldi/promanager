@@ -27,7 +27,8 @@ def dashboard(username):
 @need_authorization
 def user_proyects(username):
     current_user = Usuario.get_by_username_or_mail(username)
-    data = Proyecto.get_by_participant(current_user.id)
+    current_user.load_own_resources()
+    data = current_user.proyectos
 
     if data:
         data_keys = data[0].keys()
@@ -169,7 +170,8 @@ def delete_proyect(username, proyect_id):
 @need_authorization
 def user_teams(username):
     current_user = Usuario.get_by_username_or_mail(username)
-    data = Equipo.get_by_member(current_user.id)
+    current_user.load_own_resources()
+    data = current_user.equipos
 
     if data:
         data_keys = data[0].keys()
@@ -195,7 +197,8 @@ def user_teams(username):
 @need_authorization
 def user_tasks(username):
     current_user = Usuario.get_by_username_or_mail(username)
-    data = Ticket_Tarea.get_by_asigned_user(current_user.id)
+    current_user.load_own_resources()
+    data = current_user.tareas
 
     if data:
         data_keys = data[0].keys()

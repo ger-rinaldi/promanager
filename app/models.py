@@ -220,9 +220,9 @@ class Usuario:
         return False
 
     def load_own_resources(self):
-        self.proyectos = Proyecto.get_by_participant(self.id)
-        self.equipos = Equipo.get_by_member(self.id)
-        self.tareas = Ticket_Tarea.get_by_asigned_user(self.id)
+        self.proyectos = Proyecto._get_all_of_participant(self.id)
+        self.equipos = Equipo._get_by_member(self.id)
+        self.tareas = Ticket_Tarea._get_by_asigned_user(self.id)
 
     def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla
@@ -332,7 +332,7 @@ class prefijos_telefonicos:
 
 class Proyecto:
     @classmethod
-    def get_by_participant(cls, participant_id):
+    def _get_all_of_participant(cls, participant_id):
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
@@ -586,7 +586,7 @@ class Proyecto:
 
 class Ticket_Tarea:
     @classmethod
-    def get_by_asigned_user(cls, user_id):
+    def _get_by_asigned_user(cls, user_id):
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
@@ -645,7 +645,7 @@ class Ticket_Tarea:
 
 class Equipo:
     @classmethod
-    def get_by_member(cls, member_id):
+    def _get_by_member(cls, member_id):
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
