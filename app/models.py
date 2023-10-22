@@ -210,6 +210,11 @@ class Usuario:
 
         return False
 
+    def load_own_resources(self):
+        self.proyectos = Proyecto.get_by_participant(self.id)
+        self.equipos = Equipo.get_by_member(self.id)
+        self.tareas = Ticket_Tarea.get_by_asigned_user(self.id)
+
     def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla
 
