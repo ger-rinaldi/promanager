@@ -14,7 +14,6 @@ from contextvars import ContextVar
 
 from config import DOMAIN
 from jinja2 import Environment, FileSystemLoader, Template
-from models import Usuario
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.local import LocalProxy
 from werkzeug.routing import Map, Rule
@@ -28,44 +27,14 @@ del tiempo de vida de las instancias de aplicación.
 
 _request_ctx_var: definicion de variable de contexto de request (solicitud)
 request: LocalProxy de _request_ctx_var
-
-_session_ctx_var: definicion de variable de contexto para diccionario de sesión de usuaro
-session: LocalProxy de diccionario de sesión
-
 """
 
 _request_ctx_var: ContextVar[str] = ContextVar("request")
 request: Request = LocalProxy(_request_ctx_var)
 
 
-_session_ctx_var: ContextVar[dict] = ContextVar("user_session", default={})
-session: dict = LocalProxy(_session_ctx_var)
-
-
-def set_session_values(new_session_values: iter) -> None:
-    """
-    Esta función establece los valores de la sesión con los datos proporcionados en `new_session_values`.
-
-    Args:
-        new_session_values (iter): Iterable que contiene los nuevos valores de sesión en pares clave-valor.
-
-    Raises:
-        TypeError: Si `new_session_values` no es un objeto iterable.
-
-    Returns:
-        None: Esta función no devuelve ningún valor.
-    """
-    if not hasattr(new_session_values, "__iter__"):
-        raise TypeError("_set_session_values solo acepta objetos iterables")
-
-    for k, v in new_session_values:
-        session[k] = v
-
-
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
-
-jinja_env.globals.update(session=session)
 
 
 def render_template(template_name: str, **context) -> dict[Template, str]:
@@ -425,18 +394,6 @@ class wsgi:
 
         request = Request(environ)
         self._request_ctx_var.set(request)
-
-        if request.cookies:
-            session_id = request.cookies.get("sessionId", None)
-
-            if session_id is not None and not session:
-                session_user = Usuario.get_user_by_session_id(session_id)
-
-                if session_user is not None:
-                    set_session_values(session_user)
-
-        elif session:
-            session.clear()
 
         response = self.dispatch_request()
 

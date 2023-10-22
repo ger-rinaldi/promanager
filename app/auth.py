@@ -8,8 +8,6 @@ from wsgi_app import (
     make_response,
     render_template,
     request,
-    session,
-    set_session_values,
 )
 
 bp = Blueprint(base_prefix="auth")
@@ -92,8 +90,7 @@ def login():
         session_cookie = generate_session_cookies()
 
         if logged_user.set_session_id(session_cookie["value"]):
-            set_session_values(logged_user)
-            response = redirect("/usuario/dashboard")
+            response = redirect(f"/usuario/{logged_user.username}/dashboard")
             response.set_cookie(**session_cookie)
 
             return response
@@ -115,10 +112,6 @@ def ask_login():
 
 @bp.route("/logout")
 def logout():
-    Usuario.remove_session(session["id"])
-
-    session.clear()
-
     response = redirect("/")
 
     dummy_cookies = generate_session_cookies()

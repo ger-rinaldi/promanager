@@ -15,20 +15,32 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        {% if session %}
+        {% if current_user %}
 
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a href="/usuario/dashboard" class="nav-link">Dashboard</a>
+            <a
+              href="/usuario/{{current_user.username}}/dashboard"
+              class="nav-link"
+              >Dashboard</a
+            >
           </li>
           <li class="nav-item">
-            <a href="/usuario/proyecto" class="nav-link">Mis Proyectos</a>
+            <a
+              href="/usuario/{{current_user.username}}/proyecto"
+              class="nav-link"
+              >Mis Proyectos</a
+            >
           </li>
           <li class="nav-item">
-            <a href="/usuario/equipo" class="nav-link">Mis Equipos</a>
+            <a href="/usuario/{{current_user.username}}/equipo" class="nav-link"
+              >Mis Equipos</a
+            >
           </li>
           <li class="nav-item">
-            <a href="/usuario/tarea" class="nav-link">Mis Tareas</a>
+            <a href="/usuario/{{current_user.username}}/tarea" class="nav-link"
+              >Mis Tareas</a
+            >
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
@@ -45,7 +57,7 @@
               class="dropdown-menu dropdown-menu-end"
               aria-labelledby="dropdown04"
             >
-              <li class="dropdown-item">Usuario: {{session["username"]}}</li>
+              <li class="dropdown-item">Usuario: {{current_user.username}}</li>
               <li>
                 <a class="dropdown-item" href="#">Configuración</a>
               </li>

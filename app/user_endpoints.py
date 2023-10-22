@@ -2,21 +2,29 @@ from input_validation import validate_proyect
 from models import Equipo, Proyecto, Ticket_Tarea, Usuario
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wsgi_app import Blueprint, render_template, request, required_login, session
+from wsgi_app import Blueprint, render_template, request, required_login
 
-bp = Blueprint("/usuario")
+bp = Blueprint("/usuario/<string:username>")
 
 
 @bp.route("/dashboard")
 @required_login
-def dashboard():
-    return Response(**render_template("user/dashboard.html"))
+def dashboard(username):
+    current_user = Usuario.get_by_username_or_mail(username)
+
+    return Response(
+        **render_template(
+            "user/dashboard.html",
+            current_user=current_user,
+        )
+    )
 
 
 @bp.route("/proyecto")
 @required_login
-def user_proyects():
-    data = Proyecto.get_by_participant(session["id"])
+def user_proyects(username):
+    current_user = Usuario.get_by_username_or_mail(username)
+    data = Proyecto.get_by_participant(current_user.id)
 
     if data:
         data_keys = data[0].keys()
@@ -41,13 +49,15 @@ def user_proyects():
             data=data,
             data_keys=data_keys,
             resource="proyecto",
+            current_user=current_user,
         )
     )
 
 
 @bp.route("/proyecto/crear")
 @required_login
-def create_proyect():
+def create_proyect(username):
+    current_user = Usuario.get_by_username_or_mail(username)
     errors: list = []
 
     if request.method == "POST":
@@ -89,13 +99,15 @@ def create_proyect():
         **render_template(
             "/create_forms/crear-proyecto.html",
             errors=errors,
+            current_user=current_user,
         )
     )
 
 
 @bp.route("/proyecto/<int:proyect_id>/modificar")
 @required_login
-def modify_proyect(proyect_id):
+def modify_proyect(username, proyect_id):
+    current_user = Usuario.get_by_username_or_mail(username)
     errors = []
 
     if request.method == "POST":
@@ -132,23 +144,25 @@ def modify_proyect(proyect_id):
             "/update_forms/ajustes-proyecto.html",
             proyect=proyect_to_update,
             errors=errors,
+            current_user=current_user,
         )
     )
 
 
 @bp.route("/proyecto/<int:proyect_id>/eliminar")
 @required_login
-def delete_proyect(proyect_id):
+def delete_proyect(username, proyect_id):
     if request.method == "POST":
         proyect_to_delete = Proyecto.get_by_id(proyect_id)
         proyect_to_delete.delete()
-    return redirect("/usuario/proyecto")
+    return redirect(f"/usuario/{username}/proyecto")
 
 
 @bp.route("/equipo")
 @required_login
-def user_teams():
-    data = Equipo.get_by_member(session["id"])
+def user_teams(username):
+    current_user = Usuario.get_by_username_or_mail(username)
+    data = Equipo.get_by_member(current_user.id)
 
     if data:
         data_keys = data[0].keys()
@@ -164,14 +178,16 @@ def user_teams():
             data=data,
             data_keys=data_keys,
             resource="equipo",
+            current_user=current_user,
         )
     )
 
 
 @bp.route("/tarea")
 @required_login
-def user_tasks():
-    data = Ticket_Tarea.get_by_asigned_user(session["id"])
+def user_tasks(username):
+    current_user = Usuario.get_by_username_or_mail(username)
+    data = Ticket_Tarea.get_by_asigned_user(current_user.id)
 
     if data:
         data_keys = data[0].keys()
@@ -187,5 +203,6 @@ def user_tasks():
             data=data,
             data_keys=data_keys,
             resource="tarea",
+            current_user=current_user,
         )
     )
