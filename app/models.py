@@ -29,9 +29,9 @@ class Usuario:
         loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
         if loaded_user is not None:
-            return_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
+            return Usuario(**loaded_user)
 
-        return return_user  # type: ignore
+        return None
 
     @classmethod
     def get_by_session_id(self, session_id: str) -> Union["Usuario", None]:
@@ -52,9 +52,9 @@ class Usuario:
         loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
         if loaded_user is not None:
-            loaded_user: "Usuario" = Usuario(**loaded_user)  # type: ignore
+            return Usuario(**loaded_user)
 
-        return loaded_user  # type: ignore
+        return None
 
     @classmethod
     def get_authenticated(cls, identif: str, contrasena: str) -> Union["Usuario", None]:
@@ -141,7 +141,7 @@ class Usuario:
         if user_info is not None:
             return Usuario(**user_info)
 
-        return user_info
+        return None
 
     def __init__(
         self,
