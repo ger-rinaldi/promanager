@@ -1,0 +1,37 @@
+<!-- prettier-ignore -->
+{% extends 'nav_foot.html' %}
+<!-- prettier-ignore -->
+{% block title %} Sin Sesión {% endblock %}
+<!-- prettier-ignore -->
+{% block nf_content %}
+<div
+  class=".container-fluid modal modal-sheet d-flex align-items-center justify-content-center"
+  tabindex="-1"
+  role="dialog"
+  id="modalChoice"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content rounded-3 shadow">
+      <div class="modal-body p-4 text-center">
+        <h5 class="mb-0">No puedes acceder a este recurso.</h5>
+        <p class="mb-0">
+          No tienes permiso para visualizar este recurso ni modificarlo. No
+          toques lo que no es tuyo.
+        </p>
+      </div>
+      <a
+        class="justify-content-center modal-footer flex-nowrap p-0 text-decoration-none"
+        href="/"
+      >
+        <button
+          type="button"
+          class="btn btn-lg btn-link fs-6 text-decoration-none py-3 m-0 rounded-0"
+        >
+          <strong>Ir a Home</strong>
+        </button>
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

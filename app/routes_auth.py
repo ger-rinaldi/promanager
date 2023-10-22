@@ -104,6 +104,14 @@ def ask_login():
     return response
 
 
+@bp.route("/access_denied")
+def denie_access():
+    response = make_response(render_template("access_denied.html"))
+    response.status = 403
+
+    return response
+
+
 @bp.route("/logout")
 def logout():
     response = redirect("/")
