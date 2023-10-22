@@ -17,12 +17,12 @@ def create_app(with_static=True):
     def home_page():
         return make_response(render_template("home.html"))
 
-    import auth
+    import routes_auth
 
-    new_app.register_blueprint(auth.bp)
+    new_app.register_blueprint(routes_auth.bp)
 
-    import user_endpoints
+    import routes_user
 
-    new_app.register_blueprint(user_endpoints.bp)
+    new_app.register_blueprint(routes_user.bp)
 
     return new_app
