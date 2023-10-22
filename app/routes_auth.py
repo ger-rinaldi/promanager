@@ -1,4 +1,4 @@
-from authentication import generate_session_cookies
+from authentication import generate_session_cookies, required_login
 from input_validation import validate_user
 from models import Usuario, prefijos_telefonicos
 from werkzeug.utils import redirect
@@ -105,7 +105,8 @@ def ask_login():
 
 
 @bp.route("/access_denied")
-def denie_access():
+@required_login
+def denied_access():
     response = make_response(render_template("access_denied.html"))
     response.status = 403
 
