@@ -138,7 +138,10 @@ class Usuario:
 
         close_conn_cursor(cnx, cursor)
 
-        return Usuario(**user_info)
+        if user_info is not None:
+            return Usuario(**user_info)
+
+        return user_info
 
     def __init__(
         self,
