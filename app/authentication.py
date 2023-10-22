@@ -77,11 +77,15 @@ def _has_access() -> bool:
     user_by_path = Usuario.get_by_username_or_mail(resources_queried["usuario"])
     user_by_cookies = Usuario.get_user_by_session_id(request_session_id)
 
+    if user_by_path is None or user_by_cookies is None:
+        return False
+
     if (
         user_by_cookies.llave_sesion != user_by_path.llave_sesion
         or user_by_cookies.username != user_by_path.username
     ):
         return False
+
     resources_queried.pop("usuario")
     user_by_cookies.load_own_resources()
 
