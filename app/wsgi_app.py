@@ -1,23 +1,18 @@
 """Modulo de funcionalidades generales de webapp WSGI y Jinja Engine.
-    Funciones de creación de cookies y validación de sesión, 
+    Funciones de creación de cookies y validación de sesión,
     Generación de motor y renderizado de templates Jinja,
     Creación de Blueprints de rutas
     y apliación WSGI encargada de manejar solicitudes y respuestas.
 """
 
-import datetime
-import functools
 import os
-import secrets
 import types
 from contextvars import ContextVar
 
-from config import DOMAIN
 from jinja2 import Environment, FileSystemLoader, Template
-from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.exceptions import HTTPException
 from werkzeug.local import LocalProxy
 from werkzeug.routing import Map, Rule
-from werkzeug.utils import redirect
 from werkzeug.wrappers import Request, Response
 
 """
@@ -51,78 +46,6 @@ def render_template(template_name: str, **context) -> dict[Template, str]:
     return {"response": template.render(context), "mimetype": "text/html"}
 
 
-def generate_session_cookies() -> dict:
-    """Función para generar las cookies de sesión de usuario.
-    "key": "sessionId",
-    "value": id de sesión,
-    "max_age": 5 días,
-    "expires": 5 días,
-    "path": "/",
-    "domain": dominio del sitio,
-    "secure": True,
-    "httponly": True,
-    "samesite": "lax",
-
-    Returns:
-        dict: con los valores previamente expresados.
-    """
-
-    now = datetime.datetime.now(datetime.timezone.utc)
-    max_age = datetime.timedelta(days=5)
-    expires = datetime.datetime.now(datetime.timezone.utc) + max_age
-
-    session_cookies = {
-        "key": "sessionId",
-        "value": secrets.token_urlsafe(16),
-        "max_age": max_age,
-        "expires": expires,
-        "path": "/",
-        "domain": DOMAIN,
-        "secure": True,
-        "httponly": True,
-        "samesite": "lax",
-    }
-
-    return session_cookies
-
-
-def required_login(func: types.FunctionType) -> Response:
-    """Decorador de verificación de sesion de usuario en cliente.
-    Recibe la función de un endpoint/vista y la ejecuta solamente
-    si el usuarió cuenta con cookies de sesión y dicha sesión
-    esta registrada en la base de datos.
-
-    Returns:
-        Function: ejecuta la funcion de endpoint y retorna su respuesta (response).
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs) -> Response:
-        if "sessionId" in request.cookies.keys():
-            sessionId = request.cookies["sessionId"]
-        else:
-            return redirect("/auth/login_required")
-
-        from db import close_conn_cursor, get_connection
-
-        cnx = get_connection()
-
-        cursor = cnx.cursor()
-
-        cursor.execute("SELECT 1 FROM usuario WHERE llave_sesion = %s", (sessionId,))
-
-        query_result = cursor.fetchone()
-
-        close_conn_cursor(cnx, cursor)
-
-        if query_result is None:
-            return redirect("/auth/login_required")
-
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
 def make_response(response_attr: dict) -> Response:
     """_summary_
 
@@ -145,7 +68,8 @@ def _get_endpoint_name(endpoint: str | types.FunctionType) -> str:
     Visibilidad privada, sólo del módulo.
 
     Args:
-        endpoint (str, Function): endpoint del cual debe obtenerse el nombre, si str, retornar sin cambios.
+        endpoint (str, Function): endpoint del cual debe obtenerse el nombre,
+        si str, retornar sin cambios.
 
     Raises:
         Exception: Solo acepta str y Function

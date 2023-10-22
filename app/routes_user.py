@@ -1,8 +1,9 @@
+from authentication import required_login
 from input_validation import validate_proyect
 from models import Equipo, Proyecto, Ticket_Tarea, Usuario
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wsgi_app import Blueprint, render_template, request, required_login
+from wsgi_app import Blueprint, render_template, request
 
 bp = Blueprint("/usuario/<string:username>")
 

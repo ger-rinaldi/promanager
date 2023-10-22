@@ -1,14 +1,8 @@
-from input_validation import Errors, validate_user
+from authentication import generate_session_cookies
+from input_validation import validate_user
 from models import Usuario, prefijos_telefonicos
 from werkzeug.utils import redirect
-from werkzeug.wrappers import Request, Response
-from wsgi_app import (
-    Blueprint,
-    generate_session_cookies,
-    make_response,
-    render_template,
-    request,
-)
+from wsgi_app import Blueprint, make_response, render_template, request
 
 bp = Blueprint(base_prefix="auth")
 
