@@ -1,4 +1,6 @@
-<a href="/usuario/{{resource}}/{{row['id '+resource]}}/modificar">
+<a
+  href="/usuario/{{current_user.username}}/{{resource}}/{{row['id '+resource]}}/modificar"
+>
   <div class="btn btn-warning btn-sm">
     <img
       src="/static/setting.png"
@@ -10,7 +12,9 @@
     />
   </div>
 </a>
-<a href="/usuario/{{resource}}/{{row['id '+resource]}}/integrantes">
+<a
+  href="/usuario/{{current_user.username}}/{{resource}}/{{row['id '+resource]}}/integrantes"
+>
   <div class="btn btn-info btn-sm">
     <img
       src="/static/view.png"
