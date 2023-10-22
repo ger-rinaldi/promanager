@@ -1,4 +1,4 @@
-from authentication import required_login
+from authentication import need_authorization, required_login
 from input_validation import validate_proyect
 from models import Equipo, Proyecto, Ticket_Tarea, Usuario
 from werkzeug.utils import redirect
@@ -10,6 +10,7 @@ bp = Blueprint("/usuario/<string:username>")
 
 @bp.route("/dashboard")
 @required_login
+@need_authorization
 def dashboard(username):
     current_user = Usuario.get_by_username_or_mail(username)
 
@@ -23,6 +24,7 @@ def dashboard(username):
 
 @bp.route("/proyecto")
 @required_login
+@need_authorization
 def user_proyects(username):
     current_user = Usuario.get_by_username_or_mail(username)
     data = Proyecto.get_by_participant(current_user.id)
@@ -57,6 +59,7 @@ def user_proyects(username):
 
 @bp.route("/proyecto/crear")
 @required_login
+@need_authorization
 def create_proyect(username):
     current_user = Usuario.get_by_username_or_mail(username)
     errors: list = []
@@ -107,6 +110,7 @@ def create_proyect(username):
 
 @bp.route("/proyecto/<int:proyect_id>/modificar")
 @required_login
+@need_authorization
 def modify_proyect(username, proyect_id):
     current_user = Usuario.get_by_username_or_mail(username)
     errors = []
@@ -152,6 +156,7 @@ def modify_proyect(username, proyect_id):
 
 @bp.route("/proyecto/<int:proyect_id>/eliminar")
 @required_login
+@need_authorization
 def delete_proyect(username, proyect_id):
     if request.method == "POST":
         proyect_to_delete = Proyecto.get_by_id(proyect_id)
@@ -161,6 +166,7 @@ def delete_proyect(username, proyect_id):
 
 @bp.route("/equipo")
 @required_login
+@need_authorization
 def user_teams(username):
     current_user = Usuario.get_by_username_or_mail(username)
     data = Equipo.get_by_member(current_user.id)
@@ -186,6 +192,7 @@ def user_teams(username):
 
 @bp.route("/tarea")
 @required_login
+@need_authorization
 def user_tasks(username):
     current_user = Usuario.get_by_username_or_mail(username)
     data = Ticket_Tarea.get_by_asigned_user(current_user.id)
