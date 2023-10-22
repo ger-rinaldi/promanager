@@ -70,6 +70,48 @@ def _is_logged() -> bool:
     return True
 
 
+def _has_access() -> bool:
+    request_session_id = request.cookies.get("sessionId", False)
+    resources_queried = _required_resources()
+
+    user_by_path = Usuario.get_by_username_or_mail(resources_queried["usuario"])
+    user_by_cookies = Usuario.get_user_by_session_id(request_session_id)
+
+    if (
+        user_by_cookies.llave_sesion != user_by_path.llave_sesion
+        or user_by_cookies.username != user_by_path.username
+    ):
+        return False
+    resources_queried.pop("usuario")
+    user_by_cookies.load_own_resources()
+
+    user_resources = {
+        "proyecto": [str(p["id proyecto"]) for p in user_by_cookies.proyectos],
+        "equipo": [str(e["id equipo"]) for e in user_by_cookies.equipos],
+        "tarea": [str(t["id tarea"]) for t in user_by_cookies.tareas],
+    }
+
+    for resource, value in resources_queried.items():
+        if value not in user_resources[resource]:
+            return False
+
+    return True
+
+
+def _required_resources():
+    request_path = request.path
+    split_path = request_path.split("/")
+
+    resources = ("usuario", "proyecto", "equipo", "tarea")
+    queried_resources = {}
+
+    for r in resources:
+        if r in split_path and split_path.index(r) < len(split_path) - 1:
+            queried_resources[r] = split_path[split_path.index(r) + 1]
+
+    return queried_resources
+
+
 def required_login(func: types.FunctionType) -> Response:
     """Decorador de verificación de sesion de usuario en cliente.
     Recibe la función de un endpoint/vista y la ejecuta solamente
@@ -84,6 +126,9 @@ def required_login(func: types.FunctionType) -> Response:
     def wrapper(*args, **kwargs) -> Response:
         if not _is_logged():
             return redirect("/auth/login_required")
+
+        if not _has_access():
+            return redirect("/auth/access_denied")
 
         return func(*args, **kwargs)
 
