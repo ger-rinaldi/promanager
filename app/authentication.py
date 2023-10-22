@@ -127,6 +127,14 @@ def required_login(func: types.FunctionType) -> Response:
         if not _is_logged():
             return redirect("/auth/login_required")
 
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def need_authorization(func: types.FunctionType) -> Response:
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> Response:
         if not _has_access():
             return redirect("/auth/access_denied")
 
