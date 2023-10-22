@@ -11,7 +11,7 @@ from mysql.connector.types import RowType
 
 class Usuario:
     @classmethod
-    def get_user_by_id(cls, id: int) -> Union["Usuario", None]:
+    def get_by_id(cls, id: int) -> Union["Usuario", None]:
         user_info_query_by_id = """SELECT
             u.id, username, nombre, apellido, email,
             prefijo AS telefono_prefijo, telefono_numero,
@@ -34,7 +34,7 @@ class Usuario:
         return return_user  # type: ignore
 
     @classmethod
-    def get_user_by_session_id(self, session_id: str) -> Union["Usuario", None]:
+    def get_by_session_id(self, session_id: str) -> Union["Usuario", None]:
         user_info_query_by_id = """SELECT
             u.id, username, nombre, apellido, email,
             prefijo AS telefono_prefijo, telefono_numero,
@@ -57,7 +57,7 @@ class Usuario:
         return loaded_user  # type: ignore
 
     @classmethod
-    def get_user_auth(cls, identif: str, contrasena: str) -> Union["Usuario", None]:
+    def get_authenticated(cls, identif: str, contrasena: str) -> Union["Usuario", None]:
         if not cls._authenticate(identif=identif, passwd=contrasena):
             return None
 

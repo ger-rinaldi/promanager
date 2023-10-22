@@ -74,7 +74,7 @@ def login():
             response = make_response(render_template(template_name, errors=errors))
             return response
 
-        logged_user = Usuario.get_user_auth(**user_auth_info)
+        logged_user = Usuario.get_authenticated(**user_auth_info)
 
         if not logged_user:
             errors.append("Error al autenticar. Contraseña o e-mail erróneos.")
