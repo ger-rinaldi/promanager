@@ -391,7 +391,7 @@ class Proyecto:
         fecha_inicio: date,
         fecha_finalizacion: date,
         id: Optional[int] = None,
-        instatiate_components: Optional[bool] = True,
+        instatiate_components: Optional[bool] = False,
         components_as_dicts: Optional[bool] = True,
     ) -> None:
         self.id = id
@@ -403,12 +403,7 @@ class Proyecto:
         self.fecha_inicio = fecha_inicio
         self.fecha_finalizacion = fecha_finalizacion
         if instatiate_components:
-            self.participantes = []
-            self._fetch_all_participants(as_dicts=components_as_dicts)
-            self.equipos = []
-            self._fetch_all_teams(as_dicts=components_as_dicts)
-            self.tareas = []
-            self._fetch_all_tasks(as_dicts=components_as_dicts)
+            self.load_own_resources(components_as_dicts)
 
     def create(self) -> None:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
@@ -551,6 +546,11 @@ class Proyecto:
         else:
             for t in all_tasks:
                 self.tareas.append(Ticket_Tarea(**t))
+
+    def load_own_resources(self, as_dicts: bool):
+        self._fetch_all_participants(as_dicts)
+        self._fetch_all_tasks(as_dicts)
+        self._fetch_all_teams(as_dicts)
 
     def __tuple__(self, with_id: bool = False) -> tuple:
         self_as_tuple: list[Any] = [
