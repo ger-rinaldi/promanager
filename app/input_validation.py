@@ -1,6 +1,5 @@
 import datetime
 import re
-from typing import Union
 
 
 class validate_user:
@@ -216,7 +215,7 @@ class validate_proyect:
         rgx_numbers: re.Pattern = re.compile(r"[0-9]")
 
         total_numbers = len(re.findall(rgx_numbers, budget))
-        total_dots = len(re.findall(re.compile("\."), budget))
+        total_dots = len(re.findall(re.compile("\\."), budget))
 
         if not total_numbers >= len(budget) - 1:
             return False
@@ -257,7 +256,8 @@ class validate_proyect:
 class Errors:
     non_unique_username: str = "El nombre de usuario ingresado ya está registrado"
 
-    username_bad_length: str = f"El nombre de usuario no puede exceder los {validate_user.username_max_length} y debe superar los {validate_user.name_min_length}"
+    username_bad_length: str = f"El nombre de usuario no puede exceder los \
+        {validate_user.username_max_length} y debe superar los {validate_user.name_min_length}"
 
     pass_too_short: str = f"La contraseña debe tener un mínimo de\
                         {validate_user.password_required_length} caractéres"
@@ -281,10 +281,14 @@ class Errors:
     proy_bad_name: str = f"Nombre de proyecto inválido. Debe contener entre \
     {validate_proyect.name_min_len} y {validate_proyect.name_max_len} caracteres."
 
-    bad_budget_type: str = "Tipo de presupuesto inválido. Solo puede contener numeros y un punto para decimales"
+    bad_budget_type: str = "Tipo de presupuesto inválido. Solo puede contener \
+        numeros y un punto para decimales"
 
-    start_before: str = f"Fechas ingresadas inválidas. La fecha de inicio debe ser anterior a la de finalización."
+    start_before: str = "Fechas ingresadas inválidas. La fecha de inicio debe ser \
+        anterior a la de finalización."
 
-    end_after_today: str = f"Fecha de finalización inválida. El proyecto debe terminar después de la fecha corriente."
+    end_after_today: str = "Fecha de finalización inválida. El proyecto debe terminar \
+        después de la fecha corriente."
 
-    bad_budget_amount: str = f"La cantidad de presupuesto no es válida. debe encontrarse entre -2<sup>63</sup> y 2<sup>63</sup>"
+    bad_budget_amount: str = "La cantidad de presupuesto no es válida. debe \
+        encontrarse entre -2<sup>63</sup> y 2<sup>63</sup>"

@@ -185,7 +185,8 @@ class Usuario:
         cursor_create: CursorBase = cnx.cursor()
 
         sql = """INSERT INTO
-                usuario(username, nombre, apellido, email, telefono_prefijo, telefono_numero, contrasena)
+                usuario(username, nombre, apellido, email, telefono_prefijo, \
+                telefono_numero, contrasena)
                 VALUES  (%s, %s, %s, %s, %s, %s, %s)"""
 
         values = self.__tuple__()
@@ -259,11 +260,11 @@ class Usuario:
 
         # Para reducir el largo de linea
         # se crean dos strings por separado
-        id_name_sur = f"Id: {self.id}, Username: {self.username}, Nombre: {self.nombre}, Apellido: {self.apellido}, "
+        user_as_string = f"Id: {self.id}, Username: {self.username}, \
+        Nombre: {self.nombre}, Apellido: {self.apellido}, e-mail: {self.email}, \
+        teléfono: {self.telefono_prefijo}-{self.telefono_numero}"
 
-        mail_phone = f"e-mail: {self.email}, teléfono: {self.telefono_prefijo}-{self.telefono_numero}"
-
-        return id_name_sur + mail_phone
+        return user_as_string
 
     def __iter__(self) -> None:
         """Dunder Method para permitir iterar sobre ciertos atributos del objeto usuario.
@@ -307,7 +308,7 @@ class prefijos_telefonicos:
 
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_getall = cnx.cursor(dictionary=True)
-        cursor_getall.execute(f"SELECT id, prefijo, pais FROM prefijo_telefono")
+        cursor_getall.execute("SELECT id, prefijo, pais FROM prefijo_telefono")
 
         return cursor_getall.fetchall()
 
@@ -318,7 +319,7 @@ class prefijos_telefonicos:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor_prefix: CursorBase = cnx.cursor()
         cursor_prefix.execute(
-            f"SELECT prefijo FROM prefijo_telefono WHERE id = %s",
+            "SELECT prefijo FROM prefijo_telefono WHERE id = %s",
             (id,),
         )
 
@@ -409,7 +410,7 @@ class Proyecto:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor()
 
-        insert_query: str = """INSERT INTO 
+        insert_query: str = """INSERT INTO
         proyecto(nombre, descripcion, es_publico, activo,
         presupuesto, fecha_inicio, fecha_finalizacion)
         VALUES (%s, %s, %s, %s, %s, %s, %s)"""
@@ -453,8 +454,8 @@ class Proyecto:
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor()
 
-        insert_participant = """INSERT INTO 
-        integrantes_proyecto(proyecto, integrante, rol ) 
+        insert_participant = """INSERT INTO
+        integrantes_proyecto(proyecto, integrante, rol )
         VALUES (%s, %s, %s)"""
 
         cursor.execute(insert_participant, (self.id, participant_id, role_id))
@@ -569,7 +570,8 @@ class Proyecto:
         return tuple(self_as_tuple)
 
     def __repr__(self) -> str:
-        return f"id: {self.id}, nombre: {self.nombre}, presupuesto: {self.presupuesto}, inicio: {self.fecha_inicio}"
+        return f"id: {self.id}, nombre: {self.nombre}, \
+            presupuesto: {self.presupuesto}, inicio: {self.fecha_inicio}"
 
     def __iter__(self) -> None:
         yield "id", self.id
@@ -592,8 +594,9 @@ class Ticket_Tarea:
 
         select_query: str = """select
             t.id as "id tarea", t.proyecto as "proyecto padre", t.equipo as "equipo encargado"
-            , t.nombre, t.estado, t.fecha_asignacion as "asignada a equipo", t.fecha_limite as "limite"
-            , a.id as "asignacion nº", a.fecha_asignacion as "asignada a usuario"
+            , t.nombre, t.estado, t.fecha_asignacion as "asignada a equipo"
+            , t.fecha_limite as "limite", a.id as "asignacion nº"
+            , a.fecha_asignacion as "asignada a usuario"
             from
             ticket_tarea as t
             inner join
