@@ -103,17 +103,21 @@ def _has_access() -> bool:
 
 
 def _required_resources():
-    request_path = request.path
-    split_path = request_path.split("/")
+    splitted_path = _get_split_request_path()
 
     resources = ("usuario", "proyecto", "equipo", "tarea")
     queried_resources = {}
 
     for r in resources:
-        if r in split_path and split_path.index(r) < len(split_path) - 1:
-            queried_resources[r] = split_path[split_path.index(r) + 1]
+        if r in splitted_path and splitted_path.index(r) < len(splitted_path) - 1:
+            queried_resources[r] = splitted_path[splitted_path.index(r) + 1]
 
     return queried_resources
+
+
+def _get_split_request_path():
+    request_path = request.path
+    return request_path.split("/")
 
 
 def required_login(func: types.FunctionType) -> Response:
