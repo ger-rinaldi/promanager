@@ -553,6 +553,25 @@ class Proyecto:
         self._fetch_all_tasks(as_dicts)
         self._fetch_all_teams(as_dicts)
 
+    def user_can_modify(self, user_id):
+        query = """
+        select true
+        from integrantes_proyecto
+        where integrante = %s and proyecto = %s and rol = %s
+        """
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(query, (user_id, self.id, 1))
+
+        result = cursor.fetchone()
+
+        if result is not None and result[0] == 1:
+            return True
+
+        return False
+
     def __tuple__(self, with_id: bool = False) -> tuple:
         self_as_tuple: list[Any] = [
             self.nombre,
@@ -669,6 +688,21 @@ class Ticket_Tarea:
         self.fecha_limite = fecha_limite
         self.fecha_finalizacion = fecha_finalizacion
 
+    def user_can_modify(self, user_id):
+        query = "select true from miembros_equipo where miembro = %s and equipo = %s and rol = %s"
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(query, (user_id, self.equipo, 1))
+
+        result = cursor.fetchone()
+
+        if result is not None and result[0] == 1:
+            return True
+
+        return False
+
 
 class Equipo:
     @classmethod
@@ -733,6 +767,25 @@ class Equipo:
         self.nombre = nombre
         self.fecha_creacion = fecha_creacion
         self.proyecto = proyecto
+
+    def user_can_modify(self, user_id):
+        query = """
+        select true
+        from miembros_equipo
+        where miembro = %s and miembro = %s and rol = %s
+        """
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(query, (user_id, self.id, 1))
+
+        result = cursor.fetchone()
+
+        if result is not None and result[0] == 1:
+            return True
+
+        return False
 
 
 class Roles:
