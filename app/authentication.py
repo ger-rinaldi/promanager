@@ -5,7 +5,7 @@ import types
 
 from config import DOMAIN
 from db import close_conn_cursor, get_connection
-from models import Usuario
+from models import Equipo, Proyecto, Ticket_Tarea, Usuario
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wsgi_app import request
@@ -102,6 +102,30 @@ def _has_access() -> bool:
     return True
 
 
+def _can_modify():
+    resources_queried = _required_resources()
+
+    request_session_id = request.cookies.get("sessionId", False)
+    user_in_session = Usuario.get_by_session_id(request_session_id)
+
+    if "proyecto" in resources_queried.keys():
+        required_proyect = Proyecto.get_by_id(resources_queried["proyecto"])
+        if not required_proyect.user_can_modify(user_in_session.id):
+            return False
+
+    if "equipo" in resources_queried.keys():
+        required_team = Equipo.get_by_id(resources_queried["equipo"])
+        if not required_team.user_can_modify(user_in_session.id):
+            return False
+
+    if "tarea" in resources_queried.keys():
+        required_task = Ticket_Tarea.get_by_id(resources_queried["tarea"])
+        if not required_task.user_can_modify(user_in_session.id):
+            return False
+
+    return True
+
+
 def _required_resources():
     splitted_path = _get_split_request_path()
 
@@ -144,6 +168,11 @@ def need_authorization(func: types.FunctionType) -> Response:
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> Response:
         if not _has_access():
+            return redirect("/auth/access_denied")
+
+        splitted_path = _get_split_request_path()
+
+        if splitted_path[-1] in ["modificar", "eliminar"] and not _can_modify():
             return redirect("/auth/access_denied")
 
         return func(*args, **kwargs)
