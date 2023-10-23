@@ -621,6 +621,30 @@ class Ticket_Tarea:
 
         return tasks_of_user
 
+    @classmethod
+    def get_by_id(csl, task_id):
+        query = """
+        SELECT
+        id, proyecto, equipo, nombre, estado, descripcion,
+        fecha_creacion, fecha_asignacion,
+        fecha_limite, fecha_finalizacion
+        FROM
+        ticket_tarea
+        WHERE id = %s
+        """
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(query, (task_id,))
+
+        queried_task = cursor.fetchone()
+
+        if queried_task is not None:
+            return Ticket_Tarea(**queried_task)
+
+        return None
+
     def __init__(
         self,
         proyecto: Union[int, "Proyecto"],
@@ -675,6 +699,28 @@ class Equipo:
         cnx.close()
 
         return teams_of_member
+
+    @classmethod
+    def get_by_id(csl, task_id):
+        query = """
+        SELECT
+        nombre, fecha_creacion, proyecto, id
+        FROM
+        equipo
+        WHERE id = %s
+        """
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(query, (task_id,))
+
+        queried_team = cursor.fetchone()
+
+        if queried_team is not None:
+            return Equipo(**queried_team)
+
+        return None
 
     def __init__(
         self,
