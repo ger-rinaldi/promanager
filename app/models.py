@@ -625,8 +625,11 @@ class Ticket_Tarea:
             miembros_equipo as m
             on a.miembro = m.id
             inner join
+            integrantes_proyecto as ipr
+            on m.miembro = ipr.id
+            inner join
             usuario as u
-            on m.miembro = u.id
+            on ipr.integrante = u.id
             where u.id = %s
             order by t.id;
         """
@@ -678,8 +681,8 @@ class Ticket_Tarea:
         id: Optional[int] = None,
     ) -> None:
         self.id = id
-        self.proyecto = proyecto
-        self.equipo = equipo
+        self.proyecto = Proyecto.get_by_id(proyecto)
+        self.equipo = Equipo.get_by_id(equipo)
         self.nombre = nombre
         self.estado = estado
         self.descripcion = descripcion
@@ -689,16 +692,9 @@ class Ticket_Tarea:
         self.fecha_finalizacion = fecha_finalizacion
 
     def user_can_modify(self, user_id):
-        query = "select true from miembros_equipo where miembro = %s and equipo = %s and rol = %s"
-
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        cursor.execute(query, (user_id, self.equipo, 1))
-
-        result = cursor.fetchone()
-
-        if result is not None and result[0] == 1:
+        if self.proyecto.user_can_modify(user_id) or self.equipo.user_can_modify(
+            user_id
+        ):
             return True
 
         return False
@@ -721,7 +717,13 @@ class Equipo:
                 INNER JOIN
                 roles_equipo as re
                 ON re.id = m.rol
-                WHERE m.miembro = %s
+                INNER JOIN
+                integrantes_proyecto as ipr
+                ON ipr.id = m.miembro
+                INNER JOIN
+                usuario as u
+                ON u.id = ipr.integrante
+                WHERE u.id = %s
                 ORDER BY e.id;
         """
 
@@ -770,15 +772,22 @@ class Equipo:
 
     def user_can_modify(self, user_id):
         query = """
-        select true
-        from miembros_equipo
-        where miembro = %s and miembro = %s and rol = %s
+            select true
+            from
+            miembros_equipo as m
+            inner join
+            integrantes_proyecto as ipr
+            on m.miembro = ipr.id
+            inner join
+            usuario as u
+            on ipr.integrante = u.id
+            where u.id = %s and m.equipo = %s and (m.rol = %s  or ipr.rol = %s);
         """
 
         connection = get_connection()
         cursor = connection.cursor()
 
-        cursor.execute(query, (user_id, self.id, 1))
+        cursor.execute(query, (user_id, self.id, 1, 1))
 
         result = cursor.fetchone()
 
