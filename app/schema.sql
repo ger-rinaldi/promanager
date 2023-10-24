@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS miembros_equipo(
     fecha_baja DATE NOT NULL DEFAULT '1000-01-01',
     suspendido BOOLEAN NOT NULL DEFAULT false,
     FOREIGN KEY (equipo) REFERENCES equipo(id) ON DELETE CASCADE,
-    FOREIGN KEY (miembro) REFERENCES usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (miembro) REFERENCES integrantes_proyecto(id) ON DELETE CASCADE,
     FOREIGN KEY (rol) REFERENCES roles_equipo(id) ON DELETE CASCADE,
     CONSTRAINT miembro_equipo UNIQUE (equipo, miembro)
 );
