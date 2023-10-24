@@ -141,6 +141,7 @@ def tirar_tablas_rama(test_db: bool = False) -> None:
         cursor.execute("DROP TABLE IF EXISTS miembros_equipo")
         cursor.execute("DROP TABLE IF EXISTS ticket_tarea")
         cursor.execute("DROP TABLE IF EXISTS equipo")
+        cursor.execute("DROP TABLE IF EXISTS integrantes_proyecto")
         cursor.execute("DROP TABLE IF EXISTS usuario")
     except dbError as exception:
         # TODO: Loggear este output a algun lugar
@@ -157,7 +158,6 @@ def tirar_tablas_hoja(test_db: bool = False) -> None:
 
     try:
         cursor.execute("DROP TABLE IF EXISTS asignacion_tarea")
-        cursor.execute("DROP TABLE IF EXISTS integrantes_proyecto")
     except dbError as exception:
         # TODO: Loggear este output a algun lugar
         print(f"There was an error while dropping the leaf tables:\n {exception}")
