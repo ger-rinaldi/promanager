@@ -25,6 +25,13 @@ Fecha de inicio: 1/9/23
 ### Requisitos micro de macro actual
 
 - Vista de información de proyecto (sin permitir modificar)
+  - boton modificar dentro de esta vista
+  - boton ver equipos de proyecto
+    - tabla de equipos de proyecto
+      - acciones de equipo: ver detalles, ver integrantes, ver tareas
+  - boton ver tareas de proyecto
+  - boton ver integrantes dentro de esta vista
+- Acciones en lista: ver detalles (ojito), ver integrantes (icono con personitas)
 - Baja y confirmación de baja de proyecto
   - borrado de registros relacionados
 
