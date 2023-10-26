@@ -11,6 +11,8 @@ Fecha de inicio: 1/9/23
 1. Asignación de tareas a equipos y miembros de equipo, validación de asignación
 1. Configuración/modificación, consultas, baja y validación de datos de integrantes de proyecto
 1. Alta, configuración/modificación, consultas, baja y validación de datos de miembros de equipo
+1. Desarrollar api para separar front de back
+1. Desarrollar y agregar jsonify
 
 ## Requisitos macro: en proceso
 
