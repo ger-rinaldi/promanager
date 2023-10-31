@@ -1,0 +1,152 @@
+{% extends "nav_foot.html" %}
+<!-- prettier-ignore -->
+{% block title %}
+  {{current_proyect.nombre}}
+{% endblock %}
+
+{% block nf_content %}
+<script src="/static/confirm_del_proyect.js"></script>
+
+<h1 class="col-3 text-center mt-4 container-fluid">
+  {{current_proyect.nombre}}
+</h1>
+<div class="container">
+  <!-- Mostrar errores de autenticación -->
+  {% include '/error_display.html' %}
+
+  <!-- Nombre de creador y proyecto -->
+  <!-- Nombre del proyecto -->
+
+  <div class="row mt-4 d-flex justify-content-around align-items-center">
+    <a
+      href="/usuario/{{current_user.username}}/proyecto/{{current_proyect.id}}/integrante"
+      class="col-2 btn btn-info"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver integrantes"
+    >
+      <img src="/static/group.png" alt="" style="width: auto; height: 2vw" />
+    </a>
+    <a
+      href="/usuario/{{current_user.username}}/proyecto/{{current_proyect.id}}/equipo"
+      class="col-2 btn btn-success"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver equipos"
+    >
+      <img src="/static/circle.png" alt="" style="width: auto; height: 2vw" />
+    </a>
+    <a
+      href="/usuario/{{current_user.username}}/proyecto/{{current_proyect.id}}/tarea"
+      class="col-2 btn btn-warning"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver equipos"
+    >
+      <img src="/static/task.png" alt="" style="width: auto; height: 2vw" />
+    </a>
+  </div>
+
+  <!-- Fechas -->
+  <div class="row g-3 mt-3">
+    <!-- Fecha de inicio -->
+    <div class="col-sm-6 position-relative">
+      <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
+      <div class="form-control" id="fecha_inicio" readonly>
+        {{current_proyect.fecha_inicio|string}}
+      </div>
+    </div>
+
+    <!-- Fecha de finalizacion -->
+    <div class="col-sm-6 position-relative">
+      <label for="fecha_finalizacion" class="form-label"
+        >Fecha de finalización</label
+      >
+      <div class="form-control" id="fecha_inicio" readonly>
+        {{current_proyect.fecha_finalizacion|string}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Presupuesto -->
+  <div class="row g-3 mt-3">
+    <div class="">
+      <label for="presupuesto" class="form-label">Presupuesto</label>
+      <div class="form-control" id="fecha_inicio" readonly>
+        {{current_proyect.presupuesto}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Descripcion -->
+  <div class="row g-3 mt-3">
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <div class="form-control" id="fecha_inicio" readonly>
+        {{current_proyect.descripcion}}
+      </div>
+    </div>
+  </div>
+
+  <!-- checkboxes -->
+  <div class="row g-3 mt-3">
+    <!-- box publico -->
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        onclick="return false;"
+        onkeydown="return false;"
+        id="es_publico"
+        name="es_publico"
+        {%
+        if
+        current_proyect.es_publico
+        %}
+        checked
+        {%
+        endif
+        %}
+      />
+      <label class="form-check-label" for="es_publico"
+        >Público: cualquiera puede ver este proyecto.</label
+      >
+    </div>
+
+    <!-- box activo -->
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        onclick="return false;"
+        onkeydown="return false;"
+        id="activo"
+        name="activo"
+        {%
+        if
+        current_proyect.activo
+        %}
+        checked
+        {%
+        endif
+        %}
+      />
+      <label class="form-check-label" for="activo"
+        >Activo: se esta trabajando en el proyecto actualmente.</label
+      >
+    </div>
+  </div>
+
+  <hr class="my-4" />
+
+  {% if current_proyect.user_can_modify(current_user.id) %}
+
+  <a href="{{current_proyect.id}}/modificar">
+    <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
+      Modificar proyecto
+    </button>
+  </a>
+  {% endif %}
+</div>
+
+{% endblock nf_content %}
