@@ -57,13 +57,18 @@
               class="dropdown-menu dropdown-menu-end"
               aria-labelledby="dropdown04"
             >
-              <li class="dropdown-item">Usuario: {{current_user.username}}</li>
+              <a
+                class="dropdown-item"
+                href="/usuario/{{current_user.username}}/perfil"
+              >
+                <li>Perfil: {{current_user.username}}</li>
+              </a>
               <li>
                 <a class="dropdown-item" href="#">Configuración</a>
               </li>
-              <li>
-                <a class="dropdown-item" href="/auth/logout">Cerrar Sesión</a>
-              </li>
+              <a class="dropdown-item" href="/auth/logout">
+                <li>Cerrar Sesión</li>
+              </a>
             </ul>
           </li>
         </ul>
