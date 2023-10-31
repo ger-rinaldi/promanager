@@ -1,0 +1,142 @@
+{% extends "nav_foot.html" %}
+<!-- prettier-ignore -->
+{% block title %}
+Mi Perfil
+{% endblock %}
+
+{% block nf_content %}
+
+<div class="container">
+  <!-- Mostrar errores de autenticación -->
+  {% include '/error_display.html' %}
+
+  <form
+    class="needs-validation was-validated"
+    autocomplete="off"
+    aria-autocomplete="none"
+    novalidate=""
+    method="POST"
+  >
+    <input
+      autocomplete="false"
+      name="hidden"
+      type="text"
+      style="display: none"
+    />
+    <!-- Username e Email -->
+    <div class="row mt-3 align-items-end">
+      <!-- Username -->
+      <div class="col position-relative">
+        <label for="username" class="form-label">Username</label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Tu username: juanci1203"
+          id="username"
+          value="{{current_user.username}}"
+          name="username"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          ¡No puedes dejar esto vacío!
+        </div>
+      </div>
+      <div class="col position-relative">
+        <label for="email" class="form-label">Email</label>
+        <input
+          class="form-control"
+          type="email"
+          placeholder="tunombre@ejemplo.org"
+          id="email"
+          value="{{current_user.email}}"
+          name="email"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          ¡No puedes dejar esto vacío!
+        </div>
+      </div>
+    </div>
+
+    <!-- Nombre y apellido -->
+    <div class="row mt-3 align-items-end">
+      <!-- Nombre  -->
+      <div class="col position-relative">
+        <label for="nombre" class="form-label">Tu Nombre</label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Tu nombre: Juan"
+          id="nombre"
+          value="{{current_user.nombre}}"
+          name="nombre"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          ¡No puedes dejar esto vacío!
+        </div>
+      </div>
+      <!-- Apellido -->
+      <div class="col position-relative">
+        <label for="apellido" class="form-label">Tu Apellido</label>
+        <input
+          class="form-control"
+          type="apellido"
+          placeholder="Tu apellido: Juanes"
+          id="apellido"
+          value="{{current_user.apellido}}"
+          name="apellido"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          ¡No puedes dejar esto vacío!
+        </div>
+      </div>
+    </div>
+
+    <div class="row my-2">
+      <label class="form-label">Número de teléfono (sólo números):</label>
+      <div class="col-3">
+        <select
+          required
+          class="custom-select"
+          name="telefono_prefijo"
+          id="country_code"
+        >
+          {% for code in country_codes %}
+          <!-- prettier-ignore -->
+          {% if code['prefijo'] == current_user.telefono_prefijo %}
+          <option selected value="{{code['id']}}">
+            {{code['pais']}} {{code['prefijo']}}
+          </option>
+
+          {% else %}
+          <option value="{{code['id']}}">
+            {{code['pais']}} {{code['prefijo']}}
+          </option>
+
+          {% endif %} {% endfor %}
+        </select>
+      </div>
+      <div class="col">
+        <input
+          required
+          type="text"
+          class="form-control"
+          placeholder="Número de teléfono"
+          value="{{current_user.telefono_numero}}"
+          name="telefono_numero"
+          id="phonenumber"
+        />
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
+      Actualizar Perfil
+    </button>
+  </form>
+</div>
+
+{% endblock nf_content %}

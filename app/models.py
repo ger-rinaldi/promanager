@@ -197,6 +197,24 @@ class Usuario:
         cursor_create.close()
         cnx.close()
 
+    def update(self) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        sql = """UPDATE usuario SET 
+        username = %s, nombre = %s, apellido = %s,  
+        email = %s, telefono_prefijo = %s, telefono_numero = %s
+        WHERE id = %s"""
+
+        values = (*self.__tuple__(), self.id)
+
+        cursor.execute(sql, values)
+
+        cnx.commit()
+
+        cursor.close()
+        cnx.close()
+
     def set_session_id(self, sessionId):
         update_session_query = "UPDATE usuario SET llave_sesion = %s WHERE id = %s"
 

@@ -47,6 +47,31 @@ class validate_user:
         return errors
 
     @classmethod
+    def validate_update(
+        cls,
+        email: str,
+        name: str,
+        surname: str,
+        phonenumber: str,
+        username: str,
+    ):
+        errors = []
+
+        if not cls.email_address_validator(email):
+            errors.append(Errors.invalid_email)
+
+        if not cls.valid_name_length(name) or not cls.valid_name_length(surname):
+            errors.append(Errors.username_too_long_short)
+
+        if not cls.valid_phonenumber(phonenumber):
+            errors.append(Errors.phonetoolong)
+
+        if not cls.username_length(username):
+            errors.append(Errors.username_bad_length)
+
+        return errors
+
+    @classmethod
     def password_complexity_validator(cls, password: str) -> bool:
         def _correct_match_times(
             password: str,

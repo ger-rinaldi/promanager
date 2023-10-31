@@ -1,0 +1,75 @@
+{% extends "nav_foot.html" %}
+<!-- prettier-ignore -->
+{% block title %}
+Mi Perfil
+{% endblock %}
+
+{% block nf_content %}
+
+<div class="container">
+  <!-- Mostrar errores de autenticación -->
+  {% include '/error_display.html' %}
+
+  <!-- Username e Email -->
+  <div class="row mt-3 align-items-end">
+    <!-- Username -->
+    <div class="col-3">
+      <label for="username" class="form-label">Username</label>
+      <div class="form-control" id="username" readonly>
+        {{ current_user.username }}
+      </div>
+    </div>
+
+    <div class="col">
+      <label for="email" class="form-label">Email</label>
+      <div class="input-group">
+        <div class="form-control" id="email" readonly>
+          {{ current_user.email }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nombre y apellido -->
+  <div class="row mt-3 align-items-end">
+    <!-- Nombre  -->
+    <div class="col">
+      <label for="nombre" class="form-label">Tu Nombre</label>
+      <div class="input-group">
+        <div class="form-control" id="nombre" readonly>
+          {{ current_user.nombre }}
+        </div>
+      </div>
+    </div>
+    <!-- Apellido -->
+    <div class="col">
+      <label for="apellido" class="form-label">Tu Apellido</label>
+      <div class="input-group">
+        <div class="form-control" id="apellido" readonly>
+          {{ current_user.apellido }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row my-2">
+    <div class="col">
+      <label for="telefono" class="form-label">Tu Número de Teléfono</label>
+      <div class="input-group">
+        <div class="form-control" id="telefono" readonly>
+          {{ current_user.telefono_prefijo }} {{ current_user.telefono_numero }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-4" />
+
+  <a href="modificar">
+    <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
+      Modificar Perfil
+    </button>
+  </a>
+</div>
+
+{% endblock nf_content %}
