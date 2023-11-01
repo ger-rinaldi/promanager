@@ -298,22 +298,22 @@ class Usuario:
         yield "email", self.email
         yield "telefono", f"{self.telefono_prefijo}-{self.telefono_numero}"
 
-        if self.id is not None:
+        if hasattr(self, "id") and self.id is not None:
             yield "id", self.id
 
-        if self.id_integrante is not None:
+        if hasattr(self, "id_integrante") and self.id_integrante is not None:
             yield "id_integrante", self.id_integrante
 
-        if self.id_miembro is not None:
+        if hasattr(self, "id_miembro") and self.id_miembro is not None:
             yield "id_miembro", self.id_miembro
 
-        if self.rol_proyecto is not None:
+        if hasattr(self, "rol_proyecto") and self.rol_proyecto is not None:
             yield "rol_proyecto", self.rol_proyecto
 
-        if self.rol_equipo is not None:
+        if hasattr(self, "rol_equipo") and self.rol_equipo is not None:
             yield "rol_equipo", self.rol_equipo
 
-        if self.llave_sesion is not None:
+        if hasattr(self, "llave_sesion") and self.llave_sesion is not None:
             yield "llave_sesion", self.llave_sesion
 
 
@@ -619,8 +619,12 @@ class Proyecto:
         yield "presupuesto", self.presupuesto
         yield "fecha_inicio", self.fecha_inicio
         yield "fecha_finalizacion", self.fecha_finalizacion
-        yield "participantes", self.participantes
-        yield "equipos", self.equipos
+
+        if hasattr(self, "participantes") and self.participantes is not None:
+            yield "participantes", self.participantes
+
+        if hasattr(self, "equipos") and self.equipos is not None:
+            yield "equipos", self.equipos
 
 
 class Ticket_Tarea:
