@@ -53,7 +53,7 @@
     <div class="col-sm-6 position-relative">
       <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
       <div class="form-control" id="fecha_inicio" readonly>
-        {{current_proyect.fecha_inicio|string}}
+        {{current_proyect.fecha_inicio.strftime('%d %B %Y')}}
       </div>
     </div>
 
@@ -63,7 +63,7 @@
         >Fecha de finalización</label
       >
       <div class="form-control" id="fecha_inicio" readonly>
-        {{current_proyect.fecha_finalizacion|string}}
+        {{current_proyect.fecha_finalizacion.strftime('%d %B %Y')}}
       </div>
     </div>
   </div>

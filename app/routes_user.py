@@ -66,7 +66,6 @@ def perfil(username):
     return Response(**render_template(template_name, current_user=current_user))
 
 
-
 @bp.route("/dashboard")
 @required_login
 @need_authorization
@@ -157,7 +156,7 @@ def create_proyect(username):
             new_proyect.create()
             new_proyect.register_new_participant(gerente_id, 1)
 
-            return redirect(f"/usuario/proyecto/{new_proyect.id}/integrantes")
+            return redirect(f"{new_proyect.id}")
 
     return Response(
         **render_template(
@@ -184,6 +183,7 @@ def read_proyect(username, proyect_id):
             errors=errors,
         )
     )
+
 
 @bp.route("/proyecto/<int:proyect_id>/modificar")
 @required_login
