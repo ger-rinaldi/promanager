@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block nf_content %}
-<script src="/static/confirm_del_proyect.js"></script>
+<script src="/static/js/confirm_del_proyect.js"></script>
 
 <h1 class="col-3 text-center mt-4 container-fluid">
   {{current_proyect.nombre}}
@@ -25,7 +25,11 @@
       data-placement="top"
       title="Ver integrantes"
     >
-      <img src="/static/group.png" alt="" style="width: auto; height: 2vw" />
+      <img
+        src="/static/icons/group.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
     </a>
     <a
       href="/usuario/{{current_user.username}}/proyecto/{{current_proyect.id}}/equipo"
@@ -34,7 +38,11 @@
       data-placement="top"
       title="Ver equipos"
     >
-      <img src="/static/circle.png" alt="" style="width: auto; height: 2vw" />
+      <img
+        src="/static/icons/circle.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
     </a>
     <a
       href="/usuario/{{current_user.username}}/proyecto/{{current_proyect.id}}/tarea"
@@ -43,7 +51,11 @@
       data-placement="top"
       title="Ver equipos"
     >
-      <img src="/static/task.png" alt="" style="width: auto; height: 2vw" />
+      <img
+        src="/static/icons/task.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
     </a>
   </div>
 
