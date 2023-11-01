@@ -168,6 +168,23 @@ def create_proyect(username):
     )
 
 
+@bp.route("/proyecto/<int:proyect_id>")
+@required_login
+@need_authorization
+def read_proyect(username, proyect_id):
+    current_user = Usuario.get_by_username_or_mail(username)
+    current_proyect = Proyecto.get_by_id(proyect_id)
+    errors = []
+
+    return Response(
+        **render_template(
+            "read_views/read_proyecto.html",
+            current_user=current_user,
+            current_proyect=current_proyect,
+            errors=errors,
+        )
+    )
+
 @bp.route("/proyecto/<int:proyect_id>/modificar")
 @required_login
 @need_authorization
