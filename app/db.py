@@ -12,6 +12,58 @@ from mysql.connector.cursor import CursorBase
 from mysql.connector.pooling import PooledMySQLConnection
 
 
+class context_db_manager:
+    def __init__(
+        self,
+        dict: bool = False,
+        named_tuple: bool = False,
+        test_db: bool = False,
+    ) -> None:
+        self.db_config = DB_CONFIG
+        self.type = None
+        self.connection = None
+        self.cursor = None
+
+        if dict and named_tuple:
+            raise Exception("No hay cursor dispobible con diccionario y named_tuple")
+        elif dict:
+            self.type = {"dictionary": True}
+        elif named_tuple:
+            self.type = {"named_tuple": True}
+
+        if test_db:
+            self.db_config["database"] = TEST_DB
+        else:
+            self.db_config["database"] = DB_NAME
+
+    def __enter__(self):
+        self.connection = mysql.connector.connect(**self.db_config)
+        if self.type is not None:
+            self.cursor = self.connection.cursor(**self.type)
+        else:
+            self.cursor = self.connection.cursor()
+
+        self.execute = self.cursor.execute
+        self.fetchall = self.cursor.fetchall
+        self.fetchone = self.cursor.fetchone
+
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        self.cursor.close()
+        self.connection.close()
+
+        if exc_type:
+            print(
+                f"""
+            There has been han exception: {exc_type}
+            Exception message: {exc_value}
+            Traceback:
+            {exc_tb}
+            """
+            )
+
+
 def crear_base_de_datos(test_db: bool = False) -> None:
     """Crear la base de datos al:
         - inicializar la aplicación
