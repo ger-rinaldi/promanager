@@ -5,6 +5,7 @@
     y apliación WSGI encargada de manejar solicitudes y respuestas.
 """
 
+import json
 import os
 import types
 from contextvars import ContextVar
@@ -30,6 +31,25 @@ request: Request = LocalProxy(_request_ctx_var)
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_path), autoescape=True)
+
+
+def make_json(*args, **kwargs) -> Response:
+    if args and kwargs:
+        raise Exception("jsonify solo acepta uso de args o kwargs, pero no ambos")
+
+    if args:
+        jsonified = json.dumps(args, default=str)
+
+    elif kwargs:
+        jsonified = json.dumps(kwargs, default=str)
+
+    response = Response(
+        response=jsonified,
+        status=200,
+        mimetype="application/json",
+    )
+
+    return response
 
 
 def render_template(template_name: str, **context) -> dict[Template, str]:
