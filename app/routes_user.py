@@ -44,7 +44,7 @@ def modificar_usuario(username):
             user_to_update.username = nombre_usuario
 
             user_to_update.update()
-            return redirect(f"perfil")
+            return redirect(f"/usuario/{user_to_update.username}/perfil")
 
     return Response(
         **render_template(
@@ -218,6 +218,7 @@ def modify_proyect(username, proyect_id):
         if not errors:
             proyect_to_update = Proyecto(**proyect_info, instatiate_components=False)
             proyect_to_update.update()
+            return redirect(f"/usuario/{current_user.username}/proyecto/{proyect_id}")
 
     proyect_to_update = Proyecto.get_by_id(proyect_id)
 
