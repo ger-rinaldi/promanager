@@ -131,12 +131,67 @@ Mi Perfil
       </div>
     </div>
 
-    <hr class="my-4" />
+    <hr class="my-2" />
 
     <button class="w-100 btn btn-primary btn-lg mt-1" type="submit">
       Actualizar Perfil
     </button>
   </form>
+
+  <hr class="my-5" />
+
+  <div
+    class="needs-validation was-validated"
+    autocomplete="off"
+    aria-autocomplete="none"
+    novalidate=""
+    id="delete_user"
+  >
+    <div class="col position-relative" id="div_pass_1">
+      <label for="contrasena_1" class="form-label"
+        >Ingresa tu contraseña:</label
+      >
+      <input
+        class="form-control"
+        contenteditable="true"
+        autocomplete="new-password"
+        type="password"
+        placeholder="Ingresa tu contraseña"
+        id="contrasena_1"
+        name="contrasena_1"
+        required
+      />
+      <div class="invalid-feedback">¡No puedes dejar este campo vacío!</div>
+    </div>
+
+    <div class="col position-relative my-4" id="div_pass_2">
+      <label for="contrasena_2" class="form-label"
+        >Vuelve a ingresar tu contraseña:</label
+      >
+      <input
+        class="form-control"
+        contenteditable="true"
+        autocomplete="new-password"
+        type="password"
+        placeholder="Ingresa tu contraseña"
+        id="contrasena_2"
+        name="contrasena_2"
+        required
+      />
+      <div class="invalid-feedback">¡No puedes dejar este campo vacío!</div>
+    </div>
+
+    <hr class="my-2" />
+
+    <button
+      class="w-100 btn btn-danger btn-lg mt-1"
+      onclick="return alert_wrong_passwords()"
+    >
+      Borrar Cuenta
+    </button>
+  </div>
 </div>
+
+<script defer src="/static/js/del_user.js"></script>
 
 {% endblock nf_content %}

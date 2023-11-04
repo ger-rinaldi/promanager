@@ -215,6 +215,19 @@ class Usuario:
         cursor.close()
         cnx.close()
 
+    def delete(self) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        sql = "DELETE FROM usuario WHERE id = %s"
+
+        cursor.execute(sql, (self.id,))
+
+        cnx.commit()
+
+        cursor.close()
+        cnx.close()
+
     def set_session_id(self, sessionId):
         update_session_query = "UPDATE usuario SET llave_sesion = %s WHERE id = %s"
 
