@@ -8,6 +8,8 @@ bp = Blueprint("/api/usuario/<string:username>")
 
 
 @bp.route("/proyecto/<proyect_id>/tareas_equipo")
+@required_login
+@need_authorization
 def task_per_team(username, proyect_id):
     data = None
 
@@ -37,6 +39,8 @@ def task_per_team(username, proyect_id):
 
 
 @bp.route("/proyecto/<proyect_id>/miembros_equipo")
+@required_login
+@need_authorization
 def members_per_team(username, proyect_id):
     data = None
 
@@ -64,6 +68,8 @@ def members_per_team(username, proyect_id):
 
 
 @bp.route("/proyecto/<proyect_id>/estado_tareas")
+@required_login
+@need_authorization
 def tasks_per_status(username, proyect_id):
     data = None
 
@@ -118,6 +124,8 @@ def delete_proyect(username, proyect_id):
 
 
 @bp.route("/eliminar")
+@required_login
+@need_authorization
 def delete_user(username):
     if request.method != "POST":
         bad_request = make_json(message="Mala peticion solo se recibe POST")
