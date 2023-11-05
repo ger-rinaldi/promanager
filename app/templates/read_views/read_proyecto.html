@@ -57,6 +57,19 @@
         style="width: auto; height: 2vw"
       />
     </a>
+    <a
+      href="/usuario/{{current_user.username}}/proyecto/{{current_proyect.id}}/metrics"
+      class="col-2 btn btn-primary"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver metricas"
+    >
+      <img
+        src="/static/icons/metric.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
+    </a>
   </div>
 
   <!-- Fechas -->
@@ -94,8 +107,18 @@
   <div class="row g-3 mt-3">
     <div class="form-group">
       <label for="descripcion">Descripción</label>
-      <div class="form-control" id="fecha_inicio" readonly>
-        {{current_proyect.descripcion}}
+      <div>
+        <textarea
+          class="form-control"
+          id="fecha_inicio"
+          name=""
+          id=""
+          cols="20"
+          rows="5"
+          readonly
+        >
+          {{current_proyect.descripcion}}
+        </textarea>
       </div>
     </div>
   </div>

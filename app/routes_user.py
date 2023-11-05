@@ -232,14 +232,20 @@ def modify_proyect(username, proyect_id):
     )
 
 
-@bp.route("/proyecto/<int:proyect_id>/eliminar")
+@bp.route("/proyecto/<int:proyect_id>/metrics")
 @required_login
 @need_authorization
-def delete_proyect(username, proyect_id):
-    if request.method == "POST":
-        proyect_to_delete = Proyecto.get_by_id(proyect_id)
-        proyect_to_delete.delete()
-    return redirect(f"/usuario/{username}/proyecto")
+def metrics(username, proyect_id):
+    current_user = Usuario.get_by_username_or_mail(username)
+    current_proyect = Proyecto.get_by_id(proyect_id)
+
+    return Response(
+        **render_template(
+            "read_views/metrics_proyecto.html",
+            current_proyect=current_proyect,
+            current_user=current_user,
+        )
+    )
 
 
 @bp.route("/equipo")

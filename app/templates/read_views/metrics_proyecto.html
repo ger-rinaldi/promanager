@@ -1,0 +1,64 @@
+{% extends "nav_foot.html" %}
+<!-- prettier-ignore -->
+{% block title %}
+Métricas
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block nf_content %}
+
+<div class="container">
+  <h1 class="text-center">Métricas de {{current_proyect.nombre}}</h1>
+
+  <div class="row my-4 d-flex justify-content-around align-items-center">
+    <btn
+      class="col-2 btn btn-outline-info"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver total de miembros por equipo"
+      id="mpt-btn"
+    >
+      <img
+        src="/static/icons/group.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
+    </btn>
+    <btn
+      class="col-2 btn btn-outline-info"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver total de tareas por equipo"
+      id="tpt-btn"
+    >
+      <img
+        src="/static/icons/circle.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
+    </btn>
+    <btn
+      class="col-2 btn btn-outline-info"
+      data-toggle="tooltip"
+      data-placement="top"
+      title="Ver total de tareas por estado"
+      id="tps-btn"
+    >
+      <img
+        src="/static/icons/task.png"
+        alt=""
+        style="width: auto; height: 2vw"
+      />
+    </btn>
+  </div>
+  <hr class="mb-5" />
+  <div id="chart-cointainer">
+    <div id="textdata"></div>
+    <canvas id="barchart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="/static/js/datavis.js"></script>
+<script type="module" src="/static/js/api_consult.mjs"></script>
+{% endblock %}

@@ -7,6 +7,89 @@ from wsgi_app import Blueprint, make_json, request
 bp = Blueprint("/api/usuario/<string:username>")
 
 
+@bp.route("/proyecto/<proyect_id>/tareas_equipo")
+def task_per_team(username, proyect_id):
+    data = None
+
+    with context_db_manager(dict=True) as db:
+        db.execute(
+            """select
+            e.id, e.nombre, count(tt.id) as total
+            from proyecto as p
+            inner join equipo as e
+            on p.id = e.proyecto
+            left join ticket_tarea as tt
+            on e.id = tt.equipo
+            where p.id = %s
+            group by e.id
+            """,
+            (proyect_id,),
+        )
+
+        data = db.fetchall()
+
+    if data is None or not data:
+        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found.status = 404
+        return not_found
+
+    return make_json(*data)
+
+
+@bp.route("/proyecto/<proyect_id>/miembros_equipo")
+def members_per_team(username, proyect_id):
+    data = None
+
+    with context_db_manager(dict=True) as db:
+        db.execute(
+            """select
+            e.id, e.nombre, count(m.id) as "total"
+            from equipo as e
+            inner join miembros_equipo as m
+            on e.id = m.equipo
+            where e.proyecto = %s
+            group by e.id
+            """,
+            (proyect_id,),
+        )
+
+        data = db.fetchall()
+
+    if data is None or not data:
+        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found.status = 404
+        return not_found
+
+    return make_json(*data)
+
+
+@bp.route("/proyecto/<proyect_id>/estado_tareas")
+def tasks_per_status(username, proyect_id):
+    data = None
+
+    with context_db_manager(dict=True) as db:
+        db.execute(
+            """select
+            st.id, st.nombre, count(tt.id) as "total"
+            from estado as st
+            inner join ticket_tarea as tt
+            on st.id = tt.estado
+            where tt.proyecto = %s
+            group by st.id
+            """,
+            (proyect_id,),
+        )
+
+        data = db.fetchall()
+
+    if data is None or not data:
+        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found.status = 404
+        return not_found
+
+    return make_json(*data)
+
+
 @bp.route("/proyecto/<proyect_id>/eliminar")
 @required_login
 @need_authorization
