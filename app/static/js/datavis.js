@@ -126,7 +126,7 @@ async function show_user_stats() {
   console.log(completed_tasks);
 
   data["porcentaje_tareas_completadas"] =
-    (completed_tasks / data.total_tareas) * 100 + "%";
+    checkForNaN((completed_tasks / data.total_tareas) * 100) + "%";
 
   const user_stats_elem = document.getElementById("user_stats");
 
@@ -158,11 +158,12 @@ async function show_user_stats() {
 function process_gral_stats(gral_stats, tasks_per_state) {
   let processed_data = {};
 
-  processed_data["promedio_tareas_equipo"] =
-    gral_stats.total_tareas / gral_stats.total_equipos;
+  processed_data["promedio_tareas_equipo"] = checkForNaN(
+    gral_stats.total_tareas / gral_stats.total_equipos
+  );
 
-  let total_task_completed;
-  let total_task_late;
+  let total_task_completed = 0;
+  let total_task_late = 0;
 
   tasks_per_state.forEach((e) => {
     if (e.nombre === "Completada") {
@@ -173,12 +174,20 @@ function process_gral_stats(gral_stats, tasks_per_state) {
   });
 
   processed_data["porcentaje_tareas_completadas"] =
-    (total_task_completed / gral_stats.total_tareas) * 100 + "%";
+    checkForNaN((total_task_completed / gral_stats.total_tareas) * 100) + "%";
 
   processed_data["porcentaje_tareas_atrasadas"] =
-    (total_task_late / gral_stats.total_tareas) * 100 + "%";
+    checkForNaN((total_task_late / gral_stats.total_tareas) * 100) + "%";
 
   return processed_data;
+}
+
+function checkForNaN(result) {
+  if (isNaN(result)) {
+    return "0";
+  } else {
+    return result;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
