@@ -14,7 +14,9 @@ def general_stats(username, proyect_id):
     with context_db_manager(dict=True) as db:
         db.execute(
             """select
-            e.total_equipos, tt.total_tareas, ipr.total_integrantes
+            COALESCE(e.total_equipos, 0)  as "total_equipos"
+            , COALESCE(tt.total_tareas, 0)  as "total_tareas"
+            , COALESCE(ipr.total_integrantes, 0)  as "total_integrantes"
             from proyecto as p
             left join
             (select proyecto, count(id) as total_equipos from equipo group by proyecto)
@@ -52,7 +54,7 @@ def user_stats(username, proyect_id):
 
         total_tasks_n_teams = """SELECT
                 COUNT(me.id) AS total_equipos
-                , SUM(asigt.total) AS total_tareas
+                , COALESCE(SUM(asigt.total), 0) AS total_tareas
                 FROM usuario AS u
                 INNER JOIN integrantes_proyecto AS ipr
                 ON u.id = ipr.integrante
@@ -171,12 +173,13 @@ def tasks_per_status(username, proyect_id):
 
     with context_db_manager(dict=True) as db:
         db.execute(
-            """select
-            st.id, st.nombre, count(tt.id) as "total"
+            """select 
+            st.id, st.nombre,
+            IFNULL(count(tt.id), 0) as total
             from estado as st
-            inner join ticket_tarea as tt
+            left join ticket_tarea as tt
             on st.id = tt.estado
-            where tt.proyecto = %s
+            and tt.proyecto = %s
             group by st.id
             order by st.id
             """,
