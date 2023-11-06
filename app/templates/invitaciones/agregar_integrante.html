@@ -1,0 +1,125 @@
+{% extends 'nav_foot.html' %}
+
+<!-- prettier-ignore -->
+
+{% block title %} Invitar a Proyecto {% endblock%}
+
+<!-- prettier-ignore -->
+
+{% block nf_content %}
+
+{% include 'error_display.html'   %}
+
+<h4 class="mb-3">Agregar integrantes nuevos a Proyecto</h4>
+<a
+  href="/usuario/{{current_user.username}}/proyecto/{{proyect.id}}"
+  class="text-decoration-none"
+>
+  <div class="row mt-4">
+    <!-- Input: nombre proyecto padre de equipo -->
+    <div class="col-2">
+      <label for="proyecto_id" class="form-label"><b>#</b></label>
+      <div class="form-control" id="proyecto_id" readonly>{{ proyect.id }}</div>
+    </div>
+    <div class="col">
+      <label for="proyecto_nombre" class="form-label"><b>Proyecto</b></label>
+      <div class="form-control" id="proyecto_nombre" readonly>
+        {{ proyect.nombre }}
+      </div>
+    </div>
+  </div>
+</a>
+{% if proyect.user_can_modify(current_user.id) %}
+
+<div class="row mt-4 py-3">
+  <form class="needs-validation was-validated" novalidate="" method="POST">
+    <!-- nombre y proyecto padre -->
+    <div class="row mt-4 align-items-end">
+      <!-- Input: nuevo integrante -->
+      <div class="col position-relative">
+        <label for="participant_identif" class="form-label"
+          >Nuevo participante</label
+        >
+        <input
+          class="form-control"
+          autocomplete="new-password"
+          type="text"
+          placeholder="email o username"
+          id="participant_identif"
+          name="participant_identif"
+          required
+        />
+        <div class="invalid-feedback position-absolute">
+          Ingresa el nombre de usuario o email del nuevo integrante.
+        </div>
+      </div>
+      <!-- Input: rol del nuevo integrante -->
+
+      <div class="col position-relative">
+        <label for="role" class="form-label">Rol</label>
+        <select
+          required
+          class="form-select"
+          name="role"
+          id="role"
+          aria-label=".form-select"
+        >
+          <option value="">Roles de integrante</option>
+
+          {% for role in roles %}
+          <!-- prettier-ignore -->
+          <option value="{{ role['id'] }}">{{ role['nombre'] }} </option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback position-absolute">
+          El nuevo integrante debe tener un rol.
+        </div>
+      </div>
+      <div
+        class="col col-lg-1 d-flex justify-content-center align-items-center"
+      >
+        <button class="btn btn-primary" type="submit">Agregar</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<!-- prettier-ignore -->
+
+{% if proyect.participantes %}
+
+<div class="table-responsive-lg mt-5">
+  <table class="table table-bordered table-hover">
+    <thead class="table-secondary">
+      {% for key in proyect.participantes[0].keys() %}
+
+      <th class="text-center">{{key}}</th>
+
+      {% endfor %}
+    </thead>
+    <tbody>
+      {% for participant in proyect.participantes %}
+
+      <tr>
+        {% for value in participant.values() %}
+
+        <td class="text-center">{{value}}</td>
+
+        {% endfor %}
+      </tr>
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+
+<h1>No hay registros de integrantes para este proyecto</h1>
+
+{% endif %}
+
+<!-- prettier-ignore -->
+
+{% endblock %}

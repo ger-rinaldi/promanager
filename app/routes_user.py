@@ -1,6 +1,6 @@
 from authentication import need_authorization, required_login
 from input_validation import validate_proyect, validate_user
-from models import Equipo, Proyecto, Ticket_Tarea, Usuario, prefijos_telefonicos
+from models import Equipo, Proyecto, Roles, Ticket_Tarea, Usuario, prefijos_telefonicos
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wsgi_app import Blueprint, render_template, request
@@ -244,6 +244,32 @@ def metrics(username, proyect_id):
             "read_views/metrics_proyecto.html",
             current_proyect=current_proyect,
             current_user=current_user,
+        )
+    )
+
+
+@bp.route("/proyecto/<int:proyect_id>/integrante")
+@required_login
+def register_new_participants(username, proyect_id):
+    current_user = Usuario.get_by_username_or_mail(username)
+    current_proyect = Proyecto.get_by_id(proyect_id)
+    current_proyect.load_own_resources(as_dicts=True)
+
+    if request.method == "POST":
+        new_participant = Usuario.get_by_username_or_mail(
+            request.form["participant_identif"]
+        )
+
+        participant_role = request.form["role"]
+
+        current_proyect.register_new_participant(new_participant.id, participant_role)
+
+    return Response(
+        **render_template(
+            "/invitaciones/agregar_integrante.html",
+            current_user=current_user,
+            proyect=current_proyect,
+            roles=Roles.get_proyect_roles(),
         )
     )
 
