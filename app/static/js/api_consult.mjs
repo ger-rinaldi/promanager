@@ -54,6 +54,12 @@ async function get_project_gral_stats() {
   return response;
 }
 
+async function get_user_stats_project() {
+  const request = new Request(api_url + "/user_stats");
+  const response = await fetch(request).then((response) => response.json());
+
+  return response;
+}
 
 export {
   get_members_per_team,
@@ -62,4 +68,5 @@ export {
   split_url,
   get_resources,
   get_project_gral_stats,
+  get_user_stats_project,
 };

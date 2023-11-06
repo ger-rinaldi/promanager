@@ -3,6 +3,7 @@ import {
   get_tasks_per_state,
   get_members_per_team,
   get_project_gral_stats,
+  get_user_stats_project,
 } from "./api_consult.mjs";
 
 const mpt = document.getElementById("mpt-btn");
@@ -108,6 +109,51 @@ async function show_project_gral_stats() {
   }
 }
 
+async function show_user_stats() {
+  const data = await get_user_stats_project();
+  const task_states = data["por_estado"];
+  delete data["por_estado"];
+
+  let completed_tasks = 0;
+  task_states.forEach((state) => {
+    if (state.nombre == "Completada") {
+      completed_tasks = state.total;
+    }
+  });
+
+  console.log(data.total_tareas);
+  console.log(completed_tasks);
+
+  data["porcentaje_tareas_completadas"] =
+    (completed_tasks / data.total_tareas) * 100 + "%";
+
+  const user_stats_elem = document.getElementById("user_stats");
+
+  for (const key in data) {
+    let capitalized_key = key[0].toUpperCase() + key.slice(1) + ": ";
+    let pContent = capitalized_key.split("_").join(" ") + data[key];
+    console.log(pContent);
+
+    const pElement = document.createElement("p");
+    pElement.setAttribute("class", "col");
+    pElement.textContent = pContent;
+    user_stats_elem.append(pElement);
+  }
+
+  const user_tasks_elem = document.getElementById("user_task_stats");
+
+  for (const state of task_states) {
+    let capitalized_name =
+      state.nombre[0].toUpperCase() + state.nombre.slice(1) + ": ";
+    let pContent = capitalized_name.split("_").join(" ") + state.total;
+
+    const pElement = document.createElement("p");
+    pElement.setAttribute("class", "col");
+    pElement.textContent = pContent;
+    user_tasks_elem.append(pElement);
+  }
+}
+
 function process_gral_stats(gral_stats, tasks_per_state) {
   let processed_data = {};
 
@@ -139,4 +185,5 @@ document.addEventListener("DOMContentLoaded", async function () {
   tpt.addEventListener("click", task_x_team_chart);
   tps.addEventListener("click", task_x_state_chart);
   show_project_gral_stats();
+  show_user_stats();
 });

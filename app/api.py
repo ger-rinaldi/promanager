@@ -43,6 +43,66 @@ def general_stats(username, proyect_id):
     return make_json(**data[0])
 
 
+@bp.route("/proyecto/<proyect_id>/user_stats")
+@required_login
+@need_authorization
+def user_stats(username, proyect_id):
+    with context_db_manager(dict=True) as db:
+        data = {}
+
+        total_tasks_n_teams = """SELECT
+                COUNT(me.id) AS total_equipos
+                , SUM(asigt.total) AS total_tareas
+                FROM usuario AS u
+                INNER JOIN integrantes_proyecto AS ipr
+                ON u.id = ipr.integrante
+                INNER JOIN miembros_equipo AS me
+                ON ipr.id = me.miembro
+                INNER JOIN
+                (SELECT COUNT(id) AS total, miembro FROM asignacion_tarea group by miembro) AS asigt
+                ON me.id = asigt.miembro
+                WHERE ipr.proyecto = %s AND u.username = %s"""
+
+        db.execute(total_tasks_n_teams, (proyect_id, username))
+        total_tasks_n_teams = db.fetchall()
+
+        if total_tasks_n_teams is None:
+            not_found = make_json(message="El recurso solicitado no fue encontrado")
+            not_found.status = 404
+            return not_found
+
+        data.update(total_tasks_n_teams[0])
+        data["total_tareas"] = int(data["total_tareas"])
+        total_per_state = """SELECT
+                st.nombre, COUNT(tt.id) AS "total"
+                FROM usuario AS u
+                INNER JOIN integrantes_proyecto AS ipr
+                ON u.id = ipr.integrante
+                INNER JOIN miembros_equipo AS me
+                ON ipr.id = me.miembro
+                INNER JOIN asignacion_tarea AS asigt
+                ON me.id = asigt.miembro
+                INNER JOIN ticket_tarea AS tt
+                ON asigt.ticket_tarea = tt.id
+                INNER JOIN estado AS st
+                ON tt.estado = st.id
+                WHERE ipr.proyecto = %s AND u.username = %s
+                group by st.nombre
+                order by st.id;"""
+
+        db.execute(total_per_state, (proyect_id, username))
+        query_result = db.fetchall()
+
+        if query_result is None:
+            not_found = make_json(message="El recurso solicitado no fue encontrado")
+            not_found.status = 404
+            return not_found
+
+        data["por_estado"] = query_result
+
+    return make_json(**data)
+
+
 @bp.route("/proyecto/<proyect_id>/tareas_equipo")
 @required_login
 @need_authorization
