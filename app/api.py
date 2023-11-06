@@ -178,6 +178,7 @@ def tasks_per_status(username, proyect_id):
             on st.id = tt.estado
             where tt.proyecto = %s
             group by st.id
+            order by st.id
             """,
             (proyect_id,),
         )
