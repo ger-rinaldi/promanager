@@ -73,6 +73,7 @@ function make_chart(label, data) {
       },
     },
   });
+  canvas.scrollIntoView({ behavior: "smooth" });
 }
 
 async function show_project_gral_stats() {
