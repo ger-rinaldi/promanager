@@ -8,7 +8,16 @@ Métricas
 {% block nf_content %}
 
 <div class="container">
-  <h1 class="text-center">Métricas de {{current_proyect.nombre}}</h1>
+  <h1 class="text-center my-3">Métricas de {{current_proyect.nombre}}</h1>
+
+  <div id="textdata" class="mt-5 mb-2">
+    <h2>Información general del proyecto</h2>
+    <div class="row" id="gral_stats"></div>
+    <div class="row" id="gral_stats_averages"></div>
+
+  </div>
+
+  <hr class="mt-5" />
 
   <div class="row my-4 d-flex justify-content-around align-items-center">
     <btn

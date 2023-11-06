@@ -2,6 +2,7 @@ import {
   get_tasks_per_team,
   get_tasks_per_state,
   get_members_per_team,
+  get_project_gral_stats,
 } from "./api_consult.mjs";
 
 const mpt = document.getElementById("mpt-btn");
@@ -73,8 +74,69 @@ function make_chart(label, data) {
   });
 }
 
+async function show_project_gral_stats() {
+  const data = await get_project_gral_stats();
+  const task_per_state = await get_tasks_per_state();
+
+  const gral_stats_elem = document.getElementById("gral_stats");
+
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      let capitalized_key = key[0].toUpperCase() + key.slice(1) + ": ";
+      let pContent = capitalized_key.split("_").join(" ") + data[key];
+
+      const pElement = document.createElement("p");
+      pElement.setAttribute("class", "col");
+      pElement.textContent = pContent;
+      gral_stats_elem.append(pElement);
+    }
+  }
+
+  const data_averages = process_gral_stats(data, task_per_state);
+  const avg_stats_elem = document.getElementById("gral_stats_averages");
+
+  for (const key in data_averages) {
+    if (data_averages.hasOwnProperty(key)) {
+      let capitalized_key = key[0].toUpperCase() + key.slice(1) + ": ";
+      let pContent = capitalized_key.split("_").join(" ") + data_averages[key];
+
+      const pElement = document.createElement("p");
+      pElement.setAttribute("class", "col");
+      pElement.textContent = pContent;
+      avg_stats_elem.append(pElement);
+    }
+  }
+}
+
+function process_gral_stats(gral_stats, tasks_per_state) {
+  let processed_data = {};
+
+  processed_data["promedio_tareas_equipo"] =
+    gral_stats.total_tareas / gral_stats.total_equipos;
+
+  let total_task_completed;
+  let total_task_late;
+
+  tasks_per_state.forEach((e) => {
+    if (e.nombre === "Completada") {
+      total_task_completed = e.total;
+    } else if (e.nombre === "Atrasada") {
+      total_task_late = e.total;
+    }
+  });
+
+  processed_data["porcentaje_tareas_completadas"] =
+    (total_task_completed / gral_stats.total_tareas) * 100 + "%";
+
+  processed_data["porcentaje_tareas_atrasadas"] =
+    (total_task_late / gral_stats.total_tareas) * 100 + "%";
+
+  return processed_data;
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   mpt.addEventListener("click", members_x_team_chart);
   tpt.addEventListener("click", task_x_team_chart);
   tps.addEventListener("click", task_x_state_chart);
+  show_project_gral_stats();
 });

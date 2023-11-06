@@ -47,10 +47,19 @@ async function get_tasks_per_state() {
   return response;
 }
 
+async function get_project_gral_stats() {
+  const request = new Request(api_url + "/gral_stats");
+  const response = await fetch(request).then((response) => response.json());
+
+  return response;
+}
+
+
 export {
   get_members_per_team,
   get_tasks_per_state,
   get_tasks_per_team,
   split_url,
   get_resources,
+  get_project_gral_stats,
 };

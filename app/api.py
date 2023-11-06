@@ -7,6 +7,42 @@ from wsgi_app import Blueprint, make_json, request
 bp = Blueprint("/api/usuario/<string:username>")
 
 
+@bp.route("/proyecto/<proyect_id>/gral_stats")
+@required_login
+@need_authorization
+def general_stats(username, proyect_id):
+    with context_db_manager(dict=True) as db:
+        db.execute(
+            """select
+            e.total_equipos, tt.total_tareas, ipr.total_integrantes
+            from proyecto as p
+            left join
+            (select proyecto, count(id) as total_equipos from equipo group by proyecto)
+            as e
+            on p.id = e.proyecto
+            left join
+            (select proyecto, count(id) as total_tareas from ticket_tarea group by proyecto)
+            as tt
+            on p.id = tt.proyecto
+            inner join
+            (select proyecto, count(id) as total_integrantes from integrantes_proyecto group by proyecto)
+            as ipr
+            on p.id = ipr.proyecto
+            where p.id = %s
+            group by p.id;""",
+            (proyect_id,),
+        )
+
+        data = db.fetchall()
+
+    if data is None or not data:
+        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found.status = 404
+        return not_found
+
+    return make_json(**data[0])
+
+
 @bp.route("/proyecto/<proyect_id>/tareas_equipo")
 @required_login
 @need_authorization
