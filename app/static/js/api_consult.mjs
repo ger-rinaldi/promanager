@@ -24,7 +24,6 @@ function get_resources() {
 }
 
 async function get_tasks_per_team() {
-  console.log(api_url + "/tareas_equipo");
   const request = new Request(api_url + "/tareas_equipo");
   const response = await fetch(request).then((response) => response.json());
 
@@ -32,7 +31,6 @@ async function get_tasks_per_team() {
 }
 
 async function get_members_per_team() {
-  console.log(api_url + "/miembros_equipo");
   const request = new Request(api_url + "/miembros_equipo");
   const response = await fetch(request).then((response) => response.json());
 
@@ -40,7 +38,6 @@ async function get_members_per_team() {
 }
 
 async function get_tasks_per_state() {
-  console.log(api_url + "/estado_tareas");
   const request = new Request(api_url + "/estado_tareas");
   const response = await fetch(request).then((response) => response.json());
 
