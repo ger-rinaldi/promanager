@@ -515,16 +515,20 @@ class Proyecto:
         cursor: CursorBase = cnx.cursor(dictionary=True)
 
         select_intg_query: str = """SELECT
-            i.id as id_integrante, rp.nombre as rol_proyecto,
-            u.id as id, u.nombre, u.apellido, u.email, u.telefono_prefijo, u.telefono_numero
+            i.id,
+            rp.nombre as rol,
+            u.username,  u.nombre, u.apellido, u.email, CONCAT(pf.prefijo, "-", u.telefono_numero) as "telefono_numero"
             FROM
             integrantes_proyecto as i
+            INNER JOIN
+            roles_proyecto as rp
+            ON rp.id = i.rol
             INNER JOIN
             usuario as u
             ON i.integrante = u.id
             INNER JOIN
-            roles_proyecto as rp
-            ON rp.id = i.rol
+            prefijo_telefono as pf
+            ON pf.id = u.telefono_prefijo
             WHERE i.proyecto = %s
         """
 
