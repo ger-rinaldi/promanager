@@ -254,21 +254,39 @@ def register_new_participants(username, proyect_id):
     current_user = Usuario.get_by_username_or_mail(username)
     current_proyect = Proyecto.get_by_id(proyect_id)
     current_proyect.load_own_resources(as_dicts=True)
+    errors = []
 
     if request.method == "POST":
         new_participant = Usuario.get_by_username_or_mail(
             request.form["participant_identif"]
         )
+        participant_role = request.form.get("role", "0")
 
-        participant_role = request.form["role"]
+        if new_participant is None:
+            errors.append("El participante indicado no fue encontrado")
+        elif new_participant.username in [
+            x["username"] for x in current_proyect.participantes
+        ]:
+            errors.append(
+                "El participante seleccionado ya forma parte de este proyecto"
+            )
 
-        current_proyect.register_new_participant(new_participant.id, participant_role)
+        if not participant_role.isnumeric() or int(participant_role) not in [
+            x["id"] for x in Roles.get_proyect_roles()
+        ]:
+            errors.append("El rol seleccionado no existe")
+
+        if not errors:
+            current_proyect.register_new_participant(
+                new_participant.id, participant_role
+            )
 
     return Response(
         **render_template(
             "/invitaciones/agregar_integrante.html",
             current_user=current_user,
             proyect=current_proyect,
+            errors=errors,
             roles=Roles.get_proyect_roles(),
         )
     )
