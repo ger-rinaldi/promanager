@@ -1,3 +1,5 @@
+.werkzeug
+.flask
 .venv
 .vscode
 __pycache__
