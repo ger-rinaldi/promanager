@@ -5,7 +5,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wsgi_app import Blueprint, render_template, request
 
-bp = Blueprint("/usuario/<string:username>")
+bp = Blueprint("/usuario/<string:username>", "dashboard")
 
 
 @bp.route("/modificar")
