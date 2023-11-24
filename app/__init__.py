@@ -34,6 +34,10 @@ def create_app(with_static=True):
 
     new_app.register_blueprint(routes_user.bp)
 
+    import routes_project
+
+    new_app.register_blueprint(routes_project.bp)
+
     import api
 
     new_app.register_blueprint(api.bp)
