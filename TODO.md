@@ -26,4 +26,15 @@ Fecha de inicio: 1/9/23
 
 ### Requisitos micro de macro actual
 
+- verificar que usuario a agregar existe
+- verificar que usuario a agregar no ha sido incluido previamente
+- modificación de rol de integrante
+- eliminación de integrante actual
+- suspención de integrante
+- agregar información de fechas de acciones sobre integrante
+  - cuando fue incluido al proyecto actual
+  - cuando se le asigno el rol actual
+  - cuando fue suspendido
+  - cuando se quito la suspención
+
 ### Requisitos micro completados
