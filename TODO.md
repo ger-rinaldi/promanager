@@ -7,39 +7,23 @@ Fecha de inicio: 1/9/23
 
 1. Boton volver universal (a ultima vista)
 1. Boton subir (en el path del sitio)
-1. Validación de solicitudes de informacion por usuario en sesion (Proyecto, Equipo, Tarea)
 1. Creación, configuración/modificación,  consulta, baja y validación de datos de **equipos**
 1. Creación, configuración/modificación,  consulta, baja y validación de datos **tareas**
 1. Asignación de tareas a equipos y miembros de equipo, validación de asignación
-1. Configuración/modificación, consultas, baja y validación de datos de integrantes de proyecto
 1. Alta, configuración/modificación, consultas, baja y validación de datos de miembros de equipo
 1. Desarrollar api para separar front de back
-1. Desarrollar y agregar jsonify
 
 ## Requisitos macro: en proceso
 
-1. Configuración/modificación, baja y validación de datos de **proyectos**
+1. Configuración/modificación, consultas, baja y validación de datos de integrantes de proyecto
 
 ## Requisitos macro: completados
 
 - Manejo de sesión de usuario (registro, login, logout, cookies)
+- Configuración/modificación, baja y validación de datos de **proyectos**
+- Validación de solicitudes de informacion por usuario en sesion (Proyecto, Equipo, Tarea)
+- Desarrollar y agregar jsonify
 
 ### Requisitos micro de macro actual
 
 ### Requisitos micro completados
-
-- boton ver tareas de proyecto
-- boton ver integrantes dentro de esta vista
-- Baja y confirmación de baja de proyecto
-  - borrado de registros relacionados
-- Acciones en lista: ver detalles (ojito), ver integrantes (icono con personitas)
-- Vista de información de proyecto (sin permitir modificar)
-  - boton modificar dentro de esta vista
-  - boton ver equipos de proyecto
-- creación de proyecto
-- validación de datos de creacion
-- mostrar errores de creación de proyectos
-- Modificacion de proyecto ya creado
-- Validacion de valores modificados
-- Mostrar errores
-- Vista de modificación
