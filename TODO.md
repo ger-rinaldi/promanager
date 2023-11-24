@@ -12,6 +12,13 @@ Fecha de inicio: 1/9/23
 1. Asignación de tareas a equipos y miembros de equipo, validación de asignación
 1. Alta, configuración/modificación, consultas, baja y validación de datos de miembros de equipo
 1. Desarrollar api para separar front de back
+1. Pensar e incluir métricas de proyecto mejores y más interesantes, posibles:
+     - diagrama Gantt
+     - tablero kanban
+     - representaciones graficas de un recurso deben redirigir al mismo
+     - Lead time (tiempo hasta compleción de tarea) estimado/deseado y concreto
+     - WIP (work in progress): cuanto tiempo una tarea ha estado siendo trabajada y cuantas se hayan en ese estado, permitir establecer WIP estimado/deseado
+     - Tiempo que una tarea ha estado en cada estado
 
 ## Requisitos macro: en proceso
 
