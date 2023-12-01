@@ -126,6 +126,10 @@ class Blueprint:
         # Map que contendrá las Rule de la Blueprint instanciada
         self.url_map = Map()
 
+        # Lista que permitira a la wsgi_app obtener los endpoints
+        # para luego consultar a url_map las rutas correspondientes
+        self.endpoints = []
+
         # Prefijo base de la BP, como /auth, /user
         self.base_prefix = self._add_root_to_route(base_prefix)
 
@@ -140,10 +144,6 @@ class Blueprint:
         # cargar la Rule al Map
         if self.base_prefix is not None and self.prefix_endpoint is not None:
             self._add_rule(self.base_prefix, self.prefix_endpoint)
-
-        # Lista que permitira a la wsgi_app obtener los endpoints
-        # para luego consultar a url_map las rutas correspondientes
-        self.endpoints = []
 
     def _add_root_to_route(self, route: str) -> str:
         """Agregar slash inicial a las rutas recibidas,
