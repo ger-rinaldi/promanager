@@ -114,6 +114,7 @@ def denied_access():
 
 
 @bp.route("/logout")
+@required_login
 def logout():
     response = redirect("/")
 
