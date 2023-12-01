@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'nav_foot.html' %}
 <!-- prettier-ignore  -->
 {% block title %}LOGIN{% endblock %}
 <!-- prettier-ignore  -->
-{% block base_body %}
-<main class="form-signing my-5 pt-3">
+{% block nf_content %}
+<main class="form-signing my-3 pt-3">
   <div class="container">
     <!-- Mostrar errores de autenticación -->
     {% include '/error_display.html' %}
@@ -50,7 +50,7 @@
 
 <style>
   .form-signing {
-    width: 50%;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
   }
