@@ -7,6 +7,7 @@
 
 import json
 import os
+import re
 import types
 from contextvars import ContextVar
 
@@ -101,7 +102,8 @@ def _get_endpoint_name(endpoint: str | types.FunctionType) -> str:
     if isinstance(endpoint, types.FunctionType):
         return endpoint.__name__
     elif isinstance(endpoint, str):
-        return endpoint
+        # allow redirection to variable URLs (URLs with variable sections)
+        return re.sub("<.*?:", "<", endpoint)
 
     raise Exception("_get_endpoint_name expects either a Function or a str")
 
