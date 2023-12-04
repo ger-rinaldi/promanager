@@ -84,6 +84,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const newParticipant = document.getElementById("participant_identif").value;
     const roleOfParcipant = document.getElementById("role").value;
 
+    document.getElementById("participant_identif").value = "";
+    document.getElementById("role").value = "";
+
     createForm.append("participant_identif", newParticipant);
     createForm.append("role", roleOfParcipant);
 
