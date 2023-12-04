@@ -883,6 +883,25 @@ class Roles:
         return result
 
     @classmethod
+    def proyect_role_name(cls, id: int):
+        cnx = get_connection()
+        cursor = cnx.cursor()
+
+        query = "SELECT nombre FROM roles_proyecto WHERE id=%s"
+
+        cursor.execute(query, (id,))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        cnx.close()
+
+        if result is not None:
+            return result[0]
+
+        return None
+
+    @classmethod
     def get_team_roles(cls):
         cnx = get_connection()
         cursor = cnx.cursor(dictionary=True)
