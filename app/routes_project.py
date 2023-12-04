@@ -178,6 +178,7 @@ def metrics(username, proyect_id):
 
 @bp.route("/<int:proyect_id>/integrante")
 @required_login
+@need_authorization
 def register_new_participants(username, proyect_id):
     current_user = Usuario.get_by_username_or_mail(username)
     current_proyect = Proyecto.get_by_id(proyect_id)
