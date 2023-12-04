@@ -77,6 +77,7 @@ function displayResponseMessages(responseStatus, responseMessages) {
 document.addEventListener("DOMContentLoaded", function () {
   const msgDisplay = document.getElementById("message-display");
   const createButton = document.getElementById("create-button");
+  const table = document.getElementById("table-body");
 
   createButton.addEventListener("click", async function () {
     const createParticipantURL = api_url + "/agregar";
