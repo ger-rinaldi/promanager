@@ -1,6 +1,6 @@
 from authentication import need_authorization, required_login
 from db import context_db_manager
-from models import Proyecto, Usuario
+from models import Proyecto, Roles, Usuario
 from werkzeug.wrappers import Response
 from wsgi_app import Blueprint, make_json, request
 
@@ -294,6 +294,54 @@ def add_integrant(username, proyect_id):
     success = make_json(
         message=f"El participante {new_participant.username} ha sido \
 registrado como {Roles.proyect_role_name(participant_role)} con exito"
+    )
+    success.status = 200
+    return success
+
+
+@bp.route("/proyecto/<proyect_id>/integrante/modificar")
+# @required_login
+# @need_authorization
+def update_integrant(username, proyect_id):
+    if request.method != "POST":
+        bad_request = make_json(message="Mala peticion solo se recibe POST")
+        bad_request.status = 400
+        return bad_request
+
+    errors = []
+
+    current_proyect = Proyecto.get_by_id(proyect_id)
+    current_proyect.load_own_resources(as_dicts=True)
+
+    participant_to_update = Usuario.get_by_username_or_mail(
+        request.form["participant_identif"]
+    )
+    participant_role = request.form.get("role", "rol_no_valido")
+
+    if participant_to_update is None:
+        errors.append("El usuario indicado no fue encontrado")
+
+    elif not participant_to_update.username in [
+        p["username"] for p in current_proyect.participantes
+    ]:
+        errors.append("El usuario a modificar no participa del proyecto")
+
+    if not participant_role.isnumeric():
+        errors.append("El rol seleccionado es inválido")
+
+    elif int(participant_role) not in [x["id"] for x in Roles.get_proyect_roles()]:
+        errors.append("El rol seleccionado no existe")
+
+    if errors:
+        error_response = make_json(message=errors)
+        error_response.status = 400
+        return error_response
+
+    current_proyect.update_participant(participant_to_update.id, participant_role)
+
+    success = make_json(
+        message=f"El participante {participant_to_update.username} ha \
+sido establecido como {Roles.proyect_role_name(participant_role)} con exito"
     )
     success.status = 200
     return success
