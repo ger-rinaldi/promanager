@@ -496,6 +496,20 @@ class Proyecto:
         cnx.close()
         self._fetch_all_participants()
 
+    def delete_participant(self, participant_id: int) -> None:
+        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
+        cursor: CursorBase = cnx.cursor()
+
+        update_participant = """DELETE FROM integrantes_proyecto
+        WHERE proyecto=%s AND integrante=%s"""
+
+        cursor.execute(update_participant, (self.id, participant_id))
+
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        self._fetch_all_participants()
+
     def _query_id(self):
         cnx: MySQLConnection | PooledMySQLConnection = get_connection()
         cursor: CursorBase = cnx.cursor()
