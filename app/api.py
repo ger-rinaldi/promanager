@@ -297,3 +297,42 @@ registrado como {Roles.proyect_role_name(participant_role)} con exito"
     )
     success.status = 200
     return success
+
+
+@bp.route("/proyecto/<proyect_id>/integrante/remover")
+@required_login
+@need_authorization
+def remove_integrant(username, proyect_id):
+    if request.method != "POST":
+        bad_request = make_json(message="Mala peticion solo se recibe POST")
+        bad_request.status = 400
+        return bad_request
+
+    current_proyect = Proyecto.get_by_id(proyect_id)
+    current_proyect.load_own_resources(as_dicts=True)
+
+    participant_to_remove = Usuario.get_by_username_or_mail(
+        request.form["participant_identif"]
+    )
+
+    if participant_to_remove is None:
+        no_such_user = make_json(message="El usuario indicado no fue encontrado")
+        no_such_user.status = 404
+        return no_such_user
+
+    if not participant_to_remove.username in [
+        p["username"] for p in current_proyect.participantes
+    ]:
+        not_a_participant = make_json(
+            message="El usuario a remover no participa del proyecto"
+        )
+        not_a_participant.status = 409
+        return not_a_participant
+
+    current_proyect.delete_participant(participant_to_remove.id)
+
+    success = make_json(
+        message=f"El participante {participant_to_remove.username} ha sido removido con exito"
+    )
+    success.status = 200
+    return success
