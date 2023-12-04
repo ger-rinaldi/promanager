@@ -91,6 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
     createForm.append("participant_identif", newParticipant);
     createForm.append("role", roleOfParcipant);
 
+    // request new participant information to append to table without refreshing
+
     const request = {
       method: "POST",
       body: createForm,
@@ -99,6 +101,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerResponse = await fetch(createParticipantURL, request);
     const responsePromise = await registerResponse.json();
     displayResponseMessages(registerResponse.status, responsePromise.message);
+  });
+
+  // eliminar y actualizar participante
+  const editButtons = document.querySelectorAll(".edit-button");
+
+  editButtons.forEach((e) => {
+    e.addEventListener("click", function () {
+      // get the row
+      // get its children
+      // make the Role one a dropdown selector, like the one above
+      // change edit buttons for Save and Cancel
+      // when Cancel, false for content editable
+      // when save, false for content editable, send new data to api (get username and new role id)
+    });
   });
 
   const deleteButtons = document.querySelectorAll(".delete-button");
