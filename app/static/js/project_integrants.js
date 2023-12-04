@@ -23,20 +23,33 @@ function get_resources() {
 const resources = get_resources();
 const api_url = `/api/usuario/${resources["usuario"]}/proyecto/${resources["proyecto"]}/integrante`;
 
-function getErrorDisplay(errorMsg) {
-  const errorElement = document.createElement("div");
-  errorElement.classList.add("alert-danger");
-  errorElement.classList.add("alert");
-  errorElement.textContent = errorMsg;
-  return errorElement;
-}
+function getAlertElement(message, status) {
+  const dismissBtn = () => {
+    const btn = document.createElement("button");
+    btn.classList.add("btn-close");
+    btn.setAttribute("type", "button");
+    btn.setAttribute("data-bs-dismiss", "alert");
+    btn.setAttribute("aria-label", "Close");
 
-function getSuccessDisplay(successMsg) {
-  const successElement = document.createElement("div");
-  successElement.classList.add("alert-success");
-  successElement.classList.add("alert");
-  successElement.textContent = successMsg;
-  return successElement;
+    return btn;
+  };
+  const alertElement = document.createElement("div");
+
+  if (status !== 200) {
+    alertElement.classList.add("alert-danger");
+  } else {
+    alertElement.classList.add("alert-success");
+  }
+
+  alertElement.classList.add("alert-fixed");
+  alertElement.classList.add("show");
+  alertElement.classList.add("fade");
+  alertElement.classList.add("alert-dismissible");
+  alertElement.classList.add("alert");
+  alertElement.role = "alert";
+  alertElement.textContent = message;
+  alertElement.appendChild(dismissBtn());
+  return alertElement;
 }
 
 function clearMessages() {
@@ -49,22 +62,15 @@ function clearMessages() {
 
 function displayResponseMessages(responseStatus, responseMessages) {
   clearMessages();
-  const msgDisplay = document.getElementById("message-display");
-
-  displayByStatus = (message) => {
-    if (responseStatus === 200) {
-      msgDisplay.appendChild(getSuccessDisplay(message));
-    } else {
-      msgDisplay.appendChild(getErrorDisplay(message));
-    }
-  };
 
   if (Array.isArray(responseMessages)) {
     for (const message of responseMessages) {
-      displayByStatus(message);
+      const alertElement = getAlertElement(message, responseStatus);
+      document.body.appendChild(alertElement);
     }
   } else {
-    displayByStatus(responseMessages);
+    const alertElement = getAlertElement(responseMessages, responseStatus);
+    document.body.appendChild(alertElement);
   }
 }
 

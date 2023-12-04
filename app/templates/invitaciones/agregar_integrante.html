@@ -139,4 +139,25 @@
 
 <!-- prettier-ignore -->
 
+<style>
+    .alert-fixed {
+      margin-top: 1%;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%; /* Adjust the width as needed */
+      z-index: 9999;
+      text-align: center; /* Adjust as needed */
+      padding: 10px; /* Adjust as needed */
+      box-sizing: border-box; /* Include padding in width calculation */
+    }
+      .alert-fixed .btn-close {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: 10px;
+    }
+</style>
+
 {% endblock %}
