@@ -1,7 +1,9 @@
-{% if errors %}
-<!-- prettier-ignore  -->
-{% for e in errors %}
-<div class="alert alert-danger">{{ e|safe }}</div>
-{% endfor %}
-<!-- prettier-ignore  -->
-{% endif %}
+<div id="message-display" class="container-fluid">
+  {% if errors %}
+  <!-- prettier-ignore  -->
+  {% for e in errors %}
+  <div class="alert alert-danger">{{ e|safe }}</div>
+  {% endfor %}
+  <!-- prettier-ignore  -->
+  {% endif %}
+</div>
