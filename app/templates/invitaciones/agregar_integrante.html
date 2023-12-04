@@ -98,17 +98,32 @@
 
       <th class="text-center">{{key}}</th>
 
-      {% endfor %}
+      {% endfor %} {% if proyect.user_can_modify(current_user.id) %}
+      <th class="text-center">Acciones</th>
+
+      {% endif %}
     </thead>
-    <tbody>
+    <tbody id="table-body">
       {% for participant in proyect.participantes %}
 
       <tr>
-        {% for value in participant.values() %}
+        {% for key, value in participant.items() %}
 
-        <td class="text-center">{{value}}</td>
+        <td class="text-center {{key}}-cell">{{value}}</td>
 
-        {% endfor %}
+        {% endfor %} {% if proyect.user_can_modify(current_user.id) %}
+          <div class="delete-button btn btn-danger btn-sm">
+            <img
+              src="/static/icons/recycle-bin.png"
+              alt=""
+              style="width: 16px; height: 16px"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Eliminar integrante"
+            />
+          </div>
+        </td>
+        {% endif %}
       </tr>
 
       {% endfor %}

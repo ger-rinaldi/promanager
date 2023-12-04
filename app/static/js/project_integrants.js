@@ -90,4 +90,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const responsePromise = await registerResponse.json();
     displayResponseMessages(registerResponse.status, responsePromise.message);
   });
+
+  const deleteButtons = document.querySelectorAll(".delete-button");
+
+  deleteButtons.forEach((e) => {
+    e.addEventListener("click", async function () {
+      const row = e.parentNode.parentNode;
+
+      const deleteParticipantURL = api_url + "/remover";
+      const deleteForm = new FormData();
+      const participantUsername =
+        row.querySelector(".username-cell").textContent;
+
+      deleteForm.append("participant_identif", participantUsername);
+      const request = {
+        method: "POST",
+        body: deleteForm,
+      };
+      const deleteRequest = await fetch(deleteParticipantURL, request);
+      const responsePromise = await deleteRequest.json();
+      displayResponseMessages(deleteRequest.status, responsePromise.message);
+      table.removeChild(row);
+    });
+  });
 });
