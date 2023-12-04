@@ -41,5 +41,6 @@ def create_app(with_static=True):
     import api
 
     new_app.register_blueprint(api.bp)
+    new_app.register_blueprint(api.gral_api)
 
     return new_app

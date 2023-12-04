@@ -119,6 +119,17 @@
         <td class="text-center {{key}}-cell">{{value}}</td>
 
         {% endfor %} {% if proyect.user_can_modify(current_user.id) %}
+        <td class="text-center actions-cell">
+          <div class="edit-button btn btn-warning btn-sm">
+            <img
+              src="/static/icons/edit.png"
+              alt=""
+              style="width: 16px; height: 16px"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Editar integrante"
+            />
+          </div>
           <div class="delete-button btn btn-danger btn-sm">
             <img
               src="/static/icons/recycle-bin.png"

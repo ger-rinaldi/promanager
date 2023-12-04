@@ -74,10 +74,52 @@ function displayResponseMessages(responseStatus, responseMessages) {
   }
 }
 
+async function getProyectRoles() {
+  const rolesResponse = await fetch("/api/proyecto/roles");
+  const roles = await rolesResponse.json();
+  return roles;
+}
+
+async function makeSelectCell(defaultOption) {
+  const selectElement = document.createElement("select");
+  selectElement.setAttribute("name", "role-cell");
+  const roles = await getProyectRoles();
+
+  roles.forEach((r) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = r.id;
+    optionElement.textContent = r.nombre;
+
+    if (defaultOption === r.nombre) {
+      optionElement.setAttribute("selected", "");
+    }
+
+    selectElement.appendChild(optionElement);
+  });
+  return selectElement;
+}
+
+function makeEditBtns(originalButton) {
+  const saveBtn = originalButton.cloneNode(true);
+  const cancelBtn = originalButton.nextElementSibling.cloneNode(true);
+
+  saveBtn.classList.replace("btn-warning", "btn-success");
+  saveBtn.classList.replace("edit-button", "save-button");
+  console.log(saveBtn);
+  saveBtn.firstElementChild.src = "/static/icons/save.png";
+
+  cancelBtn.firstElementChild.src = "/static/icons/cancel.png";
+  cancelBtn.classList.replace("delete-button", "cancel-button");
+
+  return [saveBtn, cancelBtn];
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const msgDisplay = document.getElementById("message-display");
   const createButton = document.getElementById("create-button");
   const table = document.getElementById("table-body");
+  const editBtnEl = document.querySelector(".edit-button");
+  const deleteBtnEl = document.querySelector(".delete-button");
 
   createButton.addEventListener("click", async function () {
     const createParticipantURL = api_url + "/agregar";
@@ -91,6 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
     createForm.append("participant_identif", newParticipant);
     createForm.append("role", roleOfParcipant);
 
+    // request new participant information to append to table without refreshing
+
     const request = {
       method: "POST",
       body: createForm,
@@ -99,6 +143,33 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerResponse = await fetch(createParticipantURL, request);
     const responsePromise = await registerResponse.json();
     displayResponseMessages(registerResponse.status, responsePromise.message);
+  });
+
+  // eliminar y actualizar participante
+  const editButtons = document.querySelectorAll(".edit-button");
+
+  editButtons.forEach((e) => {
+    e.addEventListener("click", async function () {
+      // get the row
+      const row = e.parentNode.parentNode;
+      // get its children
+      const roleCell = row.querySelector(".rol-cell");
+      const selectElement = await makeSelectCell(roleCell.textContent);
+      // make the Role one a dropdown selector, like the one above
+      roleCell.replaceWith(selectElement);
+      // change edit buttons for Save and Cancel
+      // when Cancel, false for content editable
+
+      [saveBtn, cancelBtn] = makeEditBtns(e);
+      e.nextElementSibling.replaceWith(cancelBtn);
+      e.replaceWith(saveBtn);
+
+      cancelBtn.addEventListener("click", function (e) {
+        e.previousElementSibling.replaceWith(editBtnEl);
+        e.replaceWith(deleteBtnEl);
+      });
+      // when save, false for content editable, send new data to api (get username and new role id)
+    });
   });
 
   const deleteButtons = document.querySelectorAll(".delete-button");

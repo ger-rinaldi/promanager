@@ -4,6 +4,14 @@ from models import Proyecto, Roles, Usuario
 from werkzeug.wrappers import Response
 from wsgi_app import Blueprint, make_json, request
 
+gral_api = Blueprint("/api")
+
+
+@gral_api.route("/proyecto/roles")
+def get_proyect_roles():
+    return make_json(*Roles.get_proyect_roles())
+
+
 bp = Blueprint("/api/usuario/<string:username>")
 
 
