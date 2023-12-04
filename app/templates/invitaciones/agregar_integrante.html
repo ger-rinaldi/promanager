@@ -9,6 +9,8 @@
 {% block nf_content %}
 
 {% include 'error_display.html'   %}
+<script src="/static/js/project_integrants.js"></script>
+
 <h1 class="mt-3 text-center">{{proyect.nombre}}</h4>
 <h4 class="mb-3 text-center">Gestión de Integrantes</h4>
 <a
@@ -32,7 +34,7 @@
 {% if proyect.user_can_modify(current_user.id) %}
 
 <div class="row mt-4 py-3">
-  <form class="needs-validation was-validated" novalidate="" method="POST">
+  <form class="needs-validation was-validated" novalidate="" method="POST" onsubmit="return false">
     <!-- nombre y proyecto padre -->
     <div class="row mt-4 align-items-end">
       <!-- Input: nuevo integrante -->
@@ -78,7 +80,7 @@
       <div
         class="col col-lg-1 d-flex justify-content-center align-items-center"
       >
-        <button class="btn btn-primary" type="submit">Agregar</button>
+        <button id="create-button" class="btn btn-primary" type="submit">Agregar</button>
       </div>
     </div>
   </form>
