@@ -1,21 +1,16 @@
 import os
 
-from models import Usuario
+from flask import Flask, make_response, render_template, request
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.utils import redirect
-from wsgi_app import make_response, render_template, request, wsgi
+
+from app.models import Usuario
 
 
 def create_app(with_static=True):
-    new_app = wsgi()
+    new_app = Flask(__name__)
 
-    if with_static:
-        new_app.app = SharedDataMiddleware(
-            new_app.app,
-            {"/static": os.path.join(os.path.dirname(__file__), "static")},
-        )
-
-    @new_app.route(["/", "/home"])
+    @new_app.route("/")
     def home_page():
         session_key = request.cookies.get("sessionId", False)
         if session_key:
@@ -26,20 +21,20 @@ def create_app(with_static=True):
 
         return make_response(render_template("home.html"))
 
-    import routes_auth
+    import app.routes_auth
 
-    new_app.register_blueprint(routes_auth.bp)
+    new_app.register_blueprint(app.routes_auth.bp)
 
-    import routes_user
+    import app.routes_user
 
-    new_app.register_blueprint(routes_user.bp)
+    new_app.register_blueprint(app.routes_user.bp)
 
-    import routes_project
+    import app.routes_project
 
-    new_app.register_blueprint(routes_project.bp)
+    new_app.register_blueprint(app.routes_project.bp)
 
-    import api
+    import app.api
 
-    new_app.register_blueprint(api.bp)
+    new_app.register_blueprint(app.api.bp)
 
     return new_app
