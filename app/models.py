@@ -2,11 +2,12 @@ from datetime import date
 from typing import Any, Optional, Sequence, Union
 
 from bcrypt import checkpw, gensalt, hashpw
-from db import close_conn_cursor, get_connection
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.cursor import CursorBase
 from mysql.connector.pooling import PooledMySQLConnection
 from mysql.connector.types import RowType
+
+from app.db import close_conn_cursor, get_connection
 
 
 class Usuario:

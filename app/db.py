@@ -5,11 +5,12 @@
 import os
 
 import mysql.connector
-from config import DB_CONFIG, DB_NAME, TEST_DB
 from mysql.connector import Error as dbError
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.cursor import CursorBase
 from mysql.connector.pooling import PooledMySQLConnection
+
+from app.config import DB_CONFIG, DB_NAME, TEST_DB
 
 
 class context_db_manager:
