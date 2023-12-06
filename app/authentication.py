@@ -137,7 +137,7 @@ def _required_resources():
         if r in splitted_path and splitted_path.index(r) < len(splitted_path) - 1:
             resource_id = splitted_path[splitted_path.index(r) + 1]
 
-            if resource_id == "crear":
+            if resource_id == "crear" or resource_id == "":
                 continue
 
             queried_resources[r] = resource_id
