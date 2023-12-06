@@ -3,12 +3,13 @@ import functools
 import secrets
 import types
 
-from config import DOMAIN
-from db import close_conn_cursor, get_connection
-from models import Equipo, Proyecto, Ticket_Tarea, Usuario
+from flask import request
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wsgi_app import request
+
+from app.config import DOMAIN
+from app.db import close_conn_cursor, get_connection
+from app.models import Equipo, Proyecto, Ticket_Tarea, Usuario
 
 
 def generate_session_cookies() -> dict:
