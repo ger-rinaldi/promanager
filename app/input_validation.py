@@ -1,6 +1,8 @@
 import datetime
 import re
 
+from app.db import get_connection
+
 
 class validate_user:
     password_required_length: int = 12
@@ -141,8 +143,6 @@ class validate_user:
 
     @classmethod
     def check_email_not_registered(cls, email: str) -> bool:
-        from db import get_connection
-
         cnx = get_connection()
         cursor = cnx.cursor()
 
@@ -172,8 +172,6 @@ class validate_user:
 
     @classmethod
     def username_not_registered(cls, username: str) -> bool:
-        from db import get_connection
-
         cnx = get_connection()
         cursor = cnx.cursor()
 
