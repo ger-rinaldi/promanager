@@ -13,7 +13,8 @@ bp = Blueprint(
 )
 
 
-@bp.route(endpoint_route="/register", is_prefix_endpoint=True)
+@bp.route("/", methods=["GET", "POST"])
+@bp.route("/register", methods=["GET", "POST"])
 def register():
     register_template = "auth/register.html"
     errors = []
@@ -43,16 +44,14 @@ def register():
 
     country_codes = prefijos_telefonicos.read_all()
 
-    return make_response(
-        render_template(
-            register_template,
-            errors=errors,
-            country_codes=country_codes,
-        )
+    return render_template(
+        register_template,
+        errors=errors,
+        country_codes=country_codes,
     )
 
 
-@bp.route(endpoint_route="/login")
+@bp.route("/login", methods=["GET", "POST"])
 def login():
     template_name = "auth/login.html"
     errors = []
@@ -98,11 +97,10 @@ def login():
         else:
             errors.append("Hubo un error al establecer su sesión.")
 
-    response = make_response(render_template(template_name, errors=errors))
-    return response
+    return render_template(template_name, errors=errors)
 
 
-@bp.route("/login_required")
+@bp.get("/login_required")
 def ask_login():
     response = make_response(render_template("login_required.html"))
     response.status = 401
@@ -110,7 +108,7 @@ def ask_login():
     return response
 
 
-@bp.route("/access_denied")
+@bp.get("/access_denied")
 @required_login
 def denied_access():
     response = make_response(render_template("access_denied.html"))
@@ -119,7 +117,7 @@ def denied_access():
     return response
 
 
-@bp.route("/logout")
+@bp.get("/logout")
 @required_login
 def logout():
     response = redirect("/")

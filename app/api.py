@@ -12,7 +12,7 @@ bp = Blueprint(
 )
 
 
-@bp.route("/proyecto/<proyect_id>/gral_stats")
+@bp.get("/proyecto/<proyect_id>/gral_stats")
 @required_login
 @need_authorization
 def general_stats(username, proyect_id):
@@ -43,14 +43,14 @@ def general_stats(username, proyect_id):
         data = db.fetchall()
 
     if data is None or not data:
-        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found = jsonify(message="El recurso solicitado no fue encontrado")
         not_found.status = 404
         return not_found
 
-    return make_json(**data[0])
+    return jsonify(**data[0])
 
 
-@bp.route("/proyecto/<proyect_id>/user_stats")
+@bp.get("/proyecto/<proyect_id>/user_stats")
 @required_login
 @need_authorization
 def user_stats(username, proyect_id):
@@ -74,7 +74,7 @@ def user_stats(username, proyect_id):
         total_tasks_n_teams = db.fetchall()
 
         if total_tasks_n_teams is None:
-            not_found = make_json(message="El recurso solicitado no fue encontrado")
+            not_found = jsonify(message="El recurso solicitado no fue encontrado")
             not_found.status = 404
             return not_found
 
@@ -101,16 +101,16 @@ def user_stats(username, proyect_id):
         query_result = db.fetchall()
 
         if query_result is None:
-            not_found = make_json(message="El recurso solicitado no fue encontrado")
+            not_found = jsonify(message="El recurso solicitado no fue encontrado")
             not_found.status = 404
             return not_found
 
         data["por_estado"] = query_result
 
-    return make_json(**data)
+    return jsonify(**data)
 
 
-@bp.route("/proyecto/<proyect_id>/tareas_equipo")
+@bp.get("/proyecto/<proyect_id>/tareas_equipo")
 @required_login
 @need_authorization
 def task_per_team(username, proyect_id):
@@ -134,14 +134,14 @@ def task_per_team(username, proyect_id):
         data = db.fetchall()
 
     if data is None or not data:
-        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found = jsonify(message="El recurso solicitado no fue encontrado")
         not_found.status = 404
         return not_found
 
-    return make_json(*data)
+    return jsonify(*data)
 
 
-@bp.route("/proyecto/<proyect_id>/miembros_equipo")
+@bp.get("/proyecto/<proyect_id>/miembros_equipo")
 @required_login
 @need_authorization
 def members_per_team(username, proyect_id):
@@ -163,14 +163,14 @@ def members_per_team(username, proyect_id):
         data = db.fetchall()
 
     if data is None or not data:
-        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found = jsonify(message="El recurso solicitado no fue encontrado")
         not_found.status = 404
         return not_found
 
-    return make_json(*data)
+    return jsonify(*data)
 
 
-@bp.route("/proyecto/<proyect_id>/estado_tareas")
+@bp.get("/proyecto/<proyect_id>/estado_tareas")
 @required_login
 @need_authorization
 def tasks_per_status(username, proyect_id):
@@ -194,33 +194,27 @@ def tasks_per_status(username, proyect_id):
         data = db.fetchall()
 
     if data is None or not data:
-        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found = jsonify(message="El recurso solicitado no fue encontrado")
         not_found.status = 404
         return not_found
 
-    return make_json(*data)
+    return jsonify(*data)
 
 
-@bp.route("/proyecto/<proyect_id>/eliminar")
+@bp.post("/proyecto/<proyect_id>/eliminar")
 @required_login
 @need_authorization
 def delete_proyect(username, proyect_id):
-    if request.method != "POST":
-        bad_request = make_json(message="Mala peticion solo se recibe POST")
-        bad_request.status = 400
-
-        return bad_request
-
     proyect_to_delete = Proyecto.get_by_id(proyect_id)
 
     if proyect_to_delete is None:
-        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found = jsonify(message="El recurso solicitado no fue encontrado")
         not_found.status = 404
         return not_found
 
     proyect_to_delete.delete()
 
-    success = make_json(
+    success = jsonify(
         message="Eliminado exitosamente",
     )
 
@@ -228,43 +222,33 @@ def delete_proyect(username, proyect_id):
     return success
 
 
-@bp.route("/eliminar")
+@bp.post("/eliminar")
 @required_login
 @need_authorization
 def delete_user(username):
-    if request.method != "POST":
-        bad_request = make_json(message="Mala peticion solo se recibe POST")
-        bad_request.status = 400
-        return bad_request
-
     user_to_delete = Usuario.get_by_username_or_mail(username)
 
     if user_to_delete is None:
-        not_found = make_json(message="El recurso solicitado no fue encontrado")
+        not_found = jsonify(message="El recurso solicitado no fue encontrado")
         not_found.status = 404
         return not_found
 
     if not user_to_delete._authenticate(username, request.form.get("contrasena_1", "")):
-        access_denied = make_json(message="No tienes acceso al recurso autorizado")
+        access_denied = jsonify(message="No tienes acceso al recurso autorizado")
         access_denied.status = 403
         return access_denied
 
     user_to_delete.delete()
 
-    success = make_json(message="Eliminado exitosamente")
+    success = jsonify(message="Eliminado exitosamente")
     success.status = 200
     return success
 
 
-@bp.route("/proyecto/<proyect_id>/integrante/agregar")
+@bp.post("/proyecto/<proyect_id>/integrante/agregar")
 @required_login
 @need_authorization
 def add_integrant(username, proyect_id):
-    if request.method != "POST":
-        bad_request = make_json(message="Mala peticion solo se recibe POST")
-        bad_request.status = 400
-        return bad_request
-
     errors = []
 
     current_proyect = Proyecto.get_by_id(proyect_id)
@@ -290,13 +274,13 @@ def add_integrant(username, proyect_id):
         errors.append("El rol seleccionado no existe")
 
     if errors:
-        error_response = make_json(message=errors)
+        error_response = jsonify(message=errors)
         error_response.status = 400
         return error_response
 
     current_proyect.register_new_participant(new_participant.id, participant_role)
 
-    success = make_json(
+    success = jsonify(
         message=f"El participante {new_participant.username} ha sido \
 registrado como {Roles.proyect_role_name(participant_role)} con exito"
     )
@@ -304,15 +288,10 @@ registrado como {Roles.proyect_role_name(participant_role)} con exito"
     return success
 
 
-@bp.route("/proyecto/<proyect_id>/integrante/modificar")
+@bp.post("/proyecto/<proyect_id>/integrante/modificar")
 # @required_login
 # @need_authorization
 def update_integrant(username, proyect_id):
-    if request.method != "POST":
-        bad_request = make_json(message="Mala peticion solo se recibe POST")
-        bad_request.status = 400
-        return bad_request
-
     errors = []
 
     current_proyect = Proyecto.get_by_id(proyect_id)
@@ -338,13 +317,13 @@ def update_integrant(username, proyect_id):
         errors.append("El rol seleccionado no existe")
 
     if errors:
-        error_response = make_json(message=errors)
+        error_response = jsonify(message=errors)
         error_response.status = 400
         return error_response
 
     current_proyect.update_participant(participant_to_update.id, participant_role)
 
-    success = make_json(
+    success = jsonify(
         message=f"El participante {participant_to_update.username} ha \
 sido establecido como {Roles.proyect_role_name(participant_role)} con exito"
     )
@@ -352,15 +331,10 @@ sido establecido como {Roles.proyect_role_name(participant_role)} con exito"
     return success
 
 
-@bp.route("/proyecto/<proyect_id>/integrante/remover")
+@bp.post("/proyecto/<proyect_id>/integrante/remover")
 @required_login
 @need_authorization
 def remove_integrant(username, proyect_id):
-    if request.method != "POST":
-        bad_request = make_json(message="Mala peticion solo se recibe POST")
-        bad_request.status = 400
-        return bad_request
-
     current_proyect = Proyecto.get_by_id(proyect_id)
     current_proyect.load_own_resources(as_dicts=True)
 
@@ -369,14 +343,14 @@ def remove_integrant(username, proyect_id):
     )
 
     if participant_to_remove is None:
-        no_such_user = make_json(message="El usuario indicado no fue encontrado")
+        no_such_user = jsonify(message="El usuario indicado no fue encontrado")
         no_such_user.status = 404
         return no_such_user
 
     if not participant_to_remove.username in [
         p["username"] for p in current_proyect.participantes
     ]:
-        not_a_participant = make_json(
+        not_a_participant = jsonify(
             message="El usuario a remover no participa del proyecto"
         )
         not_a_participant.status = 409
@@ -384,7 +358,7 @@ def remove_integrant(username, proyect_id):
 
     current_proyect.delete_participant(participant_to_remove.id)
 
-    success = make_json(
+    success = jsonify(
         message=f"El participante {participant_to_remove.username} ha sido removido con exito"
     )
     success.status = 200

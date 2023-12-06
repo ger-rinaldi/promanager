@@ -13,7 +13,7 @@ bp = Blueprint(
 )
 
 
-@bp.route("/modificar")
+@bp.route("/modificar", methods=["GET", "POST"])
 @required_login
 @need_authorization
 def modificar_usuario(username):
@@ -51,41 +51,38 @@ def modificar_usuario(username):
             user_to_update.update()
             return redirect(f"/usuario/{user_to_update.username}/perfil")
 
-    return Response(
-        **render_template(
-            template_name=template_name,
-            errors=errors,
-            current_user=user_to_update,
-            country_codes=country_codes,
-        )
+    return render_template(
+        template_name=template_name,
+        errors=errors,
+        current_user=user_to_update,
+        country_codes=country_codes,
     )
 
 
-@bp.route("/perfil")
+@bp.get("/perfil")
 @required_login
 @need_authorization
 def perfil(username):
     template_name = "user/perfil.html"
     current_user = Usuario.get_by_username_or_mail(username)
 
-    return Response(**render_template(template_name, current_user=current_user))
+    return render_template(template_name, current_user=current_user)
 
 
-@bp.route("/dashboard")
+@bp.get("/")
+@bp.get("/dashboard")
 @required_login
 @need_authorization
 def dashboard(username):
     current_user = Usuario.get_by_username_or_mail(username)
 
-    return Response(
-        **render_template(
-            "user/dashboard.html",
-            current_user=current_user,
-        )
+    return render_template(
+        "user/dashboard.html",
+        current_user=current_user,
     )
 
 
-@bp.route("/equipo")
+@bp.get("/equipo")
 @required_login
 @need_authorization
 def user_teams(username):
@@ -98,21 +95,16 @@ def user_teams(username):
     else:
         data_keys = []
 
-    if request.method == "POST":
-        pass
-
-    return Response(
-        **render_template(
-            "tables/generic_table.html",
-            data=data,
-            data_keys=data_keys,
-            resource="equipo",
-            current_user=current_user,
-        )
+    return render_template(
+        "tables/generic_table.html",
+        data=data,
+        data_keys=data_keys,
+        resource="equipo",
+        current_user=current_user,
     )
 
 
-@bp.route("/tarea")
+@bp.get("/tarea")
 @required_login
 @need_authorization
 def user_tasks(username):
@@ -125,15 +117,10 @@ def user_tasks(username):
     else:
         data_keys = []
 
-    if request.method == "POST":
-        pass
-
-    return Response(
-        **render_template(
-            "tables/generic_table.html",
-            data=data,
-            data_keys=data_keys,
-            resource="tarea",
-            current_user=current_user,
-        )
+    return render_template(
+        "tables/generic_table.html",
+        data=data,
+        data_keys=data_keys,
+        resource="tarea",
+        current_user=current_user,
     )

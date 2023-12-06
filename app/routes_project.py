@@ -13,7 +13,7 @@ bp = Blueprint(
 )
 
 
-@bp.route(is_prefix_endpoint=True)
+@bp.get("/")
 @required_login
 @need_authorization
 def user_proyects(username):
@@ -36,20 +36,16 @@ def user_proyects(username):
         else:
             d["activo"] = "No"
 
-    if request.method == "POST":
-        pass
-    return Response(
-        **render_template(
-            "tables/generic_table.html",
-            data=data,
-            data_keys=data_keys,
-            resource="proyecto",
-            current_user=current_user,
-        )
+    return render_template(
+        "tables/generic_table.html",
+        data=data,
+        data_keys=data_keys,
+        resource="proyecto",
+        current_user=current_user,
     )
 
 
-@bp.route("/crear")
+@bp.route("/crear", methods=["GET", "POST"])
 @required_login
 @need_authorization
 def create_proyect(username):
@@ -91,16 +87,14 @@ def create_proyect(username):
 
             return redirect(f"{new_proyect.id}")
 
-    return Response(
-        **render_template(
-            "/create_forms/crear-proyecto.html",
-            errors=errors,
-            current_user=current_user,
-        )
+    return render_template(
+        "/create_forms/crear-proyecto.html",
+        errors=errors,
+        current_user=current_user,
     )
 
 
-@bp.route("/<int:proyect_id>")
+@bp.get("/<int:proyect_id>")
 @required_login
 @need_authorization
 def read_proyect(username, proyect_id):
@@ -108,17 +102,15 @@ def read_proyect(username, proyect_id):
     current_proyect = Proyecto.get_by_id(proyect_id)
     errors = []
 
-    return Response(
-        **render_template(
-            "read_views/read_proyecto.html",
-            current_user=current_user,
-            current_proyect=current_proyect,
-            errors=errors,
-        )
+    return render_template(
+        "read_views/read_proyecto.html",
+        current_user=current_user,
+        current_proyect=current_proyect,
+        errors=errors,
     )
 
 
-@bp.route("/<int:proyect_id>/modificar")
+@bp.route("/<int:proyect_id>/modificar", methods=["GET", "POST"])
 @required_login
 @need_authorization
 def modify_proyect(username, proyect_id):
@@ -155,33 +147,29 @@ def modify_proyect(username, proyect_id):
 
     proyect_to_update = Proyecto.get_by_id(proyect_id)
 
-    return Response(
-        **render_template(
-            "/update_forms/ajustes-proyecto.html",
-            proyect=proyect_to_update,
-            errors=errors,
-            current_user=current_user,
-        )
+    return render_template(
+        "/update_forms/ajustes-proyecto.html",
+        proyect=proyect_to_update,
+        errors=errors,
+        current_user=current_user,
     )
 
 
-@bp.route("/<int:proyect_id>/metrics")
+@bp.get("/<int:proyect_id>/metrics")
 @required_login
 @need_authorization
 def metrics(username, proyect_id):
     current_user = Usuario.get_by_username_or_mail(username)
     current_proyect = Proyecto.get_by_id(proyect_id)
 
-    return Response(
-        **render_template(
-            "read_views/metrics_proyecto.html",
-            current_proyect=current_proyect,
-            current_user=current_user,
-        )
+    return render_template(
+        "read_views/metrics_proyecto.html",
+        current_proyect=current_proyect,
+        current_user=current_user,
     )
 
 
-@bp.route("/<int:proyect_id>/integrante")
+@bp.get("/<int:proyect_id>/integrante")
 @required_login
 def register_new_participants(username, proyect_id):
     current_user = Usuario.get_by_username_or_mail(username)
@@ -189,12 +177,10 @@ def register_new_participants(username, proyect_id):
     current_proyect.load_own_resources(as_dicts=True)
     errors = []
 
-    return Response(
-        **render_template(
-            "/invitaciones/agregar_integrante.html",
-            current_user=current_user,
-            proyect=current_proyect,
-            errors=errors,
-            roles=Roles.get_proyect_roles(),
-        )
+    return render_template(
+        "/invitaciones/agregar_integrante.html",
+        current_user=current_user,
+        proyect=current_proyect,
+        errors=errors,
+        roles=Roles.get_proyect_roles(),
     )
