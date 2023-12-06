@@ -1,11 +1,16 @@
-from authentication import need_authorization, required_login
-from input_validation import validate_user
-from models import Usuario, prefijos_telefonicos
+from flask import Blueprint, make_response, render_template, request
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wsgi_app import Blueprint, render_template, request
 
-bp = Blueprint("/usuario/<string:username>", "dashboard")
+from app.authentication import need_authorization, required_login
+from app.input_validation import validate_user
+from app.models import Usuario, prefijos_telefonicos
+
+bp = Blueprint(
+    name="user",
+    import_name=__name__,
+    url_prefix="/usuario/<string:username>",
+)
 
 
 @bp.route("/modificar")

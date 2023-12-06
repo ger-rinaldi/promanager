@@ -1,10 +1,15 @@
-from authentication import need_authorization, required_login
-from db import context_db_manager
-from models import Proyecto, Roles, Usuario
+from flask import Blueprint, jsonify, make_response, render_template, request
 from werkzeug.wrappers import Response
-from wsgi_app import Blueprint, make_json, request
 
-bp = Blueprint("/api/usuario/<string:username>")
+from app.authentication import need_authorization, required_login
+from app.db import context_db_manager
+from app.models import Proyecto, Roles, Usuario
+
+bp = Blueprint(
+    name="api",
+    import_name=__name__,
+    url_prefix="/api/usuario/<string:username>",
+)
 
 
 @bp.route("/proyecto/<proyect_id>/gral_stats")

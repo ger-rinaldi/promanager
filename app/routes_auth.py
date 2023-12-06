@@ -1,10 +1,16 @@
-from authentication import generate_session_cookies, required_login
-from input_validation import validate_user
-from models import Usuario, prefijos_telefonicos
+from flask import Blueprint, make_response, render_template, request
 from werkzeug.utils import redirect
-from wsgi_app import Blueprint, make_response, render_template, request
 
-bp = Blueprint(base_prefix="auth")
+from app.authentication import generate_session_cookies, required_login
+from app.input_validation import validate_user
+from app.models import Usuario, prefijos_telefonicos
+
+bp = Blueprint(
+    name="auth",
+    import_name=__name__,
+    template_folder="auth",
+    url_prefix="/auth",
+)
 
 
 @bp.route(endpoint_route="/register", is_prefix_endpoint=True)

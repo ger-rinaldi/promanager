@@ -1,11 +1,16 @@
-from authentication import need_authorization, required_login
-from input_validation import validate_proyect
-from models import Proyecto, Roles, Usuario
+from flask import Blueprint, make_response, render_template, request
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wsgi_app import Blueprint, render_template, request
 
-bp = Blueprint("/usuario/<string:username>/proyecto")
+from app.authentication import need_authorization, required_login
+from app.input_validation import validate_proyect
+from app.models import Proyecto, Roles, Usuario
+
+bp = Blueprint(
+    name="project",
+    import_name=__name__,
+    url_prefix="/usuario/<string:username>/proyecto",
+)
 
 
 @bp.route(is_prefix_endpoint=True)
