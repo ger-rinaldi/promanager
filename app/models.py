@@ -1,148 +1,144 @@
-from datetime import date
-from typing import Any, Optional, Sequence, Union
+import datetime
+from typing import Any, List, Literal, Optional
 
-from bcrypt import checkpw, gensalt, hashpw
-from mysql.connector.connection import MySQLConnection
-from mysql.connector.cursor import CursorBase
-from mysql.connector.pooling import PooledMySQLConnection
-from mysql.connector.types import RowType
+from sqlalchemy import (
+    DATE,
+    BigInteger,
+    Boolean,
+    Column,
+    False_,
+    ForeignKey,
+    Integer,
+    String,
+    Table,
+    True_,
+    UniqueConstraint,
+    func,
+    text,
+)
+from sqlalchemy.dialects.mysql import BIGINT, INTEGER, TINYTEXT
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db import close_conn_cursor, get_connection
+from db import Base, engine
 
 
-class Usuario:
-    @classmethod
-    def get_by_id(cls, id: int) -> Union["Usuario", None]:
-        user_info_query_by_id = """SELECT
-            u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero,
-            llave_sesion
-            FROM usuario AS u INNER JOIN prefijo_telefono AS p
-            ON u.telefono_prefijo = p.id
-            WHERE u.id = %s
-            """
+def to_date_object(date_string: str):
+    print(type(date_string))
+    return datetime.datetime.strptime(date_string, "%Y-%m-%d").date()
 
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
 
-        cursor.execute(user_info_query_by_id, (id,))
+class PrefijoTelefono(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # prefijo VARCHAR(8) NOT NULL,
+    prefijo: Mapped[str] = mapped_column(String(8))
+    # pais VARCHAR(60) NOT NULL
+    pais: Mapped[str] = mapped_column(String(60))
 
-        loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
-        if loaded_user is not None:
-            return Usuario(**loaded_user)
+class RolProyecto(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # nombre VARCHAR(60) UNIQUE NOT NULL
+    nombre: Mapped[str] = mapped_column(String(60))
 
-        return None
 
-    @classmethod
-    def get_by_session_id(self, session_id: str) -> Union["Usuario", None]:
-        user_info_query_by_id = """SELECT
-            u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero,
-            llave_sesion
-            FROM usuario AS u INNER JOIN prefijo_telefono AS p
-            ON u.telefono_prefijo = p.id
-            WHERE u.llave_sesion = %s
-            """
+class RolEquipo(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # nombre VARCHAR(60) UNIQUE NOT NULL
+    nombre: Mapped[str] = mapped_column(String(60))
 
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
 
-        cursor.execute(user_info_query_by_id, (session_id,))
+class Estado(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # nombre VARCHAR(60) UNIQUE NOT NULL
+    nombre: Mapped[str] = mapped_column(String(60))
 
-        loaded_user: RowType | Sequence[Any] | None = cursor.fetchone()
 
-        if loaded_user is not None:
-            return Usuario(**loaded_user)
+class Proyecto(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
+    nombre: Mapped[str] = mapped_column(String(60))
+    # descripcion TINYTEXT,
+    descripcion: Mapped[str] = mapped_column(TINYTEXT)
+    # es_publico BOOLEAN NOT NULL DEFAULT false,
+    es_publico: Mapped[bool] = mapped_column(Boolean, server_default=False_())
+    # activo BOOLEAN NOT NULL DEFAULT true,
+    activo: Mapped[bool] = mapped_column(Boolean, server_default=True_())
+    # presupuesto BIGINT NOT NULL DEFAULT -1,
+    presupuesto: Mapped[int] = mapped_column(BIGINT(unsigned=True))
+    # fecha_inicio DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    fecha_creacion: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
+    fecha_inicio: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
+    # fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01'
+    fecha_finalizacion: Mapped[datetime.date] = mapped_column(DATE)
+    integrantes: Mapped[List["Usuario"]] = relationship(
+        secondary="integrante_proyecto", back_populates="proyectos", viewonly=True
+    )
+    equipos: Mapped[List["Equipo"]] = relationship(
+        back_populates="proyecto", viewonly=True
+    )
+    tickets: Mapped[List["TicketTarea"]] = relationship(
+        back_populates="proyecto", viewonly=True
+    )
 
-        return None
+    def __init__(
+        self,
+        nombre: str,
+        descripcion: str,
+        presupuesto: int,
+        fecha_finalizacion: datetime.date,
+        es_publico: bool = False,
+        activo: bool = True,
+        fecha_inicio: datetime.date = datetime.date.today(),
+    ):
+        self.nombre: str = nombre
+        self.descripcion: str = descripcion
+        self.es_publico: bool = es_publico
+        self.activo: bool = activo
+        self.presupuesto: int = presupuesto
+        self.fecha_inicio: datetime.date = fecha_inicio
+        self.fecha_finalizacion: datetime.date = fecha_finalizacion
 
-    @classmethod
-    def get_authenticated(cls, identif: str, contrasena: str) -> Union["Usuario", None]:
-        if not cls._authenticate(identif=identif, passwd=contrasena):
-            return None
 
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
+# ? TODO: probablemente establecer getters and setter segun necesite, por ejemplo para fechas, nombre, descripcion
+# ? con la finalidad de poder establecer validaciones
 
-        user_info_query_by_email = """SELECT
-            u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero,
-            llave_sesion
-            FROM usuario AS u INNER JOIN prefijo_telefono AS p
-            ON u.telefono_prefijo = p.id
-            WHERE %s IN (email, username)
-            """
 
-        cursor.execute(user_info_query_by_email, (identif,))
-
-        authenticated_user_info: dict = cursor.fetchone()
-
-        close_conn_cursor(cnx, cursor)
-
-        return Usuario(**authenticated_user_info)
-
-    @classmethod
-    def _authenticate(cls, identif: str, passwd: str) -> bool:
-        query_pass_by_email = (
-            "SELECT contrasena FROM usuario WHERE %s IN (email, username)"
-        )
-
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        cursor.execute(
-            query_pass_by_email,
-            (identif,),
-        )
-
-        query_result: dict | None = cursor.fetchone()
-
-        if query_result is None:
-            return False
-
-        fetched_passwd: str = query_result["contrasena"]
-
-        close_conn_cursor(cnx, cursor)
-
-        return checkpw(passwd.encode("utf8"), fetched_passwd.encode("utf8"))
-
-    @classmethod
-    def remove_session(cls, user_id: int) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        sql = "UPDATE usuario SET llave_sesion = 'not_logged' WHERE id = %s"
-
-        cursor.execute(sql, (user_id,))
-
-        cursor.close()
-        cnx.close()
-
-    @classmethod
-    def get_by_username_or_mail(cls, identif: str):
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        user_info_query_by_email = """SELECT
-            u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero,
-            llave_sesion
-            FROM usuario AS u INNER JOIN prefijo_telefono AS p
-            ON u.telefono_prefijo = p.id
-            WHERE %s IN (email, username)
-            """
-
-        cursor.execute(user_info_query_by_email, (identif,))
-
-        user_info: dict = cursor.fetchone()
-
-        close_conn_cursor(cnx, cursor)
-
-        if user_info is not None:
-            return Usuario(**user_info)
-
-        return None
+class Usuario(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # username VARCHAR(20) NOT NULL UNIQUE,
+    username: Mapped[str] = mapped_column(String(20), unique=True)
+    # nombre VARCHAR(60) NOT NULL DEFAULT 'no_name',
+    nombre: Mapped[str] = mapped_column(String(60))
+    # apellido VARCHAR(60) NOT NULL DEFAULT 'no_surname',
+    apellido: Mapped[str] = mapped_column(String(60))
+    # email VARCHAR(320) UNIQUE NOT NULL,
+    email: Mapped[str] = mapped_column(String(320), unique=True)
+    # telefono_prefijo INT NOT NULL,
+    id_telefono_prefijo: Mapped[int] = mapped_column(
+        ForeignKey(PrefijoTelefono.__tablename__ + ".id")
+    )
+    telefono_prefijo: Mapped["PrefijoTelefono"] = relationship()
+    # telefono_numero VARCHAR(30) NOT NULL,
+    telefono_numero: Mapped[str] = mapped_column(String(30))
+    # contrasena VARCHAR(72) NOT NULL,
+    contrasena: Mapped[str] = mapped_column(String(72))
+    # FOREIGN KEY (telefono_prefijo) REFERENCES prefijo_telefono(id) ON DELETE CASCADE
+    proyectos: Mapped[List["Proyecto"]] = relationship(
+        secondary="integrante_proyecto", back_populates="integrantes", viewonly=True
+    )
+    equipos: Mapped[List["Equipo"]] = relationship(
+        secondary="miembro_equipo", back_populates="miembros", viewonly=True
+    )
 
     def __init__(
         self,
@@ -150,770 +146,259 @@ class Usuario:
         nombre: str,
         apellido: str,
         email: str,
-        telefono_prefijo: str,
+        # Se utiliza la ID del registro en vez de un objeto row
+        # para evitar instanciarlo, dado que solo se necesitaria
+        # al crear o editar un usuario y porque el dato
+        # se recibirá directamente del frontend
+        id_telefono_prefijo: int,
         telefono_numero: str,
-        contrasena: Optional[str] = None,
-        id: Optional[int] = None,
-        id_integrante: Optional[int] = None,
-        id_miembro: Optional[int] = None,
-        rol_proyecto: Optional[str] = None,
-        rol_equipo: Optional[str] = None,
-        llave_sesion: Optional[str] = None,
-    ) -> None:
-        self.id = id
-        self.username = username
-        self.nombre = nombre
-        self.apellido = apellido
-        self.email = email
-        self.telefono_prefijo = telefono_prefijo
-        self.telefono_numero = telefono_numero
-        self.id_integrante = id_integrante
-        self.id_miembro = id_miembro
-        self.rol_proyecto = rol_proyecto
-        self.rol_equipo = rol_equipo
-        self.llave_sesion = llave_sesion
-
-        if contrasena is not None and not contrasena[0:3] == "$2b":
-            self.contrasena = hashpw(contrasena.encode("utf8"), gensalt())
-        else:
-            self.contrasena = contrasena
-
-    def create(self) -> None:
-        """Crear nuevo registro de usuario en la base de datos
-        con el objeto usuario ya instanciado"""
-
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor_create: CursorBase = cnx.cursor()
-
-        sql = """INSERT INTO
-                usuario(username, nombre, apellido, email, telefono_prefijo, \
-                telefono_numero, contrasena)
-                VALUES  (%s, %s, %s, %s, %s, %s, %s)"""
-
-        values = self.__tuple__()
-
-        cursor_create.execute(sql, values)
-
-        cnx.commit()
-        cursor_create.close()
-        cnx.close()
-
-    def update(self) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        sql = """UPDATE usuario SET 
-        username = %s, nombre = %s, apellido = %s,  
-        email = %s, telefono_prefijo = %s, telefono_numero = %s
-        WHERE id = %s"""
-
-        values = (*self.__tuple__(), self.id)
-
-        cursor.execute(sql, values)
-
-        cnx.commit()
-
-        cursor.close()
-        cnx.close()
-
-    def delete(self) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        sql = "DELETE FROM usuario WHERE id = %s"
-
-        cursor.execute(sql, (self.id,))
-
-        cnx.commit()
-
-        cursor.close()
-        cnx.close()
-
-    def set_session_id(self, sessionId):
-        update_session_query = "UPDATE usuario SET llave_sesion = %s WHERE id = %s"
-
-        verify_session_update = "SELECT llave_sesion FROM usuario WHERE id = %s"
-
-        values = (sessionId, self.id)
-
-        cnx = get_connection()
-        cursor = cnx.cursor()
-
-        cursor.execute(update_session_query, values)
-        cnx.commit()
-        cursor.execute(verify_session_update, (self.id,))
-
-        queried_session_id = cursor.fetchone()
-
-        close_conn_cursor(cnx, cursor)
-
-        if queried_session_id is not None and sessionId == queried_session_id[0]:
-            return True
-
-        return False
-
-    def load_own_resources(self):
-        self.proyectos = Proyecto._get_all_of_participant(self.id)
-        self.equipos = Equipo._get_by_member(self.id)
-        self.tareas = Ticket_Tarea._get_by_asigned_user(self.id)
-
-    def __tuple__(self, with_id: bool = False) -> tuple:
-        """Retornar atributos de usuario como tupla
-
-
-        Returns:
-            tuple: (id, username, nombre, apellido, email)
-        """
-
-        atributos_usuario: list[Any] = [
-            self.username,
-            self.nombre,
-            self.apellido,
-            self.email,
-            self.telefono_prefijo,
-            self.telefono_numero,
-        ]
-
-        if with_id:
-            atributos_usuario.insert(0, self.id)
-
-        if self.contrasena:
-            atributos_usuario.append(self.contrasena)
-
-        return tuple(atributos_usuario)
-
-    def __repr__(self) -> str:
-        """Dunder Method para convertir al objeto usuario (su información)
-        en un string.
-
-        Returns:
-            str: string con informacion de objeto usuario.
-        """
-
-        # Para reducir el largo de linea
-        # se crean dos strings por separado
-        user_as_string = f"Id: {self.id}, Username: {self.username}, \
-        Nombre: {self.nombre}, Apellido: {self.apellido}, e-mail: {self.email}, \
-        teléfono: {self.telefono_prefijo}-{self.telefono_numero}"
-
-        return user_as_string
-
-    def __iter__(self) -> None:
-        """Dunder Method para permitir iterar sobre ciertos atributos del objeto usuario.
-        id, nombre, apellido, email, telefono.
-
-        Yields:
-            None: la funcion no usa return, sino yield para cada atributo.
-        """
-
-        yield "username", self.username
-        yield "nombre", self.nombre
-        yield "apellido", self.apellido
-        yield "email", self.email
-        yield "telefono", f"{self.telefono_prefijo}-{self.telefono_numero}"
-
-        if hasattr(self, "id") and self.id is not None:
-            yield "id", self.id
-
-        if hasattr(self, "id_integrante") and self.id_integrante is not None:
-            yield "id_integrante", self.id_integrante
-
-        if hasattr(self, "id_miembro") and self.id_miembro is not None:
-            yield "id_miembro", self.id_miembro
-
-        if hasattr(self, "rol_proyecto") and self.rol_proyecto is not None:
-            yield "rol_proyecto", self.rol_proyecto
-
-        if hasattr(self, "rol_equipo") and self.rol_equipo is not None:
-            yield "rol_equipo", self.rol_equipo
-
-        if hasattr(self, "llave_sesion") and self.llave_sesion is not None:
-            yield "llave_sesion", self.llave_sesion
-
-
-class prefijos_telefonicos:
-    """Clase encargada de obtener los prefijos telefonicos"""
-
-    @classmethod
-    def read_all(cls):
-        """Obtener todos los paises y sus codigos sin ID"""
-
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor_getall = cnx.cursor(dictionary=True)
-        cursor_getall.execute("SELECT id, prefijo, pais FROM prefijo_telefono")
-
-        return cursor_getall.fetchall()
-
-    @classmethod
-    def get_prefix_of_id(cls, id: int) -> Union[str, None]:
-        """Obtener todos los paises y sus codigos sin ID"""
-
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor_prefix: CursorBase = cnx.cursor()
-        cursor_prefix.execute(
-            "SELECT prefijo FROM prefijo_telefono WHERE id = %s",
-            (id,),
-        )
-
-        prefix: RowType | Sequence[Any] | None = cursor_prefix.fetchone()
-
-        if prefix is not None:
-            return str(prefix[0])
-
-        return None
-
-
-class Proyecto:
-    @classmethod
-    def _get_all_of_participant(cls, participant_id):
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_query: str = """SELECT
-                p.id as 'id proyecto', p.nombre as 'nombre proyecto'
-                , p.es_publico as "publico", p.activo, p.presupuesto
-                , p.fecha_inicio as "fecha inicio", p.fecha_finalizacion as "fecha finalizacion"
-                , i.id as 'id integrante', rp.nombre as 'rol'
-                FROM
-                proyecto as  p
-                INNER JOIN
-                integrantes_proyecto as i
-                ON p.id = i.proyecto
-                INNER JOIN
-                roles_proyecto as rp
-                ON rp.id = i.rol
-                WHERE i.integrante = %s
-                ORDER BY p.id
-        """
-
-        cursor.execute(select_query, (participant_id,))
-
-        proyects_of_participant: RowType | None = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        return proyects_of_participant
-
-    @classmethod
-    def get_by_id(cls, id) -> Union["Proyecto", None]:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_query: str = "SELECT * FROM proyecto WHERE id = %s"
-
-        cursor.execute(select_query, (id,))
-
-        loaded_proyect: RowType | None = cursor.fetchone()
-
-        if loaded_proyect is not None:
-            loaded_proyect: "Proyecto" = Proyecto(**loaded_proyect)
-
-        cursor.close()
-        cnx.close()
-
-        return loaded_proyect
+        contrasena: str,
+    ):
+        self.username: str = username
+        self.nombre: str = nombre
+        self.apellido: str = apellido
+        self.email: str = email
+        self.id_telefono_prefijo: int = id_telefono_prefijo
+        self.telefono_numero: str = telefono_numero
+        self.contrasena: str = contrasena
+
+
+class IntegranteProyecto(Base):
+    # ALERT: ASSOCIATION OBJECT
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # id_proyecto INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (proyecto) REFERENCES proyecto(id) ON DELETE CASCADE,
+    id_proyecto: Mapped[int] = mapped_column(ForeignKey(Proyecto.__tablename__ + ".id"))
+    proyecto: Mapped["Proyecto"] = relationship()  # back_populates="integrantes")
+    # id_usuario INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE,
+    id_usuario: Mapped[int] = mapped_column(ForeignKey(Usuario.__tablename__ + ".id"))
+    usuario: Mapped["Usuario"] = relationship()  # back_populates="proyectos")
+    # rol INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (rol) REFERENCES roles_proyecto(id) ON DELETE CASCADE,
+    id_rol: Mapped[int] = mapped_column(ForeignKey(RolProyecto.__tablename__ + ".id"))
+    rol: Mapped["RolProyecto"] = relationship()
+    # fecha_inicio_participacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    fecha_inicio_participacion: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
+    # fecha_baja DATE NOT NULL DEFAULT '1000-01-01',
+    fecha_baja: Mapped[Optional[datetime.date]] = mapped_column(DATE)
+    # suspendido BOOLEAN NOT NULL DEFAULT false,
+    suspendido: Mapped[bool] = mapped_column(Boolean, server_default=False_())
+
+    # CONSTRAINT integrante_proyecto UNIQUE (proyecto, id_usuario)
+    __table_args__ = (
+        UniqueConstraint("id_proyecto", "id_usuario", name="integrante_proyecto"),
+    )
+
+    def __init__(
+        self,
+        proyecto: "Proyecto",
+        usuario: "Usuario",
+        rol: "RolProyecto",
+        fecha_inicio_participacion: datetime.date = datetime.date.today(),
+        suspendido: bool = False,
+        fecha_baja: Optional[datetime.date] = None,
+    ):
+        self.proyecto: "Proyecto" = proyecto
+        self.usuario: "Usuario" = usuario
+        self.rol: "RolProyecto" = rol
+        self.suspendido: bool = suspendido
+        self.fecha_baja: Optional[datetime.date] = fecha_baja
+        # despues mover esta validacion al setter
+        if fecha_inicio_participacion is not None:
+            self.fecha_inicio_participacion: datetime.date = fecha_inicio_participacion
+
+
+# ! ALERT:
+# * hacer relacion muchos a muchos directa, como en usuario y proyecto,
+# * las id foraneas empiezan con 'id_', los objetos igual que la id foranea sin el 'id_'
+
+
+class Equipo(Base):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # id_proyecto INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_proyecto) REFERENCES proyecto(id) ON DELETE CASCADE
+    id_proyecto: Mapped[int] = mapped_column(ForeignKey(Proyecto.__tablename__ + ".id"))
+    proyecto: Mapped["Proyecto"] = relationship(back_populates="equipos")
+    # nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
+    nombre: Mapped[str] = mapped_column(String(60))
+    # fecha_creacion DATE NOT NULL DEFAULT (CURRENT_DATE())
+    fecha_creacion: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
+    miembros: Mapped[List["Usuario"]] = relationship(
+        secondary="miembro_equipo", back_populates="equipos", viewonly=True
+    )
+    tickets: Mapped[List["TicketTarea"]] = relationship(
+        back_populates="equipo", viewonly=True
+    )
 
     def __init__(
         self,
         nombre: str,
+        proyecto: "Proyecto",
+    ):
+        self.nombre: str = nombre
+        self.proyecto: "Proyecto" = proyecto
+
+
+class MiembroEquipo(Base):
+    # -- ALERT: ASSOCIATION OBJECT
+    # ALERT:
+    # ALERT:
+    # ! TODO: Me olvide que miembro equipo no se relaciona directo con usuario sino con integrante_proyecto
+    # ALERT:
+    # ALERT:
+    # PK id, id_miembro
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # id_equipo INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_equipo) REFERENCES equipo(id) ON DELETE CASCADE,
+    id_equipo: Mapped[int] = mapped_column(ForeignKey(Equipo.__tablename__ + ".id"))
+    equipo: Mapped["Equipo"] = relationship()
+    # id_usuario INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_usuario) REFERENCES integrantes_proyecto(id) ON DELETE CASCADE,
+    id_usuario: Mapped[int] = mapped_column(ForeignKey(Usuario.__tablename__ + ".id"))
+    usuario: Mapped["Usuario"] = relationship()
+    # id_rol INT NOT NULL,
+    # FOREIGN KEY (id_rol) REFERENCES roles_equipo(id) ON DELETE CASCADE,
+    id_rol: Mapped[int] = mapped_column(ForeignKey(RolEquipo.__tablename__ + ".id"))
+    rol: Mapped["RolEquipo"] = relationship()
+    # fecha_inicio_participacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    fecha_inicio_participacion: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
+    # fecha_baja DATE NOT NULL DEFAULT '1000-01-01',
+    fecha_baja: Mapped[Optional[datetime.date]] = mapped_column(DATE)
+    # suspendido BOOLEAN NOT NULL DEFAULT false,
+    suspendido: Mapped[bool] = mapped_column(Boolean, server_default=False_())
+    # CONSTRAINT miembro_equipo UNIQUE (id_equipo, id_usuario)
+    __table_args__ = (
+        UniqueConstraint("id_equipo", "id_usuario", name="miembro_equipo"),
+    )
+
+    def __init__(
+        self,
+        proyecto: "Proyecto",
+        usuario: "Usuario",
+        rol: "RolProyecto",
+        fecha_inicio_participacion: Optional[datetime.date] = datetime.date.today(),
+        suspendido: bool = False,
+        fecha_baja: Optional[datetime.date] = None,
+    ):
+        self.proyecto: "Proyecto" = proyecto
+        self.usuario: "Usuario" = usuario
+        self.rol: "RolProyecto" = rol
+        self.suspendido: bool = suspendido
+        self.fecha_baja: Optional[datetime.date] = fecha_baja
+        # despues mover esta validacion al setter
+        if fecha_inicio_participacion is not None:
+            self.fecha_inicio_participacion: datetime.date = fecha_inicio_participacion
+
+
+class TicketTarea(Base):
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # id_proyecto INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_proyecto) REFERENCES proyecto(id) ON DELETE CASCADE,
+    id_proyecto: Mapped[int] = mapped_column(ForeignKey(Proyecto.__tablename__ + ".id"))
+    proyecto: Mapped["Proyecto"] = relationship(back_populates="tickets")
+    # id_equipo INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_equipo) REFERENCES equipo(id) ON DELETE CASCADE,
+    id_equipo: Mapped[int] = mapped_column(ForeignKey(Equipo.__tablename__ + ".id"))
+    equipo: Mapped["Equipo"] = relationship(back_populates="tickets")
+    # nombre VARCHAR(60) NOT NULL DEFAULT 'not_named',
+    nombre: Mapped[str] = mapped_column(String(60))
+    # id_estado INT NOT NULL,
+    # FOREIGN KEY (id_estado) REFERENCES estado(id) ON DELETE CASCADE
+    id_estado: Mapped[int] = mapped_column(ForeignKey(Estado.__tablename__ + ".id"))
+    estado: Mapped["Estado"] = relationship()
+    # descripcion TINYTEXT,
+    descripcion: Mapped[str] = mapped_column(TINYTEXT)
+    # fecha_creacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    fecha_creacion: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
+    # fecha_limite DATE NOT NULL DEFAULT '1000-01-01',
+    fecha_limite: Mapped[Optional[datetime.date]] = mapped_column(DATE)
+    # fecha_finalizacion DATE NOT NULL DEFAULT '1000-01-01',
+    fecha_finalizacion: Mapped[Optional[datetime.date]] = mapped_column(DATE)
+
+    def __init__(
+        self,
+        id_proyecto: int,
+        proyecto: "Proyecto",
+        id_equipo: int,
+        equipo: "Equipo",
+        nombre: str,
+        # se utiliza la id en vez del objeto al igual que prefijo_telefono de Usuario
+        id_estado: int,
         descripcion: str,
-        es_publico: bool,
-        activo: bool,
-        presupuesto: float,
-        fecha_inicio: date,
-        fecha_finalizacion: date,
-        id: Optional[int] = None,
-        instatiate_components: Optional[bool] = False,
-        components_as_dicts: Optional[bool] = True,
+        fecha_creacion: datetime.date,
+        fecha_asignacion: Optional[datetime.date] = None,
+        fecha_limite: Optional[datetime.date] = None,
+        fecha_finalizacion: Optional[datetime.date] = None,
+        asignado: bool = False,
     ) -> None:
-        self.id = id
-        self.nombre = nombre
-        self.descripcion = descripcion
-        self.es_publico = es_publico
-        self.activo = activo
-        self.presupuesto = presupuesto
-        self.fecha_inicio = fecha_inicio
-        self.fecha_finalizacion = fecha_finalizacion
-        if instatiate_components:
-            self.load_own_resources(components_as_dicts)
-
-    def create(self) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        insert_query: str = """INSERT INTO
-        proyecto(nombre, descripcion, es_publico, activo,
-        presupuesto, fecha_inicio, fecha_finalizacion)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-
-        cursor.execute(insert_query, self.__tuple__())
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        self._query_id()
-
-    def update(self) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        insert_query: str = """UPDATE proyecto
-        SET
-        nombre=%s, descripcion=%s, es_publico=%s, activo=%s,
-        presupuesto=%s, fecha_inicio=%s, fecha_finalizacion=%s
-        WHERE id=%s"""
-
-        cursor.execute(insert_query, (*self.__tuple__(), self.id))
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-
-    def delete(self) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        delete_query: str = "DELETE FROM proyecto WHERE id = %s"
-
-        cursor.execute(delete_query, (self.id,))
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-
-    def register_new_participant(self, participant_id: int, role_id: int) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        insert_participant = """INSERT INTO
-        integrantes_proyecto(proyecto, integrante, rol )
-        VALUES (%s, %s, %s)"""
-
-        cursor.execute(insert_participant, (self.id, participant_id, role_id))
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        self._fetch_all_participants()
-
-    def update_participant(self, participant_id: int, role_id: int) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        update_participant = """UPDATE integrantes_proyecto
-        SET rol=%s
-        WHERE proyecto=%s AND integrante=%s"""
-
-        cursor.execute(update_participant, (role_id, self.id, participant_id))
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        self._fetch_all_participants()
-
-    def delete_participant(self, participant_id: int) -> None:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        update_participant = """DELETE FROM integrantes_proyecto
-        WHERE proyecto=%s AND integrante=%s"""
-
-        cursor.execute(update_participant, (self.id, participant_id))
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        self._fetch_all_participants()
-
-    def _query_id(self):
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor()
-
-        fetch_id = """SELECT id FROM proyecto WHERE nombre = %s"""
-
-        cursor.execute(fetch_id, (self.nombre,))
-        self.id = cursor.fetchone()[0]
-
-        cursor.close()
-        cnx.close()
-
-        return self.id
-
-    def _fetch_all_participants(self, as_dicts: bool = True) -> list[RowType]:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_intg_query: str = """SELECT
-            i.id,
-            rp.nombre as rol,
-            u.username,  u.nombre, u.apellido, u.email, CONCAT(pf.prefijo, "-", u.telefono_numero) as "telefono_numero"
-            FROM
-            integrantes_proyecto as i
-            INNER JOIN
-            roles_proyecto as rp
-            ON rp.id = i.rol
-            INNER JOIN
-            usuario as u
-            ON i.integrante = u.id
-            INNER JOIN
-            prefijo_telefono as pf
-            ON pf.id = u.telefono_prefijo
-            WHERE i.proyecto = %s
-        """
-
-        cursor.execute(select_intg_query, (self.id,))
-
-        all_integrantes = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        if as_dicts:
-            self.participantes = all_integrantes
-        else:
-            for i in all_integrantes:
-                self.participantes.append(Usuario(**i))
-
-    def _fetch_all_teams(self, as_dicts: bool) -> list[RowType]:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_teams_query: str = """SELECT * from equipo WHERE proyecto = %s"""
-
-        cursor.execute(select_teams_query, (self.id,))
-
-        all_teams = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        if as_dicts:
-            self.equipos = all_teams
-        else:
-            for t in all_teams:
-                self.equipos.append(Equipo(**t))
-
-    def _fetch_all_tasks(self, as_dicts: bool) -> list[RowType]:
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_tasks_query: str = """SELECT * from ticket_tarea WHERE proyecto = %s"""
-
-        cursor.execute(select_tasks_query, (self.id,))
-
-        all_tasks = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        if as_dicts:
-            self.tareas = all_tasks
-        else:
-            for t in all_tasks:
-                self.tareas.append(Ticket_Tarea(**t))
-
-    def load_own_resources(self, as_dicts: bool):
-        self._fetch_all_participants(as_dicts)
-        self._fetch_all_tasks(as_dicts)
-        self._fetch_all_teams(as_dicts)
-
-    def user_can_modify(self, user_id):
-        query = """
-        select true
-        from integrantes_proyecto
-        where integrante = %s and proyecto = %s and rol = %s
-        """
-
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        cursor.execute(query, (user_id, self.id, 1))
-
-        result = cursor.fetchone()
-
-        if result is not None and result[0] == 1:
-            return True
-
-        return False
-
-    def __tuple__(self, with_id: bool = False) -> tuple:
-        self_as_tuple: list[Any] = [
-            self.nombre,
-            self.descripcion,
-            self.es_publico,
-            self.activo,
-            self.presupuesto,
-            self.fecha_inicio,
-            self.fecha_finalizacion,
-        ]
-
-        if with_id:
-            self_as_tuple.insert(0, self.id)
-
-        return tuple(self_as_tuple)
-
-    def __repr__(self) -> str:
-        return f"id: {self.id}, nombre: {self.nombre}, \
-            presupuesto: {self.presupuesto}, inicio: {self.fecha_inicio}"
-
-    def __iter__(self) -> None:
-        yield "id", self.id
-        yield "nombre", self.nombre
-        yield "descripcion", self.descripcion
-        yield "es_publico", self.es_publico
-        yield "activo", self.activo
-        yield "presupuesto", self.presupuesto
-        yield "fecha_inicio", self.fecha_inicio
-        yield "fecha_finalizacion", self.fecha_finalizacion
-
-        if hasattr(self, "participantes") and self.participantes is not None:
-            yield "participantes", self.participantes
-
-        if hasattr(self, "equipos") and self.equipos is not None:
-            yield "equipos", self.equipos
-
-
-class Ticket_Tarea:
-    @classmethod
-    def _get_by_asigned_user(cls, user_id):
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_query: str = """select
-            t.id as "id tarea", t.proyecto as "proyecto padre", t.equipo as "equipo encargado"
-            , t.nombre, t.estado, t.fecha_asignacion as "asignada a equipo"
-            , t.fecha_limite as "limite", a.id as "asignacion nº"
-            , a.fecha_asignacion as "asignada a usuario"
-            from
-            ticket_tarea as t
-            inner join
-            asignacion_tarea as a
-            on t.id = a.ticket_tarea
-            inner join
-            miembros_equipo as m
-            on a.miembro = m.id
-            inner join
-            integrantes_proyecto as ipr
-            on m.miembro = ipr.id
-            inner join
-            usuario as u
-            on ipr.integrante = u.id
-            where u.id = %s
-            order by t.id;
-        """
-
-        cursor.execute(select_query, (user_id,))
-
-        tasks_of_user: RowType | None = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        return tasks_of_user
-
-    @classmethod
-    def get_by_id(csl, task_id):
-        query = """
-        SELECT
-        id, proyecto, equipo, nombre, estado, descripcion,
-        fecha_creacion, fecha_asignacion,
-        fecha_limite, fecha_finalizacion
-        FROM
-        ticket_tarea
-        WHERE id = %s
-        """
-
-        connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        cursor.execute(query, (task_id,))
-
-        queried_task = cursor.fetchone()
-
-        if queried_task is not None:
-            return Ticket_Tarea(**queried_task)
-
-        return None
+        self.id_proyecto: int = id_proyecto
+        self.proyecto: "Proyecto" = proyecto
+        self.id_equipo: int = id_equipo
+        self.equipo: "Equipo" = equipo
+        self.nombre: str = nombre
+        self.id_estado: int = id_estado
+        self.descripcion: str = descripcion
+        self.fecha_creacion: datetime.date = fecha_creacion
+        self.asignado: bool = asignado
+
+        if fecha_asignacion is not None:
+            self.fecha_asignacion: datetime.date = fecha_asignacion
+        if fecha_limite is not None:
+            self.fecha_limite: datetime.date = fecha_limite
+        if fecha_finalizacion is not None:
+            self.fecha_finalizacion: datetime.date = fecha_finalizacion
+
+
+class AsignacionTarea(Base):
+    # -- ALERT: ASSOCIATION OBJECT
+    # id INT AUTO_INCREMENT PRIMARY KEY,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # id_ticket_tarea INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_ticket_tarea) REFERENCES ticket_tarea(id) ON DELETE CASCADE,
+    id_ticket: Mapped[int] = mapped_column(
+        ForeignKey(TicketTarea.__tablename__ + ".id")
+    )
+    ticket: Mapped["TicketTarea"] = relationship()
+    # id_miembro INT NOT NULL, /*FORANEA*/
+    # FOREIGN KEY (id_miembro) REFERENCES miembros_equipo(id) ON DELETE CASCADE,
+    id_miembro: Mapped[int] = mapped_column(
+        ForeignKey(
+            MiembroEquipo.__tablename__ + ".id"
+        )  # TODO: el campo aca no es .id si no .id_miembro
+    )
+    miembro: Mapped["MiembroEquipo"] = relationship()
+    # fecha_asignacion DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    fecha_asignacion: Mapped[datetime.date] = mapped_column(
+        DATE, server_default=text("(CURRENT_DATE())")
+    )
 
     def __init__(
         self,
-        proyecto: Union[int, "Proyecto"],
-        equipo: Union[int, "Equipo"],
-        nombre: str,
-        estado: int | str,
-        descripcion: str,
-        fecha_creacion: date,
-        fecha_asignacion: date,
-        fecha_limite: date,
-        fecha_finalizacion: date,
-        id: Optional[int] = None,
+        ticket: "TicketTarea",
+        miembro: "MiembroEquipo",
+        fecha_asignacion: Optional[datetime.date] = None,
     ) -> None:
-        self.id = id
-        self.proyecto = Proyecto.get_by_id(proyecto)
-        self.equipo = Equipo.get_by_id(equipo)
-        self.nombre = nombre
-        self.estado = estado
-        self.descripcion = descripcion
-        self.fecha_creacion = fecha_creacion
-        self.fecha_asignacion = fecha_asignacion
-        self.fecha_limite = fecha_limite
-        self.fecha_finalizacion = fecha_finalizacion
+        self.ticket: "TicketTarea" = ticket
+        self.miembro: "MiembroEquipo" = miembro
 
-    def user_can_modify(self, user_id):
-        if self.proyecto.user_can_modify(user_id) or self.equipo.user_can_modify(
-            user_id
-        ):
-            return True
-
-        return False
+        if fecha_asignacion is not None:
+            self.fecha_asignacion: datetime.date = fecha_asignacion
+        if self.ticket.fecha_limite is not None:
+            self.fecha_limite: datetime.date = self.ticket.fecha_limite
+        if self.ticket.fecha_finalizacion is not None:
+            self.fecha_finalizacion: datetime.date = self.ticket.fecha_finalizacion
 
 
-class Equipo:
-    @classmethod
-    def _get_by_member(cls, member_id):
-        cnx: MySQLConnection | PooledMySQLConnection = get_connection()
-        cursor: CursorBase = cnx.cursor(dictionary=True)
-
-        select_query: str = """SELECT
-                e.id as "id equipo", e.nombre as "nombre equipo", e.proyecto as "proyecto padre"
-                , m.id as "id miembro", re.nombre as "rol", m.suspendido
-                FROM
-                equipo as  e
-                INNER JOIN
-                miembros_equipo as m
-                ON e.id = m.equipo
-                INNER JOIN
-                roles_equipo as re
-                ON re.id = m.rol
-                INNER JOIN
-                integrantes_proyecto as ipr
-                ON ipr.id = m.miembro
-                INNER JOIN
-                usuario as u
-                ON u.id = ipr.integrante
-                WHERE u.id = %s
-                ORDER BY e.id;
-        """
-
-        cursor.execute(select_query, (member_id,))
-
-        teams_of_member: RowType | None = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        return teams_of_member
-
-    @classmethod
-    def get_by_id(csl, task_id):
-        query = """
-        SELECT
-        nombre, fecha_creacion, proyecto, id
-        FROM
-        equipo
-        WHERE id = %s
-        """
-
-        connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        cursor.execute(query, (task_id,))
-
-        queried_team = cursor.fetchone()
-
-        if queried_team is not None:
-            return Equipo(**queried_team)
-
-        return None
-
-    def __init__(
-        self,
-        nombre: str,
-        fecha_creacion: date,
-        proyecto: Union[int, "Proyecto"],
-        id: Optional[int] = None,
-    ) -> None:
-        self.id = id
-        self.nombre = nombre
-        self.fecha_creacion = fecha_creacion
-        self.proyecto = proyecto
-
-    def user_can_modify(self, user_id):
-        query = """
-            select true
-            from
-            miembros_equipo as m
-            inner join
-            integrantes_proyecto as ipr
-            on m.miembro = ipr.id
-            inner join
-            usuario as u
-            on ipr.integrante = u.id
-            where u.id = %s and m.equipo = %s and (m.rol = %s  or ipr.rol = %s);
-        """
-
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        cursor.execute(query, (user_id, self.id, 1, 1))
-
-        result = cursor.fetchone()
-
-        if result is not None and result[0] == 1:
-            return True
-
-        return False
-
-
-class Roles:
-    @classmethod
-    def get_proyect_roles(cls):
-        cnx = get_connection()
-        cursor = cnx.cursor(dictionary=True)
-
-        query = "SELECT * FROM roles_proyecto"
-
-        cursor.execute(query)
-
-        result = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        return result
-
-    @classmethod
-    def proyect_role_name(cls, id: int):
-        cnx = get_connection()
-        cursor = cnx.cursor()
-
-        query = "SELECT nombre FROM roles_proyecto WHERE id=%s"
-
-        cursor.execute(query, (id,))
-
-        result = cursor.fetchone()
-
-        cursor.close()
-        cnx.close()
-
-        if result is not None:
-            return result[0]
-
-        return None
-
-    @classmethod
-    def get_team_roles(cls):
-        cnx = get_connection()
-        cursor = cnx.cursor(dictionary=True)
-
-        query = "SELECT * FROM roles_equipo"
-
-        cursor.execute(query)
-
-        result = cursor.fetchall()
-
-        cursor.close()
-        cnx.close()
-
-        return result
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)

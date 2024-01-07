@@ -10,6 +10,8 @@ from app.models import Usuario
 def create_app(with_static=True):
     new_app = Flask(__name__)
 
+    new_app.config.from_prefixed_env()
+
     @new_app.route("/")
     def home_page():
         session_key = request.cookies.get("sessionId", False)
