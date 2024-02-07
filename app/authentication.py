@@ -7,7 +7,6 @@ from flask import request
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from app.config import DOMAIN
 from app.db import close_conn_cursor, get_connection
 from app.models import Equipo, Proyecto, Ticket_Tarea, Usuario
 
@@ -37,7 +36,6 @@ def generate_session_cookies() -> dict:
         "max_age": max_age,
         "expires": expires,
         "path": "/",
-        "domain": DOMAIN,
         "secure": True,
         "httponly": True,
         "samesite": "lax",
