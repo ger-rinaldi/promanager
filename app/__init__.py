@@ -21,6 +21,10 @@ def create_app(with_static=True):
 
         return make_response(render_template("home.html"))
 
+    from app.db_cli import db_setup
+
+    new_app.cli.add_command(db_setup)
+
     import app.routes_auth
 
     new_app.register_blueprint(app.routes_auth.bp)

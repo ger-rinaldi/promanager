@@ -3,13 +3,13 @@ from setuptools import setup
 setup(
     name="db_cli",
     version="0.1.0",
-    py_modules=["yourscript"],
+    py_modules=["app"],
     install_requires=[
         "Click",
     ],
     entry_points={
         "console_scripts": [
-            "db_cli = db_cli:db_setup",
+            "db-cli = db_cli:db_setup",
         ],
     },
 )
