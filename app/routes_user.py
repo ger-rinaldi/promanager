@@ -52,7 +52,7 @@ def modificar_usuario(username):
             return redirect(f"/usuario/{user_to_update.username}/perfil")
 
     return render_template(
-        template_name=template_name,
+        template_name,
         errors=errors,
         current_user=user_to_update,
         country_codes=country_codes,
