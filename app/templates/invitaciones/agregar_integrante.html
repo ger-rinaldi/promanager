@@ -9,7 +9,8 @@
 {% block nf_content %}
 
 {% include 'error_display.html'   %}
-<script src="/static/js/project_integrants.js"></script>
+<script type="module" src="/static/js/project_integrants.js"></script>
+<script type="module" src="/static/js/api_utils.js"></script>
 
 <h1 class="mt-3 text-center">{{proyect.nombre}}</h1>
 <h4 class="mb-3 text-center">Gestión de Integrantes</h4>
@@ -120,24 +121,54 @@
 
         {% endfor %} {% if proyect.user_can_modify(current_user.id) %}
         <td class="text-center">
-          <div class="edit-button btn btn-warning btn-sm">
+          <div
+            class="edit-button btn btn-warning btn-sm"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Editar integrante"
+          >
             <img
               src="/static/icons/edit.png"
               alt=""
-              style="width: 16px; height: 16px"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Editar integrante"
+              style="width: 14px; height: 14px"
             />
           </div>
-          <div class="delete-button btn btn-danger btn-sm">
+          <div
+            class="save-button btn btn-success btn-sm"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Guardar edición"
+            hidden
+          >
+            <img
+              src="/static/icons/save.png"
+              alt=""
+              style="width: 14px; height: 14px"
+            />
+          </div>
+          <div
+            class="delete-button btn btn-danger btn-sm"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Eliminar integrante"
+          >
             <img
               src="/static/icons/recycle-bin.png"
               alt=""
-              style="width: 16px; height: 16px"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Eliminar integrante"
+              style="width: 14px; height: 14px"
+            />
+          </div>
+          <div
+            class="cancel-button btn btn-danger btn-sm"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Cancelar edición"
+            hidden
+          >
+            <img
+              src="/static/icons/cancel.png"
+              alt=""
+              style="width: 14px; height: 14px"
             />
           </div>
         </td>
@@ -156,26 +187,5 @@
 {% endif %}
 
 <!-- prettier-ignore -->
-
-<style>
-    .alert-fixed {
-      margin-top: 1%;
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50%; /* Adjust the width as needed */
-      z-index: 9999;
-      text-align: center; /* Adjust as needed */
-      padding: 10px; /* Adjust as needed */
-      box-sizing: border-box; /* Include padding in width calculation */
-    }
-      .alert-fixed .btn-close {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      right: 10px;
-    }
-</style>
 
 {% endblock %}

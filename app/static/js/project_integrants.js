@@ -1,35 +1,15 @@
-function split_url() {
-  const str_url = window.location.toString();
-  const split_url = str_url.split("/");
+import { get_api_url } from "./api_utils.js";
 
-  return split_url;
-}
-
-function get_resources() {
-  let available_resources = ["usuario", "proyecto", "equipo", "tarea"];
-  let queried_resources = {};
-
-  const path = split_url();
-
-  for (const resource of available_resources) {
-    if (path.indexOf(resource) >= 0) {
-      queried_resources[resource] = path[path.indexOf(resource) + 1];
-    }
-  }
-
-  return queried_resources;
-}
-
-const resources = get_resources();
-const api_url = `/api/usuario/${resources["usuario"]}/proyecto/${resources["proyecto"]}/integrante`;
+const api_url = get_api_url();
 
 function getAlertElement(message, status) {
   const dismissBtn = () => {
     const btn = document.createElement("button");
-    btn.classList.add("btn-close");
+    btn.classList.add("close");
     btn.setAttribute("type", "button");
     btn.setAttribute("data-bs-dismiss", "alert");
     btn.setAttribute("aria-label", "Close");
+    btn.innerHTML = "&times;";
 
     return btn;
   };
@@ -41,12 +21,8 @@ function getAlertElement(message, status) {
     alertElement.classList.add("alert-success");
   }
 
-  alertElement.classList.add("alert-fixed");
-  alertElement.classList.add("show");
-  alertElement.classList.add("fade");
-  alertElement.classList.add("alert-dismissible");
-  alertElement.classList.add("alert");
-  alertElement.role = "alert";
+  alertElement.classList.add("show", "fade", "alert-dismissible", "alert");
+  alertElement.setAttribute("role", "alert");
   alertElement.textContent = message;
   alertElement.appendChild(dismissBtn());
   return alertElement;
@@ -61,19 +37,65 @@ function clearMessages() {
 }
 
 function displayResponseMessages(responseStatus, responseMessages) {
+  const msgDisplay = document.getElementById("message-display");
   clearMessages();
 
   if (Array.isArray(responseMessages)) {
     for (const message of responseMessages) {
       const alertElement = getAlertElement(message, responseStatus);
-      document.body.appendChild(alertElement);
+      msgDisplay.appendChild(alertElement);
     }
   } else {
     const alertElement = getAlertElement(responseMessages, responseStatus);
-    document.body.appendChild(alertElement);
+    msgDisplay.appendChild(alertElement);
   }
 }
 
+async function getProyectRoles() {
+  const rolesResponse = await fetch("/api/proyecto/roles");
+  const roles = await rolesResponse.json();
+  return roles;
+}
+
+function makeSelectCell(defaultOption, values) {
+  const selectElement = document.createElement("select");
+  selectElement.setAttribute("class", "rol-cell");
+  selectElement.classList.add("text-center");
+  values.forEach((r) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = r.id;
+    optionElement.textContent = r.nombre;
+
+    if (defaultOption === r.nombre) {
+      optionElement.setAttribute("selected", "");
+    }
+
+    selectElement.appendChild(optionElement);
+  });
+
+  return selectElement;
+}
+
+function makeCell(keyName) {
+  // class="text-center {{key}}-cell"
+  const rowCell = document.createElement("td");
+  rowCell.classList.add("text-center", `${keyName}-cell`);
+  return rowCell;
+}
+
+function switchHiddenActions(element) {
+  const buttonsCell = element.parentElement;
+
+  for (const child of buttonsCell.children) {
+    if ("hidden" in child.attributes) {
+      child.removeAttribute("hidden");
+    } else {
+      child.setAttribute("hidden", "");
+    }
+  }
+}
+
+// ! ALERT: SIMPLIFY LOGIC THIS IS A BUNCH OF SHIIIIT
 document.addEventListener("DOMContentLoaded", function () {
   const msgDisplay = document.getElementById("message-display");
   const createButton = document.getElementById("create-button");
@@ -106,14 +128,20 @@ document.addEventListener("DOMContentLoaded", function () {
   // eliminar y actualizar participante
   const editButtons = document.querySelectorAll(".edit-button");
 
-  editButtons.forEach((e) => {
-    e.addEventListener("click", function () {
+  editButtons.forEach((currentEditButton) => {
+    currentEditButton.addEventListener("click", async function () {
       // get the row
+      const row = this.parentNode.parentNode;
+      //get the roles
+      const roles = await getProyectRoles();
       // get its children
+      const roleCell = row.querySelector(".rol-cell");
+      // add them to the select element
+      const selectElement = makeSelectCell(roleCell.textContent, roles);
       // make the Role one a dropdown selector, like the one above
-      // change edit buttons for Save and Cancel
-      // when Cancel, false for content editable
-      // when save, false for content editable, send new data to api (get username and new role id)
+
+      roleCell.replaceWith(selectElement);
+      switchHiddenActions(this);
     });
   });
 
@@ -137,6 +165,72 @@ document.addEventListener("DOMContentLoaded", function () {
       const responsePromise = await deleteRequest.json();
       displayResponseMessages(deleteRequest.status, responsePromise.message);
       table.removeChild(row);
+    });
+  });
+
+  const saveButtons = document.querySelectorAll(".save-button");
+
+  saveButtons.forEach((saveButton) => {
+    saveButton.addEventListener("click", async function () {
+      // send save to api
+      const row = this.parentNode.parentNode;
+      const updateParticipantURL = api_url + "/modificar";
+      const updateForm = new FormData();
+
+      updateForm.append(
+        "participant_identif",
+        row.querySelector(".username-cell").textContent
+      );
+
+      updateForm.append("role", row.querySelector(".rol-cell").value);
+
+      const request = {
+        method: "POST",
+        body: updateForm,
+      };
+
+      const updateRequest = await fetch(updateParticipantURL, request);
+      const updateResponse = await updateRequest.json();
+
+      displayResponseMessages(updateRequest.status, updateResponse.message);
+
+      if (updateRequest.status === 200) {
+        // restore role cell with new role
+        const roleCell = makeCell("rol");
+        // row.querySelector(".rol-cell").options[row.querySelector(".rol-cell").selectedIndex].textContent
+        roleCell.textContent =
+          row.querySelector(".rol-cell").options[
+            row.querySelector(".rol-cell").selectedIndex
+          ].textContent;
+
+        row.querySelector(".rol-cell").replaceWith(roleCell);
+      }
+
+      switchHiddenActions(this);
+    });
+  });
+
+  const cancelButtons = document.querySelectorAll(".cancel-button");
+
+  cancelButtons.forEach((cancelButton) => {
+    cancelButton.addEventListener("click", async function () {
+      // restore role cell with previous role
+      const row = this.parentNode.parentNode;
+
+      const getPreviousRole = () => {
+        for (const option of row.querySelector(".rol-cell")) {
+          if ("selected" in option.attributes) {
+            return option.textContent;
+          }
+        }
+      };
+
+      const roleCell = makeCell("rol");
+      roleCell.textContent = getPreviousRole();
+
+      row.querySelector(".rol-cell").replaceWith(roleCell);
+
+      switchHiddenActions(this);
     });
   });
 });

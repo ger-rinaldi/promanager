@@ -126,8 +126,7 @@ class Usuario:
 
         user_info_query_by_email = """SELECT
             u.id, username, nombre, apellido, email,
-            prefijo AS telefono_prefijo, telefono_numero,
-            llave_sesion
+            prefijo AS telefono_prefijo, telefono_numero
             FROM usuario AS u INNER JOIN prefijo_telefono AS p
             ON u.telefono_prefijo = p.id
             WHERE %s IN (email, username)
@@ -256,6 +255,21 @@ class Usuario:
         self.proyectos = Proyecto._get_all_of_participant(self.id)
         self.equipos = Equipo._get_by_member(self.id)
         self.tareas = Ticket_Tarea._get_by_asigned_user(self.id)
+
+    def load_session_key(self):
+        verify_session_update = "SELECT llave_sesion FROM usuario WHERE id = %s"
+
+        cnx = get_connection()
+        cursor = cnx.cursor()
+
+        cursor.execute(verify_session_update, (self.id,))
+
+        queried_session_id = cursor.fetchone()
+
+        close_conn_cursor(cnx, cursor)
+
+        if queried_session_id is not None:
+            self.llave_sesion = queried_session_id[0]
 
     def __tuple__(self, with_id: bool = False) -> tuple:
         """Retornar atributos de usuario como tupla

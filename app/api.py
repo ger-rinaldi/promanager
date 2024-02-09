@@ -8,7 +8,19 @@ from app.models import Proyecto, Roles, Usuario
 bp = Blueprint(
     name="api",
     import_name=__name__,
-    url_prefix="/api/usuario/<string:username>",
+    url_prefix="/api",
+)
+
+
+@bp.get("proyecto/roles")
+def get_proyect_roles():
+    return jsonify(Roles.get_proyect_roles())
+
+
+user_api = Blueprint(
+    name="user_api",
+    import_name="user_api",
+    url_prefix="/usuario/<string:username>",
 )
 
 
@@ -50,7 +62,7 @@ def general_stats(username, proyect_id):
     return jsonify(**data[0])
 
 
-@bp.get("/proyecto/<proyect_id>/user_stats")
+@user_api.get("/proyecto/<proyect_id>/user_stats")
 @required_login
 @need_authorization
 def user_stats(username, proyect_id):
@@ -110,7 +122,7 @@ def user_stats(username, proyect_id):
     return jsonify(**data)
 
 
-@bp.get("/proyecto/<proyect_id>/tareas_equipo")
+@user_api.get("/proyecto/<proyect_id>/tareas_equipo")
 @required_login
 @need_authorization
 def task_per_team(username, proyect_id):
@@ -141,7 +153,7 @@ def task_per_team(username, proyect_id):
     return jsonify(*data)
 
 
-@bp.get("/proyecto/<proyect_id>/miembros_equipo")
+@user_api.get("/proyecto/<proyect_id>/miembros_equipo")
 @required_login
 @need_authorization
 def members_per_team(username, proyect_id):
@@ -170,7 +182,7 @@ def members_per_team(username, proyect_id):
     return jsonify(*data)
 
 
-@bp.get("/proyecto/<proyect_id>/estado_tareas")
+@user_api.get("/proyecto/<proyect_id>/estado_tareas")
 @required_login
 @need_authorization
 def tasks_per_status(username, proyect_id):
@@ -201,7 +213,7 @@ def tasks_per_status(username, proyect_id):
     return jsonify(*data)
 
 
-@bp.post("/proyecto/<proyect_id>/eliminar")
+@user_api.post("/proyecto/<proyect_id>/eliminar")
 @required_login
 @need_authorization
 def delete_proyect(username, proyect_id):
@@ -222,7 +234,7 @@ def delete_proyect(username, proyect_id):
     return success
 
 
-@bp.post("/eliminar")
+@user_api.post("/eliminar")
 @required_login
 @need_authorization
 def delete_user(username):
@@ -245,7 +257,7 @@ def delete_user(username):
     return success
 
 
-@bp.post("/proyecto/<proyect_id>/integrante/agregar")
+@user_api.post("/proyecto/<proyect_id>/integrante/agregar")
 @required_login
 @need_authorization
 def add_integrant(username, proyect_id):
@@ -288,9 +300,9 @@ registrado como {Roles.proyect_role_name(participant_role)} con exito"
     return success
 
 
-@bp.post("/proyecto/<proyect_id>/integrante/modificar")
-# @required_login
-# @need_authorization
+@user_api.post("/proyecto/<proyect_id>/integrante/modificar")
+@required_login
+@need_authorization
 def update_integrant(username, proyect_id):
     errors = []
 
@@ -331,7 +343,7 @@ sido establecido como {Roles.proyect_role_name(participant_role)} con exito"
     return success
 
 
-@bp.post("/proyecto/<proyect_id>/integrante/remover")
+@user_api.post("/proyecto/<proyect_id>/integrante/remover")
 @required_login
 @need_authorization
 def remove_integrant(username, proyect_id):
@@ -363,3 +375,6 @@ def remove_integrant(username, proyect_id):
     )
     success.status = 200
     return success
+
+
+bp.register_blueprint(user_api)

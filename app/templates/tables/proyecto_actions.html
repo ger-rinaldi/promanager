@@ -1,28 +1,30 @@
 <a
   href="/usuario/{{current_user.username}}/{{resource}}/{{row['id '+resource]}}"
+  class="text-center"
+  title="Detalles de proyecto"
 >
   <div class="btn btn-success btn-sm">
     <img
       src="/static/icons/view.png"
       alt=""
-      style="width: 16px; height: 16px"
+      style="width: 14px; height: 14px"
       data-toggle="tooltip"
       data-placement="top"
-      title="Detalles de proyecto"
     />
   </div>
 </a>
 <a
   href="/usuario/{{current_user.username}}/{{resource}}/{{row['id '+resource]}}/integrante"
+  class="text-center"
+  title="Integrantes de proyecto"
 >
   <div class="btn btn-info btn-sm">
     <img
       src="/static/icons/group.png"
       alt=""
-      style="width: 16px; height: 16px"
+      style="width: 14px; height: 14px"
       data-toggle="tooltip"
       data-placement="top"
-      title="Integrantes de proyecto"
     />
   </div>
 </a>
