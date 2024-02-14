@@ -10,14 +10,14 @@ def validate_project(name, budget, start_date, end_date) -> list[str]:
     if not text.budget_type(budget):
         validation_errors.append(errors.bad_budget_type)
 
+    elif not numbers.budget_amount(budget):
+        validation_errors.append(errors.bad_budget_amount)
+
     if not dates.end_after_today(end_date):
         validation_errors.append(errors.end_after_today)
 
     if not dates.start_before_end(start_date, end_date):
         validation_errors.append(errors.start_before)
-
-    elif not numbers.budget_amount(budget):
-        validation_errors.append(errors.bad_budget_amount)
 
     return validation_errors
 
