@@ -3,8 +3,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from app.authentication import need_authorization, required_login
-from app.input_validation import validate_proyect
 from app.models import Proyecto, Roles, Usuario
+from app.validation.full import validate_project
 
 bp = Blueprint(
     name="project",
@@ -73,7 +73,7 @@ def create_proyect(username):
         else:
             proyect_info["activo"]: bool = False
 
-        errors = validate_proyect.validate_all(
+        errors = validate_project(
             name=proyect_info["nombre"],
             budget=proyect_info["presupuesto"],
             start_date=proyect_info["fecha_inicio"],
@@ -133,7 +133,7 @@ def modify_proyect(username, proyect_id):
         else:
             proyect_info["activo"]: bool = False
 
-        errors = validate_proyect.validate_all(
+        errors = validate_project(
             name=proyect_info["nombre"],
             budget=proyect_info["presupuesto"],
             start_date=proyect_info["fecha_inicio"],

@@ -3,8 +3,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from app.authentication import need_authorization, required_login
-from app.input_validation import validate_user
 from app.models import Usuario, prefijos_telefonicos
+from app.validation.full import validate_user_update
 
 bp = Blueprint(
     name="user",
@@ -32,7 +32,7 @@ def modificar_usuario(username):
         phone = form["telefono_numero"]
         nombre_usuario = form["username"]
 
-        errors = validate_user.validate_update(
+        errors = validate_user_update(
             email=email,
             name=name,
             surname=surname,

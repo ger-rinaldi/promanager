@@ -1,8 +1,8 @@
 from flask import Blueprint, make_response, render_template, request
 from werkzeug.utils import redirect
 
+import app.validation as validation
 from app.authentication import generate_session_cookies, required_login
-from app.input_validation import validate_user
 from app.models import Usuario, prefijos_telefonicos
 
 bp = Blueprint(
@@ -28,7 +28,7 @@ def register():
         phone = form["telefono_numero"]
         username = form["username"]
 
-        errors = validate_user.validate_all(
+        errors = validation.validate_user(
             password=password,
             email=email,
             name=name,
@@ -59,14 +59,10 @@ def login():
     if request.method == "POST":
         user_auth_info = request.form
 
-        valid_email = validate_user.email_address_validator(user_auth_info["identif"])
-        registered_email = not validate_user.check_email_not_registered(
-            user_auth_info["identif"]
-        )
-        valid_username = validate_user.username_length(user_auth_info["identif"])
-        registered_username = not validate_user.username_not_registered(
-            user_auth_info["identif"]
-        )
+        valid_email = validation.email_address(user_auth_info["identif"])
+        registered_email = validation.email_exists(user_auth_info["identif"])
+        valid_username = validation.username_length(user_auth_info["identif"])
+        registered_username = validation.username_exists(user_auth_info["identif"])
 
         if not valid_email and not valid_username:
             errors.append("La identificación ingresada no es válida")
