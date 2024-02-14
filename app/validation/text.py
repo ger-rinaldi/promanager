@@ -100,7 +100,7 @@ def budget_type(budget: str):
     total_numbers = len(re.findall(rgx_numbers, budget))
     total_dots = len(re.findall(re.compile("\\."), budget))
 
-    if not total_numbers >= len(budget) - 1:
+    if not (total_numbers >= len(budget) - total_dots):
         return False
 
     if not total_dots <= 1:
