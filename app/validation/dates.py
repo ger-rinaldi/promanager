@@ -1,7 +1,7 @@
 import datetime
 
 
-def start_before_end(cls, start_date: str, end_date: str) -> bool:
+def start_before_end(start_date: str, end_date: str) -> bool:
     start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
     end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
 
@@ -11,7 +11,7 @@ def start_before_end(cls, start_date: str, end_date: str) -> bool:
     return True
 
 
-def end_after_today(cls, end_date: str) -> bool:
+def end_after_today(end_date: str) -> bool:
     end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
     today = datetime.date.today()
 
