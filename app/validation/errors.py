@@ -31,7 +31,7 @@ name_too_long_short: str = f"Tanto nombre como apellido deben tener entre\
 phonetoolong: str = f"El número de teléfono no puede ser mayor a\
 {phone_max_length} caracteres"
 
-proy_bad_name: str = f"Nombre de proyecto inválido. Debe contener entre \
+resource_name_length: str = f"Nombre de recurso inválido. Debe contener entre \
 {name_min_length} y {name_max_length} caracteres."
 
 bad_budget_type: str = "Tipo de presupuesto inválido. Solo puede contener \
@@ -42,6 +42,10 @@ anterior a la de finalización."
 
 end_after_today: str = "Fecha de finalización inválida. El proyecto debe terminar \
 después de la fecha corriente."
+
+date_before_today: str = (
+    "Fecha de creación inválida. El recurso no puede haberse creado después de hoy."
+)
 
 bad_budget_amount: str = "La cantidad de presupuesto no es válida. debe \
 encontrarse entre -2<sup>63</sup> y 2<sup>63</sup>"

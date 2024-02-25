@@ -5,7 +5,7 @@ def validate_project(name, budget, start_date, end_date) -> list[str]:
     validation_errors = []
 
     if not text.name_length(name):
-        validation_errors.append(errors.proy_bad_name)
+        validation_errors.append(errors.resource_name_length)
 
     if not text.budget_type(budget):
         validation_errors.append(errors.bad_budget_type)
@@ -79,5 +79,17 @@ def validate_user_update(
 
     if not text.username_length(username):
         validation_errors.append(errors.username_bad_length)
+
+    return validation_errors
+
+
+def validate_team(name, creation_date):
+    validation_errors = []
+
+    if not dates.before_today(creation_date):
+        validation_errors.append(errors.date_before_today)
+
+    if not text.name_length(name):
+        validation_errors.append(errors.resource_name_length)
 
     return validation_errors
