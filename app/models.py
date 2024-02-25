@@ -820,6 +820,17 @@ class Equipo:
         return teams_of_member
 
     @classmethod
+    def _get_by_project(cls, project_id: int):
+        query = "SELECT * FROM equipo WHERE proyecto = %s"
+
+        with context_db_manager(dict=True) as conn:
+            conn.execute(query, (project_id,))
+
+            teams_of_project: list[dict] | None = conn.fetchall()
+
+        return teams_of_project
+
+    @classmethod
     def get_by_id(csl, task_id):
         query = """
         SELECT
@@ -840,6 +851,20 @@ class Equipo:
             return Equipo(**queried_team)
 
         return None
+
+    @classmethod
+    def exists(cls, team_atribute: int | str):
+        existance_query = "SELECT 1 FROM equipo WHERE %s IN (id, nombre);"
+
+        with context_db_manager() as conn:
+            conn.execute(existance_query, (team_atribute,))
+
+            query_result = conn.fetchone()
+
+        if query_result is None:
+            return False
+
+        return True
 
     def __init__(
         self,
