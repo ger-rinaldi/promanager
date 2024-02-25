@@ -1,30 +1,17 @@
-from flask import Blueprint, jsonify, make_response, render_template, request
-from werkzeug.wrappers import Response
+from flask import Blueprint, jsonify, request
 
 from app.authentication import need_authorization, required_login
 from app.db import context_db_manager
 from app.models import Proyecto, Roles, Usuario
 
-bp = Blueprint(
-    name="api",
+project_service = Blueprint(
+    name="project_service",
     import_name=__name__,
-    url_prefix="/api",
-)
-
-
-@bp.get("proyecto/roles")
-def get_proyect_roles():
-    return jsonify(Roles.get_proyect_roles())
-
-
-user_api = Blueprint(
-    name="user_api",
-    import_name="user_api",
     url_prefix="/usuario/<string:username>",
 )
 
 
-@bp.get("/proyecto/<proyect_id>/gral_stats")
+@project_service.get("/proyecto/<proyect_id>/gral_stats")
 @required_login
 @need_authorization
 def general_stats(username, proyect_id):
@@ -62,7 +49,7 @@ def general_stats(username, proyect_id):
     return jsonify(**data[0])
 
 
-@user_api.get("/proyecto/<proyect_id>/user_stats")
+@project_service.get("/proyecto/<proyect_id>/user_stats")
 @required_login
 @need_authorization
 def user_stats(username, proyect_id):
@@ -122,7 +109,7 @@ def user_stats(username, proyect_id):
     return jsonify(**data)
 
 
-@user_api.get("/proyecto/<proyect_id>/tareas_equipo")
+@project_service.get("/proyecto/<proyect_id>/tareas_equipo")
 @required_login
 @need_authorization
 def task_per_team(username, proyect_id):
@@ -153,7 +140,7 @@ def task_per_team(username, proyect_id):
     return jsonify(*data)
 
 
-@user_api.get("/proyecto/<proyect_id>/miembros_equipo")
+@project_service.get("/proyecto/<proyect_id>/miembros_equipo")
 @required_login
 @need_authorization
 def members_per_team(username, proyect_id):
@@ -182,7 +169,7 @@ def members_per_team(username, proyect_id):
     return jsonify(*data)
 
 
-@user_api.get("/proyecto/<proyect_id>/estado_tareas")
+@project_service.get("/proyecto/<proyect_id>/estado_tareas")
 @required_login
 @need_authorization
 def tasks_per_status(username, proyect_id):
@@ -213,7 +200,7 @@ def tasks_per_status(username, proyect_id):
     return jsonify(*data)
 
 
-@user_api.post("/proyecto/<proyect_id>/eliminar")
+@project_service.post("/proyecto/<proyect_id>/eliminar")
 @required_login
 @need_authorization
 def delete_proyect(username, proyect_id):
@@ -234,30 +221,7 @@ def delete_proyect(username, proyect_id):
     return success
 
 
-@user_api.post("/eliminar")
-@required_login
-@need_authorization
-def delete_user(username):
-    user_to_delete = Usuario.get_by_username_or_mail(username)
-
-    if user_to_delete is None:
-        not_found = jsonify(message="El recurso solicitado no fue encontrado")
-        not_found.status = 404
-        return not_found
-
-    if not user_to_delete._authenticate(username, request.form.get("contrasena_1", "")):
-        access_denied = jsonify(message="No tienes acceso al recurso autorizado")
-        access_denied.status = 403
-        return access_denied
-
-    user_to_delete.delete()
-
-    success = jsonify(message="Eliminado exitosamente")
-    success.status = 200
-    return success
-
-
-@user_api.post("/proyecto/<proyect_id>/integrante/agregar")
+@project_service.post("/proyecto/<proyect_id>/integrante/agregar")
 @required_login
 @need_authorization
 def add_integrant(username, proyect_id):
@@ -300,7 +264,7 @@ registrado como {Roles.proyect_role_name(participant_role)} con exito"
     return success
 
 
-@user_api.post("/proyecto/<proyect_id>/integrante/modificar")
+@project_service.post("/proyecto/<proyect_id>/integrante/modificar")
 @required_login
 @need_authorization
 def update_integrant(username, proyect_id):
@@ -343,7 +307,7 @@ sido establecido como {Roles.proyect_role_name(participant_role)} con exito"
     return success
 
 
-@user_api.post("/proyecto/<proyect_id>/integrante/remover")
+@project_service.post("/proyecto/<proyect_id>/integrante/remover")
 @required_login
 @need_authorization
 def remove_integrant(username, proyect_id):
@@ -375,6 +339,3 @@ def remove_integrant(username, proyect_id):
     )
     success.status = 200
     return success
-
-
-bp.register_blueprint(user_api)

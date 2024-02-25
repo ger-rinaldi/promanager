@@ -37,8 +37,8 @@ def create_app(with_static=True):
 
     new_app.register_blueprint(app.routes_project.bp)
 
-    import app.api
+    from app.api import full_api
 
-    new_app.register_blueprint(app.api.bp)
+    new_app.register_blueprint(full_api)
 
     return new_app
