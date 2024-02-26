@@ -1,5 +1,5 @@
 import click
-from db import (
+from app.db import (
     crear_base_de_datos,
     crear_schemas,
     tirar_base_de_datos,
