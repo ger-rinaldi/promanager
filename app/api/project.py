@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from app.authentication import need_authorization, required_login
 from app.db import context_db_manager
 from app.models import Proyecto, Roles, Usuario
+from app.validation.full import validate_project
 
 project_service = Blueprint(
     name="project_service",
@@ -198,6 +199,95 @@ def tasks_per_status(username, proyect_id):
         return not_found
 
     return jsonify(*data)
+
+
+@project_service.post("/proyecto/crear")
+@required_login
+@need_authorization
+def create_proyect(username):
+
+    proyect_info: dict = {}
+
+    proyect_info.update(request.form)
+
+    gerente_id: str = proyect_info.pop("dueno_id")
+
+    if proyect_info.setdefault("descripcion", False) is not None:
+        proyect_info["descripcion"] = proyect_info["descripcion"].strip()
+
+    proyect_info.setdefault("es_publico", False)
+
+    proyect_info.setdefault("activo", False)
+
+    error_messages = validate_project(
+        name=proyect_info["nombre"],
+        budget=proyect_info["presupuesto"],
+        start_date=proyect_info["fecha_inicio"],
+        end_date=proyect_info["fecha_finalizacion"],
+    )
+
+    if error_messages:
+        return jsonify(message=error_messages), 400
+
+    new_proyect = Proyecto(**proyect_info)
+    new_proyect.create()
+    new_proyect.register_new_participant(gerente_id, 1)
+
+    success = jsonify(
+        message=f"El proyecto {new_proyect.nombre} ha sido creado con exito",
+        redirect=f"/usuario/{username}/proyecto/{new_proyect.id}",
+    )
+    success.status = 200
+    return success
+
+
+@project_service.get("/proyecto/<proyect_id>")
+@required_login
+@need_authorization
+def read_proyect(username, proyect_id):
+    project_read = Proyecto.get_by_id(proyect_id)
+
+    if project_read is None:
+        return jsonify(message="El proyecto solicitado no existe"), 204
+
+    return jsonify(project=dict(project_read)), 200
+
+
+@project_service.post("/proyecto/<proyect_id>/modificar")
+@required_login
+@need_authorization
+def update_proyect(username, proyect_id):
+
+    proyect_info: dict = {}
+
+    proyect_info.update(request.form)
+
+    if proyect_info.setdefault("descripcion", False) is not None:
+        proyect_info["descripcion"] = proyect_info["descripcion"].strip()
+
+    proyect_info.setdefault("es_publico", False)
+
+    proyect_info.setdefault("activo", False)
+
+    error_messages = validate_project(
+        name=proyect_info["nombre"],
+        budget=proyect_info["presupuesto"],
+        start_date=proyect_info["fecha_inicio"],
+        end_date=proyect_info["fecha_finalizacion"],
+    )
+
+    if error_messages:
+        return jsonify(message=error_messages), 400
+
+    proyect_to_update = Proyecto(**proyect_info, instatiate_components=False)
+    proyect_to_update.update()
+
+    success = jsonify(
+        message=f"El proyecto {proyect_to_update.nombre} ha sido creado con exito",
+        redirect=f"/usuario/{username}/proyecto/{proyect_id}",
+    )
+    success.status = 200
+    return success
 
 
 @project_service.post("/proyecto/<proyect_id>/eliminar")
